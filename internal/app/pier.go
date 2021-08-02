@@ -143,6 +143,7 @@ func NewPier(repoRoot string, config *repo.Config) (*Pier, error) {
 				nodeInfo.CertPath = filepath.Join(config.RepoRoot, config.Security.Tlsca)
 				nodeInfo.EnableTLS = config.Security.EnableTLS
 				nodeInfo.CommonName = config.Security.CommonName
+				nodeInfo.AccessCertPath = filepath.Join(config.RepoRoot, config.Security.AccessCert)
 			}
 			nodesInfo = append(nodesInfo, nodeInfo)
 		}
@@ -300,6 +301,7 @@ func NewUnionPier(repoRoot string, config *repo.Config) (*Pier, error) {
 			nodeInfo.CertPath = filepath.Join(config.RepoRoot, config.Security.Tlsca)
 			nodeInfo.EnableTLS = config.Security.EnableTLS
 			nodeInfo.CommonName = config.Security.CommonName
+			nodeInfo.AccessCertPath = filepath.Join(config.RepoRoot, config.Security.AccessCert)
 		}
 		nodesInfo = append(nodesInfo, nodeInfo)
 	}

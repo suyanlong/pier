@@ -392,6 +392,7 @@ func loadClient(keyPath string, grpcAddrs []string, ctx *cli.Context) (rpcx.Clie
 			nodeInfo.CertPath = filepath.Join(repoRoot, "certs/ca.pem")
 			nodeInfo.EnableTLS = config.Security.EnableTLS
 			nodeInfo.CommonName = config.Security.CommonName
+			nodeInfo.AccessCertPath = filepath.Join(config.RepoRoot, config.Security.AccessCert)
 		}
 		nodesInfo = append(nodesInfo, nodeInfo)
 	}
