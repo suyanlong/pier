@@ -3,7 +3,6 @@ package executor
 import (
 	"context"
 	"fmt"
-
 	"github.com/meshplus/bitxhub-kit/storage"
 	"github.com/meshplus/bitxhub-model/pb"
 	"github.com/meshplus/pier/internal/txcrypto"
@@ -15,13 +14,13 @@ var _ Executor = (*ChannelExecutor)(nil)
 
 // ChannelExecutor represents the necessary data for executing interchain txs in appchain
 type ChannelExecutor struct {
-	client      plugins.Client // the client to interact with appchain
-	storage     storage.Storage
-	appchainDID string // appchain did
-	cryptor     txcrypto.Cryptor
-	logger      logrus.FieldLogger
-	ctx         context.Context
-	cancel      context.CancelFunc
+	client     plugins.Client // the client to interact with appchain
+	storage    storage.Storage
+	appchainID string // appchain id
+	cryptor    txcrypto.Cryptor
+	logger     logrus.FieldLogger
+	ctx        context.Context
+	cancel     context.CancelFunc
 }
 
 // New creates new instance of Executor. agent is for interacting with counterpart chain
@@ -31,13 +30,13 @@ func New(client plugins.Client, appchainDID string, storage storage.Storage, cry
 	ctx, cancel := context.WithCancel(context.Background())
 
 	return &ChannelExecutor{
-		client:      client,
-		ctx:         ctx,
-		cancel:      cancel,
-		storage:     storage,
-		appchainDID: appchainDID,
-		cryptor:     cryptor,
-		logger:      logger,
+		client:     client,
+		ctx:        ctx,
+		cancel:     cancel,
+		storage:    storage,
+		appchainID: appchainDID,
+		cryptor:    cryptor,
+		logger:     logger,
 	}, nil
 }
 
@@ -71,7 +70,14 @@ func (e *ChannelExecutor) QueryCallbackMeta() map[string]uint64 {
 	return callbackMeta
 }
 
-// getReceipt only generates one receipt given source chain id and interchain tx index
+func (e *ChannelExecutor) QueryDstRollbackMeta() map[string]uint64 {
+	dstRollbackMeta, err := e.client.GetDstRollbackMeta()
+	if err != nil {
+		return map[string]uint64{}
+	}
+	return dstRollbackMeta
+}
+
 func (e *ChannelExecutor) QueryIBTPReceipt(originalIBTP *pb.IBTP) (*pb.IBTP, error) {
 	if originalIBTP == nil {
 		return nil, fmt.Errorf("empty original ibtp")

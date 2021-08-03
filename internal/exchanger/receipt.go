@@ -9,10 +9,11 @@ import (
 
 func (ex *Exchanger) feedIBTPReceipt(receipt *model.WrappedIBTP) {
 	var pool *Pool
-	act, loaded := ex.receipts.Load(receipt.Ibtp.To)
+	servicePair := fmt.Sprintf("%s-%s", receipt.Ibtp.From, receipt)
+	act, loaded := ex.receipts.Load(servicePair)
 	if !loaded {
-		pool = NewPool()
-		ex.receipts.Store(receipt.Ibtp.To, pool)
+		pool = NewPool(ex.callbackMeta[servicePair] + 1)
+		ex.receipts.Store(servicePair, pool)
 	} else {
 		pool = act.(*Pool)
 	}
@@ -28,12 +29,13 @@ func (ex *Exchanger) feedIBTPReceipt(receipt *model.WrappedIBTP) {
 			for wIbtp := range pool.ch {
 				entry := ex.logger.WithFields(logrus.Fields{"type": wIbtp.Ibtp.Type, "id": wIbtp.Ibtp.ID()})
 				ibtp := wIbtp.Ibtp
-				if ibtp.Index <= ex.callbackCounter[ibtp.To] {
+				if ibtp.Index < pool.beginIdx {
 					pool.delete(ibtp.Index)
 					entry.Warn("Ignore ibtp with invalid index")
 					continue
 				}
-				if ex.callbackCounter[ibtp.To]+1 == ibtp.Index {
+
+				if pool.beginIdx == ibtp.Index {
 					// if this is a failed receipt, try to rollback
 					// else handle it in normal way
 					if wIbtp.IsValid {
@@ -42,7 +44,6 @@ func (ex *Exchanger) feedIBTPReceipt(receipt *model.WrappedIBTP) {
 						ex.exec.Rollback(ibtp, true)
 					}
 
-					ex.callbackCounter[ibtp.To] += 1
 					pool.delete(ibtp.Index)
 					index := ibtp.Index + 1
 					wIbtp := pool.get(index)
@@ -53,7 +54,6 @@ func (ex *Exchanger) feedIBTPReceipt(receipt *model.WrappedIBTP) {
 						} else {
 							ex.exec.Rollback(ibtp, true)
 						}
-						ex.callbackCounter[ibtp.To] += 1
 						pool.delete(ibtp.Index)
 						index++
 						wIbtp = pool.get(index)
