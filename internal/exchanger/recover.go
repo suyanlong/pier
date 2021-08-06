@@ -11,6 +11,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// 恢复
 func (ex *Exchanger) recoverRelay() {
 	// recover possible unrollbacked ibtp
 	callbackMeta := ex.exec.QueryCallbackMeta()
@@ -100,6 +101,7 @@ func (ex *Exchanger) handleMissingCallback(to string, begin, end uint64) error {
 	return nil
 }
 
+// monitor监控
 func (ex *Exchanger) handleMissingIBTPFromMnt(to string, begin, end uint64) error {
 	if begin < 1 {
 		return fmt.Errorf("begin index for missing ibtp is required >= 1")

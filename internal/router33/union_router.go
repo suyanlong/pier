@@ -22,9 +22,9 @@ type UnionRouter struct {
 	syncer           syncer.Syncer
 	logger           logrus.FieldLogger
 	store            storage.Storage
-	appchains        map[string]*appchainmgr.Appchain //appchain 链的管理。
+	appchains        map[string]*appchainmgr.Appchain
 	pbTable          sync.Map
-	connectedPierIDs []string // 所有连接的pierID,这个ID 是唯一的吗？
+	connectedPierIDs []string
 
 	ctx    context.Context
 	cancel context.CancelFunc

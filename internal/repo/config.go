@@ -41,9 +41,9 @@ type HA struct {
 }
 
 const (
-	DirectMode = "direct"
-	RelayMode  = "relay"
-	UnionMode  = "union"
+	DirectMode = "direct"//直连模式
+	RelayMode  = "relay" //中继架构的代表的是部署架构，不够灵活。不能随时变动。
+	UnionMode  = "union" //联盟模式。
 )
 
 type Mode struct {

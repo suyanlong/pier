@@ -159,6 +159,7 @@ func (ex *Exchanger) handleUnionIBTP(wIbtp *model.WrappedIBTP) {
 	ex.logger.WithFields(logrus.Fields{"index": ibtp.Index, "type": ibtp.Type, "from": ibtp.From, "id": ibtp.ID()}).Info("Route tx successful")
 }
 
+//联盟模式主要是从bithub上同步appchain信息。
 func (ex *Exchanger) handleProviderAppchains() error {
 	appchains, err := ex.syncer.GetAppchains()
 	if err != nil {
@@ -184,6 +185,7 @@ func (ex *Exchanger) handleRouterSendIBTPMessage(stream network.Stream, msg *pee
 			"id":    ibtp.ID(),
 		})
 
+		// 这个可以放到Router里面路由。
 		retMsg := peermgr.Message(peerMsg.Message_ACK, true, nil)
 		if !ex.router.ExistAppchain(ibtp.To) {
 			entry.WithField("appchain", ibtp.To).Errorf("cannot found appchain in relay network")

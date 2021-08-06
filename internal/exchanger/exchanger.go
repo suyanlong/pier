@@ -39,7 +39,7 @@ type Exchanger struct {
 	callbackCounter      map[string]uint64
 	sourceReceiptCounter map[string]uint64
 
-	apiServer       *api.Server
+	apiServer       *api.Server //直连模式使用，联盟模式就不用了。
 	peerMgr         peermgr.PeerManager
 	checker         checker.Checker
 	sendIBTPCounter atomic.Uint64
@@ -86,7 +86,7 @@ func (ex *Exchanger) Start() error {
 		err = ex.startWithDirectMode()
 	case repo.RelayMode:
 		err = ex.startWithRelayMode()
-	case repo.UnionMode:
+	case repo.UnionMode: //主要是同步信息，是从联盟链
 		err = ex.startWithUnionMode()
 	}
 
@@ -295,8 +295,9 @@ func (ex *Exchanger) Stop() error {
 func (ex *Exchanger) sendIBTP(ibtp *pb.IBTP) error {
 	entry := ex.logger.WithFields(logrus.Fields{"index": ibtp.Index, "type": ibtp.Type, "to": ibtp.To, "id": ibtp.ID()})
 
+	//所有的这些模式全部都在路由规则里面。
 	switch ex.mode {
-	case repo.UnionMode:
+	case repo.UnionMode:// 没有这个模式吗？发送消息的时候。
 		fallthrough
 	case repo.RelayMode:
 		err := ex.syncer.SendIBTP(ibtp)
@@ -315,13 +316,14 @@ func (ex *Exchanger) sendIBTP(ibtp *pb.IBTP) error {
 			if err != nil {
 				panic(fmt.Sprintf("marshal ibtp: %s", err.Error()))
 			}
+			//peer间传输是另一套协议。
 			msg := peermgr.Message(peerMsg.Message_IBTP_SEND, true, data)
 
 			var dst string
-			if ibtp.Type == pb.IBTP_INTERCHAIN {
+			if ibtp.Type == pb.IBTP_INTERCHAIN {//是否是跨链交易？
 				dst = ibtp.To
 			} else {
-				dst = ibtp.From
+				dst = ibtp.From //否则原路返回？
 			}
 
 			if err := ex.peerMgr.AsyncSend(dst, msg); err != nil {
@@ -356,7 +358,7 @@ func (ex *Exchanger) queryIBTP(id, target string) (*pb.IBTP, bool, error) {
 		err     error
 	)
 	switch ex.mode {
-	case repo.RelayMode:
+	case repo.RelayMode://中继模式是查询bithub上的ibtp交易根据交易ID。
 		ibtp, isValid, err = ex.syncer.QueryIBTP(id)
 		if err != nil {
 			if errors.Is(err, syncer.ErrIBTPNotFound) {
