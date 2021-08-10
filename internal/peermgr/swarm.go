@@ -50,20 +50,22 @@ func New(config *repo.Config, nodePrivKey crypto.PrivateKey, privKey crypto.Priv
 	}
 	var local string
 	var remotes map[string]*peer.AddrInfo
-	switch config.Mode.Type {
-	case repo.UnionMode:
-		local, remotes, err = loadPeers(config.Mode.Union.Connectors, libp2pPrivKey)
-		if err != nil {
-			return nil, fmt.Errorf("load peers: %w", err)
-		}
-	case repo.DirectMode:
-		local, remotes, err = loadPeers(config.Mode.Direct.Peers, libp2pPrivKey)
-		if err != nil {
-			return nil, fmt.Errorf("load peers: %w", err)
-		}
-	default:
-		return nil, fmt.Errorf("unsupport mode type")
-	}
+	//switch config.Mode.Type {
+	//case repo.UnionMode:
+	//	local, remotes, err = loadPeers(config.Mode.Union.Connectors, libp2pPrivKey)
+	//	if err != nil {
+	//		return nil, fmt.Errorf("load peers: %w", err)
+	//	}
+	//case repo.DirectMode:
+	//	local, remotes, err = loadPeers(config.Mode.Direct.Peers, libp2pPrivKey)
+	//	if err != nil {
+	//		return nil, fmt.Errorf("load peers: %w", err)
+	//	}
+	//default:
+	//	return nil, fmt.Errorf("unsupport mode type")
+	//}
+
+	local, remotes, err = loadPeers(config.Mode.Peers, libp2pPrivKey)
 
 	var protocolIDs = []string{protocolID}
 

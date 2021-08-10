@@ -62,3 +62,7 @@ func CreateClient(pierID string, appchainConfig repo.Appchain, extra []byte) (Cl
 
 	return appchain, client, nil
 }
+
+func CreateClients(appchainConfigs repo.Appchains, extra []byte) {
+
+}

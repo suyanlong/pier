@@ -41,10 +41,10 @@ Monitor receives event from blockchain and sends it to network
 
 ## exchanger(舍弃)
 是整个核心上层，是一个整体循环，或者说系统的整个动力系统。
-在sidercar里Router才是整个系统的动力系统
+在sidercar里Router才是整个系统的动力系统。
 
 ## executor
-ChannelExecutor represents the necessary data for executing interchain txs in appchain
+ChannelExecutor represents the necessary data for executing interchain txs in appchain。
 主要是和appchain交互，下沉到client下面，每个插件可以实现它。
 
 
@@ -53,7 +53,7 @@ ChannelExecutor represents the necessary data for executing interchain txs in ap
 
 
 ## rulemgr 规则验证管理，
-主要是验证交易里面的存在性签名，
+主要是验证交易里面的存在性签名。
 如果仅仅是转发的话。这个模块可以不用的。
 
 sidercar 作用主要是路由转发，路由可以由用户设定。
@@ -89,6 +89,7 @@ peer管理服务
 * 节点ID，每一个节点的ID都是唯一的（p2p ID）。
 * 插件ID，每一个插件ID都是唯一的。插件绑定的链ID，才是主要路由的ID。
 * sidercar ID每一个都是唯一的，可以用是p2p的ID充当。
+* 
 
 
 sidercar ID （如果目的地址（to）是自己，那就是转发或者存储。）
@@ -101,6 +102,8 @@ plugin ID就是绑定的链ID（appchain ID）
 sidercar ID 也可以作为路由的ID，绑定自身的唯一 peer ID，(用于指定路由)（转发消息）
 
 other blockchain peer ID 这个就用链ID映射吧（直链）
+
+
 
 
 

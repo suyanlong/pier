@@ -13,14 +13,15 @@ import (
 
 // Config represents the necessary config data for starting pier
 type Config struct {
-	RepoRoot string
-	Title    string   `toml:"title" json:"title"`
-	Port     Port     `toml:"port" json:"port"`
-	Mode     Mode     `toml:"mode" json:"mode"`
-	Log      Log      `toml:"log" json:"log"`
-	Appchain Appchain `toml:"appchain" json:"appchain"`
-	Security Security `toml:"security" json:"security"`
-	HA       HA       `toml:"ha" json:"ha"`
+	RepoRoot  string
+	Title     string    `toml:"title" json:"title"`
+	Port      Port      `toml:"port" json:"port"`
+	Mode      Mode      `toml:"mode" json:"mode"`
+	Log       Log       `toml:"log" json:"log"`
+	Appchain  Appchain  `toml:"appchain" json:"appchain"`
+	Appchains Appchains `toml:"appchains" json:"appchains"`
+	Security  Security  `toml:"security" json:"security"`
+	HA        HA        `toml:"ha" json:"ha"`
 }
 
 // Security are certs used to setup connection with tls
@@ -41,9 +42,9 @@ type HA struct {
 }
 
 const (
-	DirectMode = "direct"//直连模式
-	RelayMode  = "relay" //中继架构的代表的是部署架构，不够灵活。不能随时变动。
-	UnionMode  = "union" //联盟模式。
+	DirectMode = "direct" //直连模式
+	RelayMode  = "relay"  //中继架构的代表的是部署架构，不够灵活。不能随时变动。
+	UnionMode  = "union"  //联盟模式。
 )
 
 type Mode struct {
@@ -51,6 +52,13 @@ type Mode struct {
 	Relay  Relay  `toml:"relay" json:"relay"`
 	Direct Direct `toml:"direct" json:"direct"`
 	Union  Union  `toml:"union" json:"union"`
+
+	// TODO 连接节点
+	Peers []string `toml:"peers" json:"peers"`
+	//TODO 获取节点
+	Addrs      []string `toml:"addrs" json:"addrs"`
+	Connectors []string `toml:"connectors" json:"connectors"`
+	Providers  uint64   `toml:"providers" json:"providers"`
 }
 
 // Relay are configs about bitxhub
@@ -110,6 +118,10 @@ type Appchain struct {
 	Plugin string `toml:"plugin" json:"plugin"`
 }
 
+type Appchains struct {
+	Appchains []Appchain
+}
+
 // DefaultConfig returns config with default value
 func DefaultConfig() *Config {
 	return &Config{
@@ -139,6 +151,9 @@ func DefaultConfig() *Config {
 				Connectors: []string{},
 				Providers:  1,
 			},
+			Addrs:      []string{"localhost:60011"},
+			Connectors: []string{},
+			Providers:  1,
 		},
 		Log: Log{
 			Dir:          "logs",

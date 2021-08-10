@@ -297,7 +297,7 @@ func (ex *Exchanger) sendIBTP(ibtp *pb.IBTP) error {
 
 	//所有的这些模式全部都在路由规则里面。
 	switch ex.mode {
-	case repo.UnionMode:// 没有这个模式吗？发送消息的时候。
+	case repo.UnionMode: // 没有这个模式吗？发送消息的时候。
 		fallthrough
 	case repo.RelayMode:
 		err := ex.syncer.SendIBTP(ibtp)
@@ -320,7 +320,7 @@ func (ex *Exchanger) sendIBTP(ibtp *pb.IBTP) error {
 			msg := peermgr.Message(peerMsg.Message_IBTP_SEND, true, data)
 
 			var dst string
-			if ibtp.Type == pb.IBTP_INTERCHAIN {//是否是跨链交易？
+			if ibtp.Type == pb.IBTP_INTERCHAIN { //是否是跨链交易？
 				dst = ibtp.To
 			} else {
 				dst = ibtp.From //否则原路返回？
@@ -358,7 +358,7 @@ func (ex *Exchanger) queryIBTP(id, target string) (*pb.IBTP, bool, error) {
 		err     error
 	)
 	switch ex.mode {
-	case repo.RelayMode://中继模式是查询bithub上的ibtp交易根据交易ID。
+	case repo.RelayMode: //中继模式是查询bithub上的ibtp交易根据交易ID。
 		ibtp, isValid, err = ex.syncer.QueryIBTP(id)
 		if err != nil {
 			if errors.Is(err, syncer.ErrIBTPNotFound) {
