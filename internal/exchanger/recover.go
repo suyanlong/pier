@@ -101,7 +101,7 @@ func (ex *Exchanger) handleMissingCallback(to string, begin, end uint64) error {
 	return nil
 }
 
-// monitor监控
+// monitor监控：获取丢失的数据，获取appchain一侧的。
 func (ex *Exchanger) handleMissingIBTPFromMnt(to string, begin, end uint64) error {
 	if begin < 1 {
 		return fmt.Errorf("begin index for missing ibtp is required >= 1")

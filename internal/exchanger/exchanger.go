@@ -32,7 +32,7 @@ type Exchanger struct {
 	store                storage.Storage
 	mnt                  monitor.Monitor
 	exec                 executor.Executor
-	syncer               syncer.Syncer
+	syncer               syncer.Syncer // WrapperSyncer represents the necessary data for sync tx wrappers from bitxhub
 	router               router.Router
 	interchainCounter    map[string]uint64
 	executorCounter      map[string]uint64
@@ -357,6 +357,8 @@ func (ex *Exchanger) queryIBTP(id, target string) (*pb.IBTP, bool, error) {
 		isValid bool
 		err     error
 	)
+
+	// 交易中，如果是用户，根据用户指定，如果没有按默认配置，依次排序。
 	switch ex.mode {
 	case repo.RelayMode: //中继模式是查询bithub上的ibtp交易根据交易ID。
 		ibtp, isValid, err = ex.syncer.QueryIBTP(id)
