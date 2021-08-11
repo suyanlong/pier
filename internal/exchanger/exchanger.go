@@ -104,6 +104,7 @@ func (ex *Exchanger) Start() error {
 	return nil
 }
 
+//直链模式
 func (ex *Exchanger) startWithDirectMode() error {
 	if err := ex.apiServer.Start(); err != nil {
 		return fmt.Errorf("peerMgr start: %w", err)

@@ -11,7 +11,6 @@ import (
 	"github.com/Rican7/retry/strategy"
 	"github.com/hashicorp/go-plugin"
 	"github.com/meshplus/bitxhub-core/agency"
-	appchainmgr "github.com/meshplus/bitxhub-core/appchain-mgr"
 	"github.com/meshplus/bitxhub-kit/crypto"
 	"github.com/meshplus/bitxhub-kit/storage"
 	"github.com/meshplus/bitxhub-kit/storage/leveldb"
@@ -44,20 +43,21 @@ import (
 // Pier represents the necessary data for starting the pier app
 type Pier struct {
 	privateKey crypto.PrivateKey
-	plugin     plugins.Client
-	grpcPlugin *plugin.Client
-	monitor    monitor.Monitor
-	exec       executor.Executor
-	lite       lite.Lite
-	pierHA     agency.PierHA
-	storage    storage.Storage
-	exchanger  exchanger.IExchanger
-	ctx        context.Context
-	cancel     context.CancelFunc
-	appchain   *appchainmgr.Appchain
-	meta       *pb.Interchain
-	config     *repo.Config
-	logger     logrus.FieldLogger
+	plugin     plugins.Client  //Client defines the interface that interacts with appchain 交互接口
+	grpcPlugin *plugin.Client  //plugin grpc 接口，关闭接口。可以定义到plugin里面
+	monitor    monitor.Monitor //Monitor receives event from blockchain and sends it to network
+	//Syncer 与 bithub交互的接口机制。
+	exec      executor.Executor    //represents the necessary data for executing interchain txs in appchain：与appchain链交互执行的接口
+	lite      lite.Lite            //轻客户度
+	pierHA    agency.PierHA        //集群模式
+	storage   storage.Storage      // 存储模式
+	exchanger exchanger.IExchanger //主动交换，pier的核心动力引擎。
+	ctx       context.Context
+	cancel    context.CancelFunc
+	//appchain   *appchainmgr.Appchain //appchain管理机制
+	meta   *pb.Interchain //元数据
+	config *repo.Config
+	logger logrus.FieldLogger
 }
 
 // NewPier instantiates pier instance.
@@ -97,7 +97,7 @@ func NewPier(repoRoot string, config *repo.Config) (*Pier, error) {
 	)
 
 	switch config.Mode.Type {
-	case repo.DirectMode:
+	case repo.DirectMode: //直链模式
 		peerManager, err = peermgr.New(config, nodePrivKey, privateKey, 1, loggers.Logger(loggers.PeerMgr))
 		if err != nil {
 			return nil, fmt.Errorf("peerMgr create: %w", err)
@@ -127,7 +127,7 @@ func NewPier(repoRoot string, config *repo.Config) (*Pier, error) {
 
 		meta = &pb.Interchain{}
 		lite = &direct_lite.MockLite{}
-	case repo.RelayMode:
+	case repo.RelayMode: //中继链架构模式。
 		ck = &checker.MockChecker{}
 
 		// pier register to bitxhub and got meta infos about its related

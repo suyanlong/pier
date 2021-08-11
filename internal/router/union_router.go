@@ -11,15 +11,14 @@ import (
 	"github.com/meshplus/bitxhub-model/pb"
 	"github.com/meshplus/pier/internal/peermgr"
 	peerproto "github.com/meshplus/pier/internal/peermgr/proto"
-	"github.com/meshplus/pier/internal/syncer"
 	"github.com/sirupsen/logrus"
 )
 
 var _ Router = (*UnionRouter)(nil)
 
 type UnionRouter struct {
-	peermgr          peermgr.PeerManager
-	syncer           syncer.Syncer
+	peermgr peermgr.PeerManager
+	//syncer           syncer.Syncer 未使用
 	logger           logrus.FieldLogger
 	store            storage.Storage
 	appchains        map[string]*appchainmgr.Appchain //appchain 链的管理。

@@ -1,11 +1,17 @@
 package exchanger
 
 import (
+	"encoding/json"
 	"fmt"
 	"sync"
 	"time"
 
+	"github.com/Rican7/retry"
+	"github.com/Rican7/retry/strategy"
 	"github.com/meshplus/bitxhub-model/pb"
+	network "github.com/meshplus/go-lightp2p"
+	"github.com/meshplus/pier/internal/peermgr"
+	peerMsg "github.com/meshplus/pier/internal/peermgr/proto"
 	"github.com/meshplus/pier/pkg/model"
 	"github.com/sirupsen/logrus"
 )
@@ -144,6 +150,178 @@ func (ex *Exchanger) feedReceipt(receipt *pb.IBTP) {
 				}
 			}
 		}(pool)
+	}
+}
+
+func (ex *Exchanger) postHandleIBTP(from string, receipt *pb.IBTP) {
+	if receipt == nil {
+		retMsg := peermgr.Message(peerMsg.Message_IBTP_RECEIPT_SEND, true, nil)
+		err := ex.peerMgr.AsyncSend(from, retMsg)
+		if err != nil {
+			ex.logger.Errorf("Send back empty ibtp receipt: %s", err.Error())
+		}
+		return
+	}
+
+	data, _ := receipt.Marshal()
+	retMsg := peermgr.Message(peerMsg.Message_IBTP_RECEIPT_SEND, true, data)
+	if err := ex.peerMgr.AsyncSend(from, retMsg); err != nil {
+		ex.logger.Errorf("Send back ibtp receipt: %s", err.Error())
+	}
+}
+
+//直链模式
+func (ex *Exchanger) handleSendIBTPMessage(stream network.Stream, msg *peerMsg.Message) {
+	ex.ch <- struct{}{}
+	go func(msg *peerMsg.Message) {
+		wIbtp := &model.WrappedIBTP{}
+		if err := json.Unmarshal(msg.Payload.Data, wIbtp); err != nil {
+			ex.logger.Errorf("Unmarshal ibtp: %s", err.Error())
+			return
+		}
+		defer ex.timeCost()()
+		err := ex.checker.Check(wIbtp.Ibtp)
+		if err != nil {
+			ex.logger.Error("check ibtp: %w", err)
+			return
+		}
+
+		ex.feedIBTP(wIbtp)
+		<-ex.ch
+	}(msg)
+}
+
+func (ex *Exchanger) handleSendIBTPReceiptMessage(stream network.Stream, msg *peerMsg.Message) {
+	if msg.Payload.Data == nil {
+		return
+	}
+	receipt := &pb.IBTP{}
+	if err := receipt.Unmarshal(msg.Payload.Data); err != nil {
+		ex.logger.Error("unmarshal ibtp: %w", err)
+		return
+	}
+
+	// ignore msg for receipt type
+	if receipt.Type == pb.IBTP_RECEIPT_SUCCESS || receipt.Type == pb.IBTP_RECEIPT_FAILURE {
+		//ex.logger.Warn("ignore receipt ibtp")
+		return
+	}
+
+	err := ex.checker.Check(receipt)
+	if err != nil {
+		ex.logger.Error("check ibtp: %w", err)
+		return
+	}
+
+	ex.feedReceipt(receipt)
+
+	ex.logger.Info("Receive ibtp receipt from other pier")
+}
+
+func (ex *Exchanger) handleGetIBTPMessage(stream network.Stream, msg *peerMsg.Message) {
+	ibtpID := string(msg.Payload.Data)
+	ibtp, err := ex.mnt.QueryIBTP(ibtpID)
+	if err != nil {
+		ex.logger.Error("Get wrong ibtp id")
+		return
+	}
+
+	data, err := ibtp.Marshal()
+	if err != nil {
+		return
+	}
+
+	retMsg := peermgr.Message(peerMsg.Message_ACK, true, data)
+
+	err = ex.peerMgr.AsyncSendWithStream(stream, retMsg)
+	if err != nil {
+		ex.logger.Error(err)
+	}
+}
+
+func (ex *Exchanger) handleNewConnection(dstPierID string) {
+	appchainMethod := []byte(ex.appchainDID)
+	msg := peermgr.Message(peerMsg.Message_INTERCHAIN_META_GET, true, appchainMethod)
+
+	indices := &struct {
+		InterchainIndex uint64 `json:"interchain_index"`
+		ReceiptIndex    uint64 `json:"receipt_index"`
+	}{}
+
+	loop := func() error {
+		interchainMeta, err := ex.peerMgr.Send(dstPierID, msg)
+		if err != nil {
+			return err
+		}
+
+		if !interchainMeta.Payload.Ok {
+			return fmt.Errorf("interchain meta message payload is false")
+		}
+
+		if err = json.Unmarshal(interchainMeta.Payload.Data, indices); err != nil {
+			return err
+		}
+
+		return nil
+	}
+
+	if err := retry.Retry(func(attempt uint) error {
+		return loop()
+	}, strategy.Wait(1*time.Second)); err != nil {
+		ex.logger.Panic(err)
+	}
+
+	ex.recoverDirect(dstPierID, indices.InterchainIndex, indices.ReceiptIndex)
+}
+
+func (ex *Exchanger) recoverDirect(dstPierID string, interchainIndex uint64, receiptIndex uint64) {
+	// recover unsent interchain ibtp
+	mntMeta := ex.mnt.QueryOuterMeta()
+	index, ok := mntMeta[dstPierID]
+	if !ok {
+		ex.logger.Infof("Appchain %s not exist", dstPierID)
+		return
+	}
+	if err := ex.handleMissingIBTPFromMnt(dstPierID, interchainIndex+1, index+1); err != nil {
+		ex.logger.WithFields(logrus.Fields{"address": dstPierID, "error": err.Error()}).Error("Handle missing ibtp")
+	}
+
+	// recoverDirect unsent receipt to counterpart chain
+	execMeta := ex.exec.QueryInterchainMeta()
+	idx := execMeta[dstPierID]
+	if err := ex.handleMissingReceipt(dstPierID, receiptIndex+1, idx+1); err != nil {
+		ex.logger.WithFields(logrus.Fields{"address": dstPierID, "error": err.Error()}).Panic("Get missing receipt from contract")
+	}
+}
+
+func (ex *Exchanger) handleGetInterchainMessage(stream network.Stream, msg *peerMsg.Message) {
+	mntMeta := ex.mnt.QueryOuterMeta()
+	execMeta := ex.exec.QueryInterchainMeta()
+
+	indices := &struct {
+		InterchainIndex uint64 `json:"interchain_index"`
+		ReceiptIndex    uint64 `json:"receipt_index"`
+	}{}
+
+	execLoad, ok := execMeta[string(msg.Payload.Data)]
+	if ok {
+		indices.InterchainIndex = execLoad
+	}
+
+	mntLoad, ok := mntMeta[string(msg.Payload.Data)]
+	if ok {
+		indices.InterchainIndex = mntLoad
+	}
+
+	data, err := json.Marshal(indices)
+	if err != nil {
+		panic(err)
+	}
+
+	retMsg := peermgr.Message(peerMsg.Message_ACK, true, data)
+	if err := ex.peerMgr.AsyncSendWithStream(stream, retMsg); err != nil {
+		ex.logger.Error(err)
+		return
 	}
 }
 

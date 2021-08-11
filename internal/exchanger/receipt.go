@@ -7,6 +7,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+//中继模式
 func (ex *Exchanger) feedIBTPReceipt(receipt *model.WrappedIBTP) {
 	var pool *Pool
 	act, loaded := ex.receipts.Load(receipt.Ibtp.To)

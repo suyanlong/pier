@@ -11,7 +11,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// 恢复
+//中继模式：恢复
 func (ex *Exchanger) recoverRelay() {
 	// recover possible unrollbacked ibtp
 	callbackMeta := ex.exec.QueryCallbackMeta()
@@ -52,26 +52,7 @@ func (ex *Exchanger) recoverRelay() {
 	}
 }
 
-func (ex *Exchanger) recoverDirect(dstPierID string, interchainIndex uint64, receiptIndex uint64) {
-	// recover unsent interchain ibtp
-	mntMeta := ex.mnt.QueryOuterMeta()
-	index, ok := mntMeta[dstPierID]
-	if !ok {
-		ex.logger.Infof("Appchain %s not exist", dstPierID)
-		return
-	}
-	if err := ex.handleMissingIBTPFromMnt(dstPierID, interchainIndex+1, index+1); err != nil {
-		ex.logger.WithFields(logrus.Fields{"address": dstPierID, "error": err.Error()}).Error("Handle missing ibtp")
-	}
-
-	// recoverDirect unsent receipt to counterpart chain
-	execMeta := ex.exec.QueryInterchainMeta()
-	idx := execMeta[dstPierID]
-	if err := ex.handleMissingReceipt(dstPierID, receiptIndex+1, idx+1); err != nil {
-		ex.logger.WithFields(logrus.Fields{"address": dstPierID, "error": err.Error()}).Panic("Get missing receipt from contract")
-	}
-}
-
+//中继模式
 func (ex *Exchanger) handleMissingCallback(to string, begin, end uint64) error {
 	if begin < 1 {
 		return fmt.Errorf("begin index for missing callbacks is required >= 1")

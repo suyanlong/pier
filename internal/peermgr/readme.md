@@ -105,6 +105,14 @@ other blockchain peer ID 这个就用链ID映射吧（直链）
 
 
 
+pier:
+* UnionMode：pier之间之间组成联盟。路由与转发。
+* 直链模式：pier 节点直链，不经过中继链。
+* RelayMode：中继连架构。
+
+
+
+
 
 
 
