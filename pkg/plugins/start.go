@@ -31,7 +31,7 @@ func CreateClient(pierID string, appchainConfig repo.Appchain, extra []byte) (Cl
 		Cmd:             exec.Command("sh", "-c", pluginPath),
 		Logger:          logger,
 		AllowedProtocols: []plugin.Protocol{
-			plugin.ProtocolGRPC},
+			plugin.ProtocolGRPC}, //只支持grpc
 	})
 
 	// Connect via RPC

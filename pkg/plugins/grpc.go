@@ -9,6 +9,7 @@ import (
 	"github.com/meshplus/bitxhub-model/pb"
 )
 
+// 实现 AppchainPluginServer接口，具体逻辑委托给业务接口Client的实现。主要是给插件进程使用。
 // ---- gRPC Server domain ----
 type GRPCServer struct {
 	Impl Client
@@ -134,6 +135,7 @@ func (s *GRPCServer) Type(context.Context, *pb.Empty) (*pb.TypeResponse, error) 
 
 // ---- gRPC Client domain ----
 
+// GRPCClient 实现了Client接口。此实现只是将请求转发给gRPC服务处理，通过gRPC客户端转发请求给插件进程
 // GRPCClient is an implementation of Client that talks over RPC.
 type GRPCClient struct {
 	client      pb.AppchainPluginClient

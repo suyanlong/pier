@@ -4,7 +4,7 @@ import (
 	"github.com/meshplus/bitxhub-model/pb"
 )
 
-// Client defines the interface that interacts with appchain
+// Client defines the interface that interacts with appchain 与 appchain交互。
 //go:generate mockgen -destination mock_client/mock_client.go -package mock_client -source interface.go
 type Client interface {
 	// Initialize initialize plugin client
