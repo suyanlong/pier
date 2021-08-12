@@ -294,6 +294,7 @@ func (ex *Exchanger) recoverDirect(dstPierID string, interchainIndex uint64, rec
 	}
 }
 
+//直链模式
 func (ex *Exchanger) handleGetInterchainMessage(stream network.Stream, msg *peerMsg.Message) {
 	mntMeta := ex.mnt.QueryOuterMeta()
 	execMeta := ex.exec.QueryInterchainMeta()
@@ -325,6 +326,7 @@ func (ex *Exchanger) handleGetInterchainMessage(stream network.Stream, msg *peer
 	}
 }
 
+//直链模式
 func (ex *Exchanger) analysisDirectTPS() {
 	ticker := time.NewTicker(time.Second)
 	defer ticker.Stop()

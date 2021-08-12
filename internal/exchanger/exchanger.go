@@ -39,7 +39,7 @@ type Exchanger struct {
 	callbackCounter      map[string]uint64
 	sourceReceiptCounter map[string]uint64
 
-	apiServer       *api.Server //直连模式使用，联盟模式就不用了。
+	apiServer       *api.Server //直连模式使用
 	peerMgr         peermgr.PeerManager
 	checker         checker.Checker
 	sendIBTPCounter atomic.Uint64
@@ -86,7 +86,7 @@ func (ex *Exchanger) Start() error {
 		err = ex.startWithDirectMode()
 	case repo.RelayMode:
 		err = ex.startWithRelayMode()
-	case repo.UnionMode: //主要是同步信息，是从联盟链
+	case repo.UnionMode:
 		err = ex.startWithUnionMode()
 	}
 
@@ -184,6 +184,7 @@ func (ex *Exchanger) startWithUnionMode() error {
 	return nil
 }
 
+//非联盟模式：中继、直链
 func (ex *Exchanger) listenAndSendIBTPFromMnt() {
 	ch := ex.mnt.ListenIBTP()
 	for {
@@ -235,6 +236,7 @@ func (ex *Exchanger) listenAndSendIBTPFromMnt() {
 	}
 }
 
+// 非直链模式
 func (ex *Exchanger) listenAndSendIBTPFromSyncer() {
 	ch := ex.syncer.ListenIBTP()
 	for {

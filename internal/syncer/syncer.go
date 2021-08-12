@@ -171,11 +171,13 @@ func (syncer *WrapperSyncer) syncInterchainTxWrappers() {
 
 	}
 
+	//持续监听事件，
 	for {
 		select {
 		case <-syncer.ctx.Done():
 			return
 		default:
+			//开启监听
 			ch := syncer.getWrappersChannel()
 
 			err := retry.Retry(func(attempt uint) error {
@@ -217,6 +219,7 @@ func (syncer *WrapperSyncer) getWrappersChannel() chan *pb.InterchainTxWrappers 
 	subKey := &SubscriptionKey{syncer.pierID, syncer.appchainDID}
 	subKeyData, _ := json.Marshal(subKey)
 	if err := retry.Retry(func(attempt uint) error {
+		//订阅消息
 		rawCh, err = syncer.client.Subscribe(syncer.ctx, subscriptType, subKeyData)
 		if err != nil {
 			return err
@@ -233,7 +236,7 @@ func (syncer *WrapperSyncer) getWrappersChannel() chan *pb.InterchainTxWrappers 
 			select {
 			case <-syncer.ctx.Done():
 				return
-			case h, ok := <-rawCh:
+			case h, ok := <-rawCh: //监听订阅消息
 				if !ok {
 					close(ch)
 					return

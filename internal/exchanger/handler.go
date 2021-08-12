@@ -110,6 +110,7 @@ func (ex *Exchanger) applyInterchain(wIbtp *model.WrappedIBTP, entry logrus.Fiel
 	ex.executorCounter[ibtp.From] = ibtp.Index
 }
 
+//中继模式
 func (ex *Exchanger) handleRollback(ibtp *pb.IBTP) {
 	if ibtp.Category() == pb.IBTP_RESPONSE {
 		// if this is receipt type of ibtp, no need to rollback
@@ -159,7 +160,7 @@ func (ex *Exchanger) handleUnionIBTP(wIbtp *model.WrappedIBTP) {
 	ex.logger.WithFields(logrus.Fields{"index": ibtp.Index, "type": ibtp.Type, "from": ibtp.From, "id": ibtp.ID()}).Info("Route tx successful")
 }
 
-//联盟模式主要是从bithub上同步appchain信息。
+//联盟模式: 主要是从bithub上同步appchain信息。
 func (ex *Exchanger) handleProviderAppchains() error {
 	appchains, err := ex.syncer.GetAppchains()
 	if err != nil {
@@ -168,7 +169,7 @@ func (ex *Exchanger) handleProviderAppchains() error {
 	return ex.router.AddAppchains(appchains)
 }
 
-//handleRouterSendIBTPMessage handles IBTP from union interchain network
+//联盟模式: handleRouterSendIBTPMessage handles IBTP from union interchain network
 func (ex *Exchanger) handleRouterSendIBTPMessage(stream network.Stream, msg *peerMsg.Message) {
 	handle := func() error {
 		wIbtp := &model.WrappedIBTP{}
@@ -218,6 +219,7 @@ func (ex *Exchanger) timeCost() func() {
 	}
 }
 
+//联盟模式:
 func (ex *Exchanger) handleRecover(ibtp *pb.IBTP) (*rpcx.Interchain, error) {
 	pierId, err := ex.peerMgr.FindProviders(ibtp.To)
 	if err != nil {
@@ -242,6 +244,7 @@ func (ex *Exchanger) handleRecover(ibtp *pb.IBTP) (*rpcx.Interchain, error) {
 	return ic, nil
 }
 
+//联盟模式:
 func (ex *Exchanger) handleRouterInterchain(s network.Stream, msg *peerMsg.Message) {
 	ic := ex.syncer.GetInterchainById(string(msg.Payload.Data))
 	data, err := ic.Marshal()
