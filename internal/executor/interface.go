@@ -34,4 +34,5 @@ type Executor interface {
 	QueryIBTPReceipt(originalIBTP *pb.IBTP) (*pb.IBTP, error)
 }
 
-// 是否可以重构，意义不是多大。
+// 是否可以重构，意义不是多大。视乎与Monitor意义一样。可以抽象为同一接口。
+// BxhClient 实现，这个接口

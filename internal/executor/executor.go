@@ -13,7 +13,7 @@ import (
 
 var _ Executor = (*ChannelExecutor)(nil)
 
-// ChannelExecutor represents the necessary data for executing interchain txs in appchain
+// ChannelExecutor represents the necessary data for executing interchain txs
 type ChannelExecutor struct {
 	client  plugins.Client // BxhClient
 	storage storage.Storage

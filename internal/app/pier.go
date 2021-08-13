@@ -50,7 +50,7 @@ type Pier struct {
 	exec      executor.Executor    //represents the necessary data for executing interchain txs in appchain：与appchain链交互执行的接口
 	lite      lite.Lite            //轻客户度
 	pierHA    agency.PierHA        //集群模式
-	storage   storage.Storage      // 存储模式
+	storage   storage.Storage      // 存储
 	exchanger exchanger.IExchanger //主动交换，pier的核心动力引擎。
 	ctx       context.Context
 	cancel    context.CancelFunc
@@ -238,7 +238,7 @@ func NewPier(repoRoot string, config *repo.Config) (*Pier, error) {
 		privateKey: privateKey,
 		plugin:     cli,
 		grpcPlugin: grpcPlugin,
-		//appchain:   chain,
+		// appchain:   chain,
 		meta:      meta,
 		monitor:   mnt,
 		exchanger: ex,

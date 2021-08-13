@@ -131,6 +131,23 @@ pier:
 * 
 
 
+Syncer、Monitor、Executor三个都有相同的作用。是否可以重构为同一个接口。
+
+## 输入与输出才有会ID，并且都是唯一。
+* pluginID  与绑定的blockchainID相同。
+* pierID  各自唯一
+* blockchainID 一条链的ID
+* pluginID与blockchainID可能会相同。
+
+* 注册路由表
+* 删除ID
+* 路由IBTPX数据包
+* 校验
+* 审计、治理
+* pierID 做背书、签名、留言
+* 
+
+
 
 
 
