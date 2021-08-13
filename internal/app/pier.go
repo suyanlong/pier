@@ -44,8 +44,8 @@ import (
 type Pier struct {
 	privateKey crypto.PrivateKey
 	plugin     plugins.Client  //Client defines the interface that interacts with appchain 交互接口
-	grpcPlugin *plugin.Client  //plugin grpc 接口，关闭接口。可以定义到plugin里面
-	monitor    monitor.Monitor //Monitor receives event from blockchain and sends it to network
+	grpcPlugin *plugin.Client  //plugin 管理接口。可以定义到plugin里面
+	monitor    monitor.Monitor //Monitor receives event from blockchain and sends it to network ：AppchainMonitor
 	//Syncer 与 bithub交互的接口机制。
 	exec      executor.Executor    //represents the necessary data for executing interchain txs in appchain：与appchain链交互执行的接口
 	lite      lite.Lite            //轻客户度
@@ -323,7 +323,7 @@ func NewUnionPier(repoRoot string, config *repo.Config) (*Pier, error) {
 		return nil, fmt.Errorf("syncer create: %w", err)
 	}
 
-	cli := agent.CreateClient(client)
+	cli := agent.CreateClient(client) //创建BxhClient客户端代理
 	exec, err := executor.New(cli, addr.String(), store, nil, loggers.Logger(loggers.Executor))
 	if err != nil {
 		return nil, fmt.Errorf("executor create: %w", err)

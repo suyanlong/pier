@@ -1,8 +1,6 @@
 package txcrypto
 
 import (
-	"fmt"
-
 	"github.com/meshplus/bitxhub-kit/crypto"
 	"github.com/meshplus/bitxhub-kit/crypto/asym/ecdsa"
 	"github.com/meshplus/bitxhub-kit/crypto/ecdh"
@@ -57,11 +55,9 @@ func (c *RelayCryptor) getDesKey(address string) (crypto.SymmetricKey, error) {
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println("99")
 	secret, err := ke.ComputeSecret(c.privKey, pubKey)
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println("888")
 	return sym.GenerateSymKey(crypto.ThirdDES, secret)
 }

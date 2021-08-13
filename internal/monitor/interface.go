@@ -15,3 +15,6 @@ type Monitor interface {
 	// QueryLatestMeta queries latest index map of ibtps threw on appchain
 	QueryOuterMeta() map[string]uint64
 }
+
+// 是否可以重构，意义不是多大。视乎与Executor意义一样。可以抽象为同一接口。
+//

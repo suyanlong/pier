@@ -184,7 +184,7 @@ func (ex *Exchanger) startWithUnionMode() error {
 	return nil
 }
 
-//非联盟模式：中继、直链
+// 非联盟模式：中继、直链
 func (ex *Exchanger) listenAndSendIBTPFromMnt() {
 	ch := ex.mnt.ListenIBTP()
 	for {
@@ -298,7 +298,7 @@ func (ex *Exchanger) Stop() error {
 func (ex *Exchanger) sendIBTP(ibtp *pb.IBTP) error {
 	entry := ex.logger.WithFields(logrus.Fields{"index": ibtp.Index, "type": ibtp.Type, "to": ibtp.To, "id": ibtp.ID()})
 
-	//所有的这些模式全部都在路由规则里面。
+	// 所有的这些模式全部都在路由规则里面。
 	switch ex.mode {
 	case repo.UnionMode: // 没有这个模式吗？发送消息的时候。
 		fallthrough
@@ -363,7 +363,7 @@ func (ex *Exchanger) queryIBTP(id, target string) (*pb.IBTP, bool, error) {
 
 	// 交易中，如果是用户，根据用户指定，如果没有按默认配置，依次排序。
 	switch ex.mode {
-	case repo.RelayMode: //中继模式是查询bithub上的ibtp交易根据交易ID。
+	case repo.RelayMode: // 中继模式是查询bithub上的ibtp交易根据交易ID。
 		ibtp, isValid, err = ex.syncer.QueryIBTP(id)
 		if err != nil {
 			if errors.Is(err, syncer.ErrIBTPNotFound) {

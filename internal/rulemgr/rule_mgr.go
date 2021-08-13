@@ -48,3 +48,5 @@ func New(storage storage.Storage, pm peermgr.PeerManager, logger logrus.FieldLog
 func (rm *RuleMgr) Validate(address, from string, proof, payload []byte, validators string) (bool, error) {
 	return rm.Ve.Validate(address, from, proof, payload, validators)
 }
+
+//规则验证，主要是验证交易的背书。当前阶段可以不需要加入。主要是通过WASM执行验证。

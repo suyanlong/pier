@@ -14,6 +14,7 @@ import (
 	"github.com/meshplus/pier/internal/rulemgr"
 )
 
+// 不需要使用。
 type DirectChecker struct {
 	ruleMgr       *rulemgr.RuleMgr
 	appchainMgr   *appchain.Manager

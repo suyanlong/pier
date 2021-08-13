@@ -14,6 +14,7 @@ import (
 	"github.com/meshplus/pier/internal/loggers"
 )
 
+// 应用链的元数据在hub上存储。
 func getInterchainMeta(client rpcx.Client, appchainID string) (*pb.Interchain, error) {
 	tx, err := client.GenerateContractTx(pb.TransactionData_BVM, constant.InterchainContractAddr.Address(),
 		"Interchain", rpcx.String(appchainID))
@@ -51,6 +52,7 @@ func getInterchainMeta(client rpcx.Client, appchainID string) (*pb.Interchain, e
 	return ret, nil
 }
 
+// 未使用
 func getAppchainInfo(client rpcx.Client) (*appchainmgr.Appchain, error) {
 	tx, err := client.GenerateContractTx(pb.TransactionData_BVM, constant.AppchainMgrContractAddr.Address(), "Appchain")
 	if err != nil {

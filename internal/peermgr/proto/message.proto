@@ -8,7 +8,7 @@ message Message {
         APPCHAIN_UPDATE = 1;
         APPCHAIN_GET = 2;
         INTERCHAIN_META_GET = 3;
-        RULE_DEPLOY = 4;
+        RULE_DEPLOY = 4; //部署验证规则
         IBTP_GET = 5;
         IBTP_SEND = 6;
         IBTP_RECEIPT_SEND = 7;

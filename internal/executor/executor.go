@@ -15,13 +15,13 @@ var _ Executor = (*ChannelExecutor)(nil)
 
 // ChannelExecutor represents the necessary data for executing interchain txs in appchain
 type ChannelExecutor struct {
-	client      plugins.Client // the client to interact with appchain
-	storage     storage.Storage
-	appchainDID string // appchain did
-	cryptor     txcrypto.Cryptor
-	logger      logrus.FieldLogger
-	ctx         context.Context
-	cancel      context.CancelFunc
+	client  plugins.Client // BxhClient
+	storage storage.Storage
+	//appchainDID string // appchain did
+	cryptor txcrypto.Cryptor
+	logger  logrus.FieldLogger
+	ctx     context.Context
+	cancel  context.CancelFunc
 }
 
 // New creates new instance of Executor. agent is for interacting with counterpart chain
@@ -31,13 +31,13 @@ func New(client plugins.Client, appchainDID string, storage storage.Storage, cry
 	ctx, cancel := context.WithCancel(context.Background())
 
 	return &ChannelExecutor{
-		client:      client,
-		ctx:         ctx,
-		cancel:      cancel,
-		storage:     storage,
-		appchainDID: appchainDID,
-		cryptor:     cryptor,
-		logger:      logger,
+		client:  client,
+		ctx:     ctx,
+		cancel:  cancel,
+		storage: storage,
+		//appchainDID: appchainDID,
+		cryptor: cryptor,
+		logger:  logger,
 	}, nil
 }
 

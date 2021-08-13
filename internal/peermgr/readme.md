@@ -45,7 +45,9 @@ Monitor receives event from blockchain and sends it to network
 
 ## executor
 ChannelExecutor represents the necessary data for executing interchain txs in appchain。
-主要是和appchain交互，下沉到client下面，每个插件可以实现它。
+pier:在直连、联盟模式下是主要是和appchain交互，下沉到client下面，每个插件可以实现它。
+pier:在中继模式下，使用创建BxhClient客户端代理。
+
 
 
 ## Checker规则验证
@@ -110,20 +112,23 @@ pier:
 * 直链模式：pier 节点直链，不经过中继链。
 * RelayMode：中继连架构。
 
+## sidercar设计
+1、跨链协议IBTPX设计：根据IBTP跨链协议增加路由策略：路由模式、路由方法等字段，一是用于验证交易的完整性，二是引入惩罚机制。
+2、跨链网关sidercar架构设计，主要模块有：port模块、route模块、pulgin模块、monitor模块、exchanger模块、govern模块等。sidercar只做消息的转发，以及消息订阅，对消息不做任何的修改，存在作恶行为，任何其它节点都可以相互检举到治理模块，治理模块仲裁表决，裁掉作恶网关。
+3、跨链网关路由接口port设计：抽象所有输入与输出为port接口，包括：blockchain peer、blockchain client、sidercar peer等全部抽象为port。
+4、route模块：路由转发模块，根据IBTPX跨链扩展协议，使用路由策略，在port之间转发IBTPX消息。
+5、pulgin模块：与其它区块链做跨链的各种适配插件。
+6、govern模块：惩罚机制引入，主要根据IBTPX协议规定的路由路径，做节点校验，存在作恶行为，上报节点信息，相互监控。
 
 
-
-
-
-
-
-
-
-
-
-
-
-
+* 不能完全照炒他们的东西。
+* 常用的库可以使用。
+* 定义的结构也可以使用。
+* 设计自己简单的东西，才能完成跨链交互的东西。
+* 功能进行必要的裁剪。设置实现优先级。
+* 转发如何实现，丢失又该怎么办。
+* 去掉rule、主从机制、加密机制先去掉。可以后面加进去。
+* 
 
 
 

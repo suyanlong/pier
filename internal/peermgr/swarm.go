@@ -364,6 +364,7 @@ func AddrToPeerInfo(multiAddr string) (*peer.AddrInfo, error) {
 	return peer.AddrInfoFromP2pAddr(maddr)
 }
 
+//注册异步处理数据的方法
 func (swarm *Swarm) handleMessage(s network.Stream, data []byte) {
 	m := &peermgr.Message{}
 	if err := m.Unmarshal(data); err != nil {
@@ -398,7 +399,7 @@ func (swarm *Swarm) getRemoteAddress(id peer.ID) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	retData, err := swarm.p2p.Send(id.String(), reqData)
+	retData, err := swarm.p2p.Send(id.String(), reqData) //同步获取数据
 	if err != nil {
 		return "", fmt.Errorf("sync send: %w", err)
 	}

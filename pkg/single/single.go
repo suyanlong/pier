@@ -8,6 +8,7 @@ type SinglePierMng struct {
 	isMain chan bool
 }
 
+// 集群化部署，
 func init() {
 	agency.RegisterPierHAConstructor("single", New)
 }

@@ -33,3 +33,5 @@ type Executor interface {
 	// QueryIBTPReceipt query receipt for original interchain ibtp
 	QueryIBTPReceipt(originalIBTP *pb.IBTP) (*pb.IBTP, error)
 }
+
+// 是否可以重构，意义不是多大。
