@@ -144,8 +144,22 @@ Syncer、Monitor、Executor三个都有相同的作用。是否可以重构为�
 * 路由IBTPX数据包
 * 校验
 * 审计、治理
-* pierID 做背书、签名、留言
+* pierID 做背书、签名、留言。
 * 
+
+## DID设计
+#### 标识符格式
+BitXHub 将运用数字身份来标识应用链、节点、链上账户甚至合约等各种实
+体，其标识符格式略有差别：
+其中，链的身份标识（Chain DID）的格式设计为：did:bitxhub:chain-name:.，
+第一字段为 did 固定标识，第二字段为 BitXHub 网络的固定标识，第三字段为每
+条链的链名，第四字段以.结尾。如 did:bitxhub:relaychain001:. 。
+对于每条链上基于账户地址的账户数字身份标识（Account DID）其格式为：
+did:bitxhub:chain-name:address，其中第四个字段为用户的账户地址。如：
+did:bitxhub:relaychain001:0x12345678。
+
+
+## 设计路由
 
 
 
