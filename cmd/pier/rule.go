@@ -6,7 +6,7 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/meshplus/bitxhub-model/constant"
-	rpcx "github.com/meshplus/go-bitxhub-client"
+	rpcx "github.com/meshplus/pier/hub/client"
 	"github.com/tidwall/gjson"
 	"github.com/urfave/cli"
 )
@@ -138,6 +138,7 @@ func updateMasterRule(ctx *cli.Context) error {
 	return nil
 }
 
+//TODO
 func bindRule(ctx *cli.Context) error {
 	ruleAddr := ctx.String("addr")
 	method := ctx.String("method")

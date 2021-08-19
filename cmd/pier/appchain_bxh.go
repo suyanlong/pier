@@ -11,7 +11,7 @@ import (
 	"github.com/meshplus/bitxhub-kit/crypto/asym"
 	"github.com/meshplus/bitxhub-kit/hexutil"
 	"github.com/meshplus/bitxhub-model/constant"
-	rpcx "github.com/meshplus/go-bitxhub-client"
+	rpcx "github.com/meshplus/pier/hub/client"
 	"github.com/meshplus/pier/internal/repo"
 	"github.com/tidwall/gjson"
 	"github.com/urfave/cli"
@@ -364,6 +364,7 @@ func getAppchain(ctx *cli.Context) error {
 	return nil
 }
 
+//TODO
 func loadClient(keyPath string, grpcAddrs []string, ctx *cli.Context) (rpcx.Client, error) {
 	repoRoot, err := repo.PathRootWithDefault(ctx.GlobalString("repo"))
 	if err != nil {

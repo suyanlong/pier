@@ -97,3 +97,6 @@ release-binary:
 ## make linter: Run golanci-lint
 linter:
 	golangci-lint run
+
+fmt:
+	go fmt ./...

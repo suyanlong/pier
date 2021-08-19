@@ -28,6 +28,7 @@ var governanceCMD = cli.Command{
 	},
 }
 
+// TODO
 func withdraw(ctx *cli.Context) error {
 	chainAdminKeyPath := ctx.String("admin-key")
 	id := ctx.String("id")
@@ -37,6 +38,7 @@ func withdraw(ctx *cli.Context) error {
 		return fmt.Errorf("load client: %w", err)
 	}
 
+	// TODO modify hub client
 	receipt, err := client.InvokeBVMContract(
 		constant.GovernanceContractAddr.Address(),
 		"WithdrawProposal", nil, rpcx.String(id),

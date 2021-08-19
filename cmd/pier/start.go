@@ -58,6 +58,7 @@ func start(ctx *cli.Context) error {
 
 	var pier *app.Pier
 
+	//TODO
 	switch config.Mode.Type {
 	case repo.RelayMode:
 		fallthrough
