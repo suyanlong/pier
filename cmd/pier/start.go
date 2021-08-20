@@ -56,29 +56,33 @@ func start(ctx *cli.Context) error {
 	// init loggers map for pier
 	loggers.InitializeLogger(config)
 
-	var pier *app.Pier
+	var pier app.Launcher
 
 	//TODO
-	switch config.Mode.Type {
-	case repo.RelayMode:
-		fallthrough
-	case repo.DirectMode:
-		if err := checkPlugin(config.Appchain.Plugin); err != nil {
-			return fmt.Errorf("check plugin: %w", err)
-		}
+	//switch config.Mode.Type {
+	//case repo.RelayMode:
+	//	fallthrough
+	//case repo.DirectMode:
+	//	if err := checkPlugin(config.Appchain.Plugin); err != nil {
+	//		return fmt.Errorf("check plugin: %w", err)
+	//	}
+	//
+	//	pier, err = app.NewPier(repoRoot, config)
+	//	if err != nil {
+	//		return err
+	//	}
+	//case repo.UnionMode:
+	//	pier, err = app.NewUnionPier(repoRoot, config)
+	//	if err != nil {
+	//		return err
+	//	}
+	//}
 
-		pier, err = app.NewPier(repoRoot, config)
-		if err != nil {
-			return err
-		}
-	case repo.UnionMode:
-		pier, err = app.NewUnionPier(repoRoot, config)
-		if err != nil {
-			return err
-		}
+	pier, err = app.NewUnionPier(repoRoot, config)
+	if err != nil {
+		return err
 	}
 
-	fmt.Printf("Client Type: %s\n", pier.Type())
 	runPProf(config.Port.PProf)
 
 	var wg sync.WaitGroup
@@ -95,7 +99,7 @@ func start(ctx *cli.Context) error {
 	return nil
 }
 
-func handleShutdown(pier *app.Pier, wg *sync.WaitGroup) {
+func handleShutdown(pier app.Launcher, wg *sync.WaitGroup) {
 	var stop = make(chan os.Signal)
 	signal.Notify(stop, syscall.SIGTERM)
 	signal.Notify(stop, syscall.SIGINT)
@@ -103,7 +107,7 @@ func handleShutdown(pier *app.Pier, wg *sync.WaitGroup) {
 	go func() {
 		<-stop
 		fmt.Println("received interrupt signal, shutting down...")
-		if err := pier.Stop(false); err != nil {
+		if err := pier.Stop(); err != nil {
 			logger.Error("pier stop: ", err)
 		}
 

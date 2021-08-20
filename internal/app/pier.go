@@ -10,7 +10,6 @@ import (
 	"github.com/Rican7/retry"
 	"github.com/Rican7/retry/strategy"
 	"github.com/hashicorp/go-plugin"
-	"github.com/meshplus/bitxhub-core/agency"
 	"github.com/meshplus/bitxhub-kit/crypto"
 	"github.com/meshplus/bitxhub-kit/storage"
 	"github.com/meshplus/bitxhub-kit/storage/leveldb"
@@ -37,8 +36,12 @@ import (
 	"github.com/meshplus/pier/pkg/plugins"
 	_ "github.com/meshplus/pier/pkg/single"
 	"github.com/sirupsen/logrus"
-	"github.com/wonderivan/logger"
 )
+
+type Launcher interface {
+	Start() error
+	Stop() error
+}
 
 // Pier represents the necessary data for starting the pier app
 type Pier struct {
@@ -49,7 +52,6 @@ type Pier struct {
 	//Syncer 与 bithub交互的接口机制。
 	exec      executor.Executor    //represents the necessary data for executing interchain txs in appchain：与appchain链交互执行的接口
 	lite      lite.Lite            //轻客户度
-	pierHA    agency.PierHA        //集群模式
 	storage   storage.Storage      // 存储
 	exchanger exchanger.IExchanger //主动交换，pier的核心动力引擎。
 	ctx       context.Context
@@ -61,7 +63,7 @@ type Pier struct {
 }
 
 // NewPier instantiates pier instance.
-func NewPier(repoRoot string, config *repo.Config) (*Pier, error) {
+func NewPier(repoRoot string, config *repo.Config) (Launcher, error) {
 	store, err := leveldb.New(filepath.Join(config.RepoRoot, "store"))
 	if err != nil {
 		return nil, fmt.Errorf("read from datastaore %w", err)
@@ -88,7 +90,6 @@ func NewPier(repoRoot string, config *repo.Config) (*Pier, error) {
 		cryptor   txcrypto.Cryptor
 		ex        exchanger.IExchanger
 		lite      lite.Lite
-		pierHA    agency.PierHA
 		sync      syncer.Syncer
 		apiServer *api.Server
 		meta      *pb.Interchain
@@ -163,6 +164,7 @@ func NewPier(repoRoot string, config *repo.Config) (*Pier, error) {
 		//	return nil, err
 		//}
 
+		//TODO 这里的中继是，bithub
 		cryptor, err = txcrypto.NewRelayCryptor(client, privateKey)
 		if err != nil {
 			return nil, fmt.Errorf("cryptor create: %w", err)
@@ -180,11 +182,6 @@ func NewPier(repoRoot string, config *repo.Config) (*Pier, error) {
 		if err != nil {
 			return nil, fmt.Errorf("syncer create: %w", err)
 		}
-		pierHAConstructor, err := agency.GetPierHAConstructor(config.HA.Mode)
-		if err != nil {
-			return nil, fmt.Errorf("pier ha constructor not found")
-		}
-		pierHA = pierHAConstructor(client, config.Appchain.DID)
 	default:
 		return nil, fmt.Errorf("unsupported mode")
 	}
@@ -244,7 +241,6 @@ func NewPier(repoRoot string, config *repo.Config) (*Pier, error) {
 		exchanger: ex,
 		exec:      exec,
 		lite:      lite,
-		pierHA:    pierHA,
 		logger:    logger,
 		storage:   store,
 		ctx:       ctx,
@@ -253,7 +249,7 @@ func NewPier(repoRoot string, config *repo.Config) (*Pier, error) {
 	}, nil
 }
 
-func NewUnionPier(repoRoot string, config *repo.Config) (*Pier, error) {
+func NewUnionPier(repoRoot string, config *repo.Config) (Launcher, error) {
 	store, err := leveldb.New(filepath.Join(config.RepoRoot, "store"))
 	if err != nil {
 		return nil, fmt.Errorf("read from datastaore %w", err)
@@ -329,7 +325,7 @@ func NewUnionPier(repoRoot string, config *repo.Config) (*Pier, error) {
 		return nil, fmt.Errorf("executor create: %w", err)
 	}
 
-	router := router.New(peerManager, store, loggers.Logger(loggers.Router), peerManager.(*peermgr.Swarm).ConnectedPeerIDs())
+	r := router.New(peerManager, store, loggers.Logger(loggers.Router), peerManager.(*peermgr.Swarm).ConnectedPeerIDs())
 
 	ex, err = exchanger.New(config.Mode.Type, addr.String(), meta,
 		exchanger.WithExecutor(exec),
@@ -337,7 +333,7 @@ func NewUnionPier(repoRoot string, config *repo.Config) (*Pier, error) {
 		exchanger.WithChecker(ck),
 		exchanger.WithSyncer(sync),
 		exchanger.WithStorage(store),
-		exchanger.WithRouter(router),
+		exchanger.WithRouter(r),
 		exchanger.WithLogger(loggers.Logger(loggers.Exchanger)),
 	)
 	if err != nil {
@@ -362,86 +358,36 @@ func NewUnionPier(repoRoot string, config *repo.Config) (*Pier, error) {
 
 // Start starts three main components of pier app
 func (pier *Pier) Start() error {
-	if pier.config.Mode.Type == repo.UnionMode {
-		if err := pier.lite.Start(); err != nil {
-			pier.logger.Errorf("lite start: %w", err)
-			return err
-		}
-		if err := pier.exchanger.Start(); err != nil {
-			pier.logger.Errorf("exchanger start: %w", err)
-			return err
-		}
-		return nil
+	if err := pier.lite.Start(); err != nil {
+		pier.logger.Errorf("lite start: %w", err)
+		return err
 	}
-	if err := pier.pierHA.Start(); err != nil {
-		return fmt.Errorf("pier ha start fail")
+	pier.logger.WithFields(logrus.Fields{
+		"id":                     pier.meta.ID,
+		"interchain_counter":     pier.meta.InterchainCounter,
+		"receipt_counter":        pier.meta.ReceiptCounter,
+		"source_receipt_counter": pier.meta.SourceReceiptCounter,
+	}).Info("Pier information")
+	if err := pier.monitor.Start(); err != nil {
+		pier.logger.Errorf("monitor start: %w", err)
+		return err
 	}
-	go pier.startPierHA()
-	return nil
-}
-
-func (pier *Pier) startPierHA() {
-	logger.Info("pier HA manager start")
-	status := false
-	for {
-		select {
-		case isMain := <-pier.pierHA.IsMain():
-			if isMain {
-				if status {
-					continue
-				}
-				pier.logger.WithFields(logrus.Fields{
-					"id":                     pier.meta.ID,
-					"interchain_counter":     pier.meta.InterchainCounter,
-					"receipt_counter":        pier.meta.ReceiptCounter,
-					"source_receipt_counter": pier.meta.SourceReceiptCounter,
-				}).Info("Pier information")
-				if err := pier.monitor.Start(); err != nil {
-					pier.logger.Errorf("monitor start: %w", err)
-					return
-				}
-				if err := pier.exec.Start(); err != nil {
-					pier.logger.Errorf("executor start: %w", err)
-					return
-				}
-				if err := pier.lite.Start(); err != nil {
-					pier.logger.Errorf("lite start: %w", err)
-					return
-				}
-				if err := pier.exchanger.Start(); err != nil {
-					pier.logger.Errorf("exchanger start: %w", err)
-					return
-				}
-				status = true
-			} else {
-				if !status {
-					continue
-				}
-				if err := pier.Stop(true); err != nil {
-					pier.logger.Errorf("pier stop: %w", err)
-					return
-				}
-				status = false
-			}
-		}
+	if err := pier.exec.Start(); err != nil {
+		pier.logger.Errorf("executor start: %w", err)
+		return err
 	}
+	err := pier.exchanger.Start()
+	return err
 }
 
 // Stop stops three main components of pier app
-func (pier *Pier) Stop(isAux bool) error {
-	if pier.config.Mode.Type != repo.UnionMode {
-		if err := pier.monitor.Stop(); err != nil {
-			return fmt.Errorf("monitor stop: %w", err)
-		}
+func (pier *Pier) Stop() error {
+	if err := pier.monitor.Stop(); err != nil {
+		return fmt.Errorf("monitor stop: %w", err)
+	}
 
-		if !isAux {
-			// stop appchain plugin first and kill plugin process
-			pier.grpcPlugin.Kill()
-		}
-
-		if err := pier.exec.Stop(); err != nil {
-			return fmt.Errorf("executor stop: %w", err)
-		}
+	if err := pier.exec.Stop(); err != nil {
+		return fmt.Errorf("executor stop: %w", err)
 	}
 
 	if err := pier.lite.Stop(); err != nil {
@@ -451,6 +397,8 @@ func (pier *Pier) Stop(isAux bool) error {
 	if err := pier.exchanger.Stop(); err != nil {
 		return fmt.Errorf("exchanger stop: %w", err)
 	}
+	// stop appchain plugin first and kill plugin process
+	pier.grpcPlugin.Kill()
 	return nil
 }
 
