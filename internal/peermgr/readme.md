@@ -108,7 +108,7 @@ other blockchain peer ID 这个就用链ID映射吧（直链）
 
 
 pier:
-* UnionMode：pier之间之间组成联盟。路由与转发。
+* UnionMode：pier之间组成联盟。路由与转发。
 * 直链模式：pier 节点直链，不经过中继链。
 * RelayMode：中继连架构。
 
@@ -167,6 +167,20 @@ did:bitxhub:relaychain001:0x12345678。
 * 模式选择
 * 
 
+## 
+from、to：代表链ID
+
+而sidercar ID 暂时未用，除非指定
+
+只有路由功能、适配、转发。
+重传就不需要了吧。
+
+### 待定
+* 同步数据。
+* 两阶段提交，事务
+* 保存数据
+* 治理
+* 
 
 
 

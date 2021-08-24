@@ -10,7 +10,6 @@ import (
 	"github.com/Rican7/retry"
 	"github.com/Rican7/retry/strategy"
 	"github.com/hashicorp/go-plugin"
-	"github.com/meshplus/bitxhub-kit/crypto"
 	"github.com/meshplus/bitxhub-kit/storage"
 	"github.com/meshplus/bitxhub-kit/storage/leveldb"
 	"github.com/meshplus/bitxhub-model/pb"
@@ -45,8 +44,8 @@ type Launcher interface {
 
 // Pier represents the necessary data for starting the pier app
 type Pier struct {
-	privateKey crypto.PrivateKey
-	plugin     plugins.Client  //Client defines the interface that interacts with appchain 交互接口
+	//privateKey crypto.PrivateKey
+	//plugin     plugins.Client  //Client defines the interface that interacts with appchain 交互接口
 	grpcPlugin *plugin.Client  //plugin 管理接口。可以定义到plugin里面
 	monitor    monitor.Monitor //Monitor receives event from blockchain and sends it to network ：AppchainMonitor
 	//Syncer 与 bithub交互的接口机制。
@@ -175,6 +174,7 @@ func NewPier(repoRoot string, config *repo.Config) (Launcher, error) {
 			return nil, fmt.Errorf("lite create: %w", err)
 		}
 
+		// 同步bithub数据。
 		sync, err = syncer.New(addr.String(), config.Appchain.DID, repo.RelayMode,
 			syncer.WithClient(client), syncer.WithLite(lite),
 			syncer.WithStorage(store), syncer.WithLogger(loggers.Logger(loggers.Syncer)),
@@ -192,6 +192,7 @@ func NewPier(repoRoot string, config *repo.Config) (Launcher, error) {
 		return nil, fmt.Errorf("marshal interchain meta: %w", err)
 	}
 
+	// pier网关客户端
 	var cli plugins.Client
 	var grpcPlugin *plugin.Client
 	err = retry.Retry(func(attempt uint) error {
@@ -205,11 +206,13 @@ func NewPier(repoRoot string, config *repo.Config) (Launcher, error) {
 		logger.Panic(err)
 	}
 
+	// pier网关客户端
 	mnt, err := monitor.New(cli, cryptor, loggers.Logger(loggers.Monitor))
 	if err != nil {
 		return nil, fmt.Errorf("monitor create: %w", err)
 	}
 
+	// 执行链一方。
 	exec, err := executor.New(cli, config.Appchain.DID, store, cryptor, loggers.Logger(loggers.Executor))
 	if err != nil {
 		return nil, fmt.Errorf("executor create: %w", err)
@@ -232,8 +235,8 @@ func NewPier(repoRoot string, config *repo.Config) (Launcher, error) {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	return &Pier{
-		privateKey: privateKey,
-		plugin:     cli,
+		//privateKey: privateKey,
+		//plugin:     cli,
 		grpcPlugin: grpcPlugin,
 		// appchain:   chain,
 		meta:      meta,
@@ -280,6 +283,7 @@ func NewUnionPier(repoRoot string, config *repo.Config) (Launcher, error) {
 		return nil, fmt.Errorf("repo load node key: %w", err)
 	}
 
+	// 连接指定节点。
 	peerManager, err = peermgr.New(config, nodePrivKey, privateKey, config.Mode.Union.Providers, loggers.Logger(loggers.PeerMgr))
 	if err != nil {
 		return nil, fmt.Errorf("peerMgr create: %w", err)
@@ -289,6 +293,7 @@ func NewUnionPier(repoRoot string, config *repo.Config) (Launcher, error) {
 		rpcx.WithLogger(logger),
 		rpcx.WithPrivateKey(privateKey),
 	}
+	// rpcx 连接。
 	nodesInfo := make([]*rpcx.NodeInfo, 0, len(config.Mode.Union.Addrs))
 	for _, addr := range config.Mode.Union.Addrs {
 		nodeInfo := &rpcx.NodeInfo{Addr: addr}
@@ -343,16 +348,16 @@ func NewUnionPier(repoRoot string, config *repo.Config) (Launcher, error) {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	return &Pier{
-		privateKey: privateKey,
-		meta:       meta,
-		exchanger:  ex,
-		exec:       exec,
-		lite:       lite,
-		storage:    store,
-		logger:     logger,
-		ctx:        ctx,
-		cancel:     cancel,
-		config:     config,
+		//privateKey: privateKey,
+		meta:      meta,
+		exchanger: ex,
+		exec:      exec,
+		lite:      lite,
+		storage:   store,
+		logger:    logger,
+		ctx:       ctx,
+		cancel:    cancel,
+		config:    config,
 	}, nil
 }
 
@@ -400,12 +405,4 @@ func (pier *Pier) Stop() error {
 	// stop appchain plugin first and kill plugin process
 	pier.grpcPlugin.Kill()
 	return nil
-}
-
-// Type gets the application blockchain type the pier is related to
-func (pier *Pier) Type() string {
-	if pier.config.Mode.Type != repo.UnionMode {
-		return pier.plugin.Type()
-	}
-	return repo.UnionMode
 }

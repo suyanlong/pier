@@ -58,3 +58,10 @@ type Client interface { //业务实现委托接口。需要实现的那有些。
 	// Type gets type of blockchain from plugin
 	Type() string
 }
+
+type ClientX interface {
+	//Client
+
+	// ID
+	ID() string
+}

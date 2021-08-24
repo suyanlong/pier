@@ -106,6 +106,7 @@ func (u *UnionRouter) Route(ibtp *pb.IBTP) error {
 	return nil
 }
 
+// TODO 无用
 //Broadcast broadcasts the registered appchain ids to the union network
 func (u *UnionRouter) Broadcast(appchainIds []string) error {
 	for _, id := range appchainIds {
