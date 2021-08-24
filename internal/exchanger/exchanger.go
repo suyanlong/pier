@@ -344,6 +344,7 @@ func (ex *Exchanger) sendIBTP(ibtp *pb.IBTP) error {
 	return nil
 }
 
+//主动发起，说明是from自己，
 func (ex *Exchanger) queryIBTP(id, target string) (*pb.IBTP, bool, error) {
 	verifiedTx := &pb.VerifiedTx{}
 	v := ex.store.Get(model.IBTPKey(id))

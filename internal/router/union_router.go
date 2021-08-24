@@ -19,11 +19,12 @@ var _ Router = (*UnionRouter)(nil)
 type UnionRouter struct {
 	peermgr peermgr.PeerManager
 	//syncer           syncer.Syncer 未使用
-	logger           logrus.FieldLogger
-	store            storage.Storage
-	appchains        map[string]*appchainmgr.Appchain //appchain 链的管理。
-	pbTable          sync.Map
-	connectedPierIDs []string // 所有连接的pierID,这个ID 是唯一的吗？
+	logger    logrus.FieldLogger
+	store     storage.Storage
+	appchains map[string]*appchainmgr.Appchain //appchain 链的管理。
+	pbTable   sync.Map
+
+	connectedPierIDs []string // 所有连接的pierID,这个ID 是唯一的吗？是唯一的。
 
 	ctx    context.Context
 	cancel context.CancelFunc
@@ -80,6 +81,7 @@ func (u *UnionRouter) Route(ibtp *pb.IBTP) error {
 			u.logger.Errorf("send ibtp error:%v", err)
 			return err
 		}
+		// 目的链对应的pierID
 		u.pbTable.Store(ibtp.To, pierId)
 		u.store.Put([]byte(ibtp.ID()), []byte(""))
 		u.logger.WithField("ibtp", ibtp.ID()).Infof("send ibtp successfully from %s to %s", ibtp.From, ibtp.To)

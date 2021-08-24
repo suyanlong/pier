@@ -56,3 +56,6 @@ type Syncer interface {
 
 	RegisterRollbackHandler(handler RollbackHandler) error
 }
+
+type name interface {
+}

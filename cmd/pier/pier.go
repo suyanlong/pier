@@ -37,7 +37,7 @@ func main() {
 		initCMD,
 		interchainCMD,
 		p2pCMD,
-		ruleCMD,
+		//ruleCMD,
 		startCMD,
 		versionCMD,
 		governanceCMD,

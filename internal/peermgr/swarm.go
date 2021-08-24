@@ -3,6 +3,8 @@ package peermgr
 import (
 	"context"
 	"fmt"
+	"github.com/meshplus/bitxhub-model/pb"
+	"github.com/meshplus/pier/internal/port"
 	"strings"
 	"sync"
 	"time"
@@ -185,6 +187,7 @@ func (swarm *Swarm) AsyncSend(id string, msg *peermgr.Message) error {
 	return swarm.p2p.AsyncSend(addrInfo.ID.String(), data)
 }
 
+// TODO 未使用
 func (swarm *Swarm) SendWithStream(s network.Stream, msg *peermgr.Message) (*peermgr.Message, error) {
 	data, err := msg.Marshal()
 	if err != nil {
@@ -261,6 +264,38 @@ func (swarm *Swarm) ConnectedPeerIDs() []string {
 		return true
 	})
 	return peerIDs
+}
+
+type sidercar struct {
+	peerIDs string
+	swarm   *Swarm
+}
+
+func (s *sidercar) ID() string {
+	return s.peerIDs
+}
+
+func (s *sidercar) Type() string {
+	return "peer"
+}
+
+func (s *sidercar) Name() string {
+	panic("implement me")
+}
+
+func (s *sidercar) Send(ibtp *pb.IBTP) error {
+	panic("implement me")
+	//s.swarm.Send(s.peerIDs,)
+}
+
+func (swarm *Swarm) Port() []port.Port {
+	ports := []port.Port{}
+	swarm.connectedPeers.Range(func(key, value interface{}) bool {
+		p := &sidercar{peerIDs: value.(string), swarm: swarm}
+		ports = append(ports, p)
+		return true
+	})
+	return ports
 }
 
 func (swarm *Swarm) Peers() map[string]*peer.AddrInfo {
@@ -372,6 +407,7 @@ func (swarm *Swarm) handleMessage(s network.Stream, data []byte) {
 		return
 	}
 
+	//加载执行注册的函数
 	handler, ok := swarm.msgHandlers.Load(m.Type)
 	if !ok {
 		swarm.logger.WithFields(logrus.Fields{

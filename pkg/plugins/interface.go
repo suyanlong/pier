@@ -2,6 +2,7 @@ package plugins
 
 import (
 	"github.com/meshplus/bitxhub-model/pb"
+	//"github.com/meshplus/pier/internal/port"
 )
 
 // Client defines the interface that interacts with appchain 与 appchain交互。
@@ -60,8 +61,8 @@ type Client interface { //业务实现委托接口。需要实现的那有些。
 }
 
 type ClientX interface {
-	//Client
+	Client
 
-	// ID
 	ID() string
+	Send(ibtp *pb.IBTP) error
 }

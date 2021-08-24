@@ -21,6 +21,7 @@ func (ex *Exchanger) recoverRelay() {
 			beginIndex = 0
 		}
 
+		// from 是当前
 		if err := ex.handleMissingCallback(to, beginIndex+1, idx+1); err != nil {
 			ex.logger.WithFields(logrus.Fields{"address": to, "error": err.Error()}).Panic("Get missing callbacks from bitxhub")
 		}
