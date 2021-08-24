@@ -1,10 +1,10 @@
-package bxh_lite
+package lite33
 
 import (
 	"github.com/meshplus/bitxhub-model/pb"
 )
 
-func (lite *BxhLite) verifyHeader(h *pb.BlockHeader) (bool, error) {
+func (lite *Lite33) verifyHeader(h *pb.BlockHeader) (bool, error) {
 	// TODO: blocked by signature mechanism implementation of BitXHub
 	return true, nil
 }

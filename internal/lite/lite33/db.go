@@ -1,4 +1,4 @@
-package bxh_lite
+package lite33
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 	"github.com/meshplus/bitxhub-model/pb"
 )
 
-func (lite *BxhLite) persist(h *pb.BlockHeader) error {
+func (lite *Lite33) persist(h *pb.BlockHeader) error {
 	batch := lite.storage.NewBatch()
 
 	data, err := h.Marshal()
@@ -24,7 +24,7 @@ func (lite *BxhLite) persist(h *pb.BlockHeader) error {
 }
 
 // getLastHeight gets the current working height of lite
-func (lite *BxhLite) getLastHeight() (uint64, error) {
+func (lite *Lite33) getLastHeight() (uint64, error) {
 	v := lite.storage.Get(headerHeightKey())
 	if v == nil {
 		// if header height is not set, return default 0

@@ -10,7 +10,7 @@ const (
 	ApiServer   = "api_server"
 	App         = "app"
 	AppchainMgr = "appchain_mgr"
-	BxhLite     = "bxh_lite"
+	Lite33      = "lite33"
 	Executor    = "executor"
 	Exchanger   = "exchanger"
 	Monitor     = "monitor"
@@ -35,8 +35,8 @@ func InitializeLogger(config *repo.Config) {
 	m[App].Logger.SetLevel(log.ParseLevel(config.Log.Level))
 	m[AppchainMgr] = log.NewWithModule(AppchainMgr)
 	m[AppchainMgr].Logger.SetLevel(log.ParseLevel(config.Log.Module.AppchainMgr))
-	m[BxhLite] = log.NewWithModule(BxhLite)
-	m[BxhLite].Logger.SetLevel(log.ParseLevel(config.Log.Module.BxhLite))
+	m[Lite33] = log.NewWithModule(Lite33)
+	m[Lite33].Logger.SetLevel(log.ParseLevel(config.Log.Module.Lite33))
 	m[Exchanger] = log.NewWithModule(Exchanger)
 	m[Exchanger].Logger.SetLevel(log.ParseLevel(config.Log.Module.Exchanger))
 	m[Executor] = log.NewWithModule(Executor)
@@ -45,8 +45,6 @@ func InitializeLogger(config *repo.Config) {
 	m[Monitor].Logger.SetLevel(log.ParseLevel(config.Log.Module.Monitor))
 	m[Router] = log.NewWithModule(Router)
 	m[Router].Logger.SetLevel(log.ParseLevel(config.Log.Module.Router))
-	m[RuleMgr] = log.NewWithModule(RuleMgr)
-	m[RuleMgr].Logger.SetLevel(log.ParseLevel(config.Log.Module.RuleMgr))
 	m[Swarm] = log.NewWithModule(Swarm)
 	m[Swarm].Logger.SetLevel(log.ParseLevel(config.Log.Module.Swarm))
 	m[Syncer] = log.NewWithModule(Syncer)

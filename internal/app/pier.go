@@ -22,8 +22,8 @@ import (
 	"github.com/meshplus/pier/internal/exchanger"
 	"github.com/meshplus/pier/internal/executor"
 	"github.com/meshplus/pier/internal/lite"
-	"github.com/meshplus/pier/internal/lite/bxh_lite"
 	"github.com/meshplus/pier/internal/lite/direct_lite"
+	"github.com/meshplus/pier/internal/lite/lite33"
 	"github.com/meshplus/pier/internal/loggers"
 	"github.com/meshplus/pier/internal/monitor"
 	"github.com/meshplus/pier/internal/peermgr"
@@ -161,7 +161,7 @@ func NewPier(repoRoot string, config *repo.Config) (Launcher, error) {
 			return nil, fmt.Errorf("cryptor create: %w", err)
 		}
 
-		lite, err = bxh_lite.New(client, store, loggers.Logger(loggers.BxhLite))
+		lite, err = lite33.New(client, store, loggers.Logger(loggers.Lite33))
 		if err != nil {
 			return nil, fmt.Errorf("lite create: %w", err)
 		}
@@ -304,7 +304,7 @@ func NewUnionPier(repoRoot string, config *repo.Config) (Launcher, error) {
 
 	meta = &pb.Interchain{}
 
-	lite, err = bxh_lite.New(client, store, loggers.Logger(loggers.BxhLite))
+	lite, err = lite33.New(client, store, loggers.Logger(loggers.Lite33))
 	if err != nil {
 		return nil, fmt.Errorf("lite create: %w", err)
 	}

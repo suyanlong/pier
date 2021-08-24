@@ -1,4 +1,4 @@
-package bxh_lite
+package lite33
 
 import (
 	"context"
@@ -121,7 +121,7 @@ func TestSyncHeader_Recover_GetBlockHeaderError(t *testing.T) {
 	require.Nil(t, err)
 }
 
-func TestBxhLite_HandleBlockHeaderError(t *testing.T) {
+func TestLite33_HandleBlockHeaderError(t *testing.T) {
 	lite, _, _ := prepare(t)
 	defer lite.storage.Close()
 
@@ -138,7 +138,7 @@ func TestBxhLite_HandleBlockHeaderError(t *testing.T) {
 	require.Equal(t, uint64(2), lite.height)
 }
 
-func TestBxhLite_GetHeaderChannelError(t *testing.T) {
+func TestLite33_GetHeaderChannelError(t *testing.T) {
 	lite, client, _ := prepare(t)
 	defer lite.storage.Close()
 
@@ -152,7 +152,7 @@ func TestBxhLite_GetHeaderChannelError(t *testing.T) {
 	}()
 }
 
-func TestBxhLite_SyncBlockHeaderError(t *testing.T) {
+func TestLite33_SyncBlockHeaderError(t *testing.T) {
 	lite, client, _ := prepare(t)
 	defer lite.storage.Close()
 
@@ -162,7 +162,7 @@ func TestBxhLite_SyncBlockHeaderError(t *testing.T) {
 	require.NotNil(t, lite.syncBlockHeader(ch))
 }
 
-func prepare(t *testing.T) (*BxhLite, *mock_client.MockClient, []crypto.PrivateKey) {
+func prepare(t *testing.T) (*Lite33, *mock_client.MockClient, []crypto.PrivateKey) {
 	mockCtl := gomock.NewController(t)
 	mockCtl.Finish()
 	client := mock_client.NewMockClient(mockCtl)

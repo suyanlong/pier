@@ -1,4 +1,4 @@
-package bxh_lite
+package lite33
 
 import (
 	"time"
@@ -9,7 +9,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func (lite *BxhLite) handleBlockHeader(header *pb.BlockHeader) {
+func (lite *Lite33) handleBlockHeader(header *pb.BlockHeader) {
 	if header == nil {
 		lite.logger.WithField("height", lite.height).Error("empty block header")
 		return
@@ -41,7 +41,7 @@ func (lite *BxhLite) handleBlockHeader(header *pb.BlockHeader) {
 	}).Info("Persist block header")
 }
 
-func (lite *BxhLite) syncBlock() {
+func (lite *Lite33) syncBlock() {
 	loop := func(ch chan *pb.BlockHeader) {
 		for {
 			select {
@@ -82,7 +82,7 @@ func (lite *BxhLite) syncBlock() {
 	}
 }
 
-func (lite *BxhLite) getHeaderChannel() chan *pb.BlockHeader {
+func (lite *Lite33) getHeaderChannel() chan *pb.BlockHeader {
 	ch := make(chan *pb.BlockHeader, maxChSize)
 
 	if err := retry.Retry(func(attempt uint) error {
@@ -98,7 +98,7 @@ func (lite *BxhLite) getHeaderChannel() chan *pb.BlockHeader {
 	return ch
 }
 
-func (lite *BxhLite) syncBlockHeader(headerCh chan<- *pb.BlockHeader) error {
+func (lite *Lite33) syncBlockHeader(headerCh chan<- *pb.BlockHeader) error {
 	ch, err := lite.client.Subscribe(lite.ctx, pb.SubscriptionRequest_BLOCK_HEADER, nil)
 	if err != nil {
 		return err

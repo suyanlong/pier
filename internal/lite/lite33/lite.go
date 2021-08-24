@@ -1,4 +1,4 @@
-package bxh_lite
+package lite33
 
 import (
 	"context"
@@ -12,7 +12,7 @@ import (
 
 const maxChSize = 1024
 
-type BxhLite struct {
+type Lite33 struct {
 	client  rpcx.Client
 	storage storage.Storage
 	logger  logrus.FieldLogger
@@ -21,15 +21,15 @@ type BxhLite struct {
 	cancel  context.CancelFunc
 }
 
-func New(client rpcx.Client, storage storage.Storage, logger logrus.FieldLogger) (*BxhLite, error) {
-	return &BxhLite{
+func New(client rpcx.Client, storage storage.Storage, logger logrus.FieldLogger) (*Lite33, error) {
+	return &Lite33{
 		client:  client,
 		storage: storage,
 		logger:  logger,
 	}, nil
 }
 
-func (lite *BxhLite) Start() error {
+func (lite *Lite33) Start() error {
 	ctx, cancel := context.WithCancel(context.Background())
 	lite.ctx = ctx
 	lite.cancel = cancel
@@ -60,14 +60,14 @@ func (lite *BxhLite) Start() error {
 	return nil
 }
 
-func (lite *BxhLite) Stop() error {
+func (lite *Lite33) Stop() error {
 	lite.cancel()
 
 	lite.logger.Info("BitXHub lite stopped")
 	return nil
 }
 
-func (lite *BxhLite) QueryHeader(height uint64) (*pb.BlockHeader, error) {
+func (lite *Lite33) QueryHeader(height uint64) (*pb.BlockHeader, error) {
 	v := lite.storage.Get(headerKey(height))
 	if v == nil {
 		return nil, fmt.Errorf("header at %d not found", height)
@@ -82,7 +82,7 @@ func (lite *BxhLite) QueryHeader(height uint64) (*pb.BlockHeader, error) {
 }
 
 // recover will recover those missing merkle wrapper when pier is down
-func (lite *BxhLite) recover(begin, end uint64) {
+func (lite *Lite33) recover(begin, end uint64) {
 	lite.logger.WithFields(logrus.Fields{
 		"begin": begin,
 		"end":   end,
