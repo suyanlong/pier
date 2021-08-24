@@ -29,7 +29,6 @@ import (
 	"github.com/meshplus/pier/internal/peermgr"
 	"github.com/meshplus/pier/internal/repo"
 	"github.com/meshplus/pier/internal/router"
-	"github.com/meshplus/pier/internal/rulemgr"
 	"github.com/meshplus/pier/internal/syncer"
 	"github.com/meshplus/pier/internal/txcrypto"
 	"github.com/meshplus/pier/pkg/plugins"
@@ -103,11 +102,6 @@ func NewPier(repoRoot string, config *repo.Config) (Launcher, error) {
 			return nil, fmt.Errorf("peerMgr create: %w", err)
 		}
 
-		ruleMgr, err := rulemgr.New(store, peerManager, loggers.Logger(loggers.RuleMgr))
-		if err != nil {
-			return nil, fmt.Errorf("ruleMgr create: %w", err)
-		}
-
 		appchainMgr, err := appchain.NewManager(config.Appchain.DID, store, peerManager, loggers.Logger(loggers.AppchainMgr))
 		if err != nil {
 			return nil, fmt.Errorf("ruleMgr create: %w", err)
@@ -117,8 +111,6 @@ func NewPier(repoRoot string, config *repo.Config) (Launcher, error) {
 		if err != nil {
 			return nil, fmt.Errorf("gin service create: %w", err)
 		}
-
-		ck = checker.NewDirectChecker(ruleMgr, appchainMgr)
 
 		cryptor, err = txcrypto.NewDirectCryptor(appchainMgr, privateKey)
 		if err != nil {

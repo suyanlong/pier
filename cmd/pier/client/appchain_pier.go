@@ -7,12 +7,9 @@ import (
 	"strconv"
 
 	appchainmgr "github.com/meshplus/bitxhub-core/appchain-mgr"
-	"github.com/meshplus/bitxhub-core/wasm"
 	"github.com/meshplus/bitxhub-kit/crypto"
 	"github.com/meshplus/bitxhub-kit/crypto/asym"
-	"github.com/meshplus/bitxhub-kit/types"
 	"github.com/meshplus/pier/internal/repo"
-	"github.com/meshplus/pier/internal/rulemgr"
 	"github.com/urfave/cli"
 )
 
@@ -143,23 +140,6 @@ var clientCMD = cli.Command{
 				},
 			},
 			Action: getPierAppchain,
-		},
-		{
-			Name:  "rule",
-			Usage: "register appchain validation rule",
-			Flags: []cli.Flag{
-				cli.StringFlag{
-					Name:     "path",
-					Usage:    "rule file path",
-					Required: true,
-				},
-				cli.StringFlag{
-					Name:     "pier-id",
-					Usage:    "Specific target pier id",
-					Required: true,
-				},
-			},
-			Action: registerAppchainRule,
 		},
 	},
 }
@@ -322,56 +302,4 @@ func getPubKey(keyPath string) (crypto.PublicKey, error) {
 	}
 
 	return privKey.PublicKey(), nil
-}
-
-func registerAppchainRule(ctx *cli.Context) error {
-	path := ctx.String("path")
-	pier := ctx.String("pier-id")
-
-	data, err := ioutil.ReadFile(path)
-	if err != nil {
-		return fmt.Errorf("read rule file: %w", err)
-	}
-	repoRoot, err := repo.PathRootWithDefault(ctx.GlobalString("repo"))
-	if err != nil {
-		return err
-	}
-
-	pubKey, err := getPubKey(repo.KeyPath(repoRoot))
-	if err != nil {
-		return fmt.Errorf("get public key: %w", err)
-	}
-	addr, _ := pubKey.Address()
-
-	contract := wasm.Contract{
-		Code: data,
-		Hash: types.NewHash(data),
-	}
-
-	code, err := json.Marshal(contract)
-	if err != nil {
-		return fmt.Errorf("marshal contarct: %w", err)
-	}
-	rule := &rulemgr.Rule{
-		Code:    code,
-		Address: addr.String(),
-	}
-	postData, err := json.Marshal(rule)
-	if err != nil {
-		return fmt.Errorf("marshal rule error: %w", err)
-	}
-
-	url, err := getURL(ctx, fmt.Sprintf("%s?pier_id=%s", RegisterRuleUrl, pier))
-	if err != nil {
-		return err
-	}
-
-	resp, err := httpPost(url, postData)
-	if err != nil {
-		return err
-	}
-
-	fmt.Println(parseResponse(resp))
-
-	return nil
 }
