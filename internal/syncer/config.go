@@ -2,7 +2,7 @@ package syncer
 
 import (
 	"github.com/meshplus/bitxhub-kit/storage"
-	rpcx "github.com/meshplus/go-bitxhub-client"
+	rpcx "github.com/meshplus/pier/hub/client"
 	"github.com/meshplus/pier/internal/lite"
 	"github.com/meshplus/pier/internal/repo"
 	"github.com/sirupsen/logrus"

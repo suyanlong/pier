@@ -6,7 +6,7 @@ import (
 	"github.com/meshplus/bitxhub-kit/crypto/ecdh"
 	"github.com/meshplus/bitxhub-kit/crypto/sym"
 	"github.com/meshplus/bitxhub-model/constant"
-	rpcx "github.com/meshplus/go-bitxhub-client"
+	rpcx "github.com/meshplus/pier/hub/client"
 )
 
 type RelayCryptor struct {

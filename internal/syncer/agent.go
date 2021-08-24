@@ -14,7 +14,7 @@ import (
 	"github.com/meshplus/bitxhub-kit/types"
 	"github.com/meshplus/bitxhub-model/constant"
 	"github.com/meshplus/bitxhub-model/pb"
-	rpcx "github.com/meshplus/go-bitxhub-client"
+	rpcx "github.com/meshplus/pier/hub/client"
 	"github.com/meshplus/pier/internal/repo"
 	"github.com/meshplus/pier/pkg/model"
 	"github.com/sirupsen/logrus"

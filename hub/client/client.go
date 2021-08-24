@@ -130,3 +130,10 @@ type TransactOpts struct {
 func New(opts ...Option) (Client, error) {
 	panic("implement me")
 }
+
+type Interchain struct {
+	ID                   string            `json:"id"`
+	InterchainCounter    map[string]uint64 `json:"interchain_counter,omitempty"`
+	ReceiptCounter       map[string]uint64 `json:"receipt_counter,omitempty"`
+	SourceReceiptCounter map[string]uint64 `json:"source_receipt_counter,omitempty"`
+}

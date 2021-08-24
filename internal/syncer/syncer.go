@@ -16,7 +16,7 @@ import (
 	"github.com/meshplus/bitxhub-kit/storage"
 	"github.com/meshplus/bitxhub-kit/types"
 	"github.com/meshplus/bitxhub-model/pb"
-	rpcx "github.com/meshplus/go-bitxhub-client"
+	rpcx "github.com/meshplus/pier/hub/client"
 	"github.com/meshplus/pier/internal/lite"
 	"github.com/meshplus/pier/internal/repo"
 	"github.com/sirupsen/logrus"
@@ -121,12 +121,6 @@ func (syncer *WrapperSyncer) recover(begin, end uint64) {
 		"begin": begin,
 		"end":   end,
 	}).Info("Syncer recover")
-
-	if syncer.isUnionMode() {
-		if err := syncer.appchainHandler(); err != nil {
-			syncer.logger.WithField("err", err).Errorf("Router handle")
-		}
-	}
 
 	ch := make(chan *pb.InterchainTxWrappers, maxChSize)
 	if err := syncer.client.GetInterchainTxWrappers(syncer.ctx, syncer.appchainDID, begin, end, ch); err != nil {
@@ -253,11 +247,6 @@ func (syncer *WrapperSyncer) listenInterchainTxWrappers() {
 	for {
 		select {
 		case wrappers := <-syncer.wrappersC:
-			if syncer.isUnionMode() {
-				if err := syncer.appchainHandler(); err != nil {
-					syncer.logger.WithField("err", err).Errorf("Router handle")
-				}
-			}
 
 			if len(wrappers.InterchainTxWrappers) == 0 {
 				syncer.logger.WithField("interchain_tx_wrappers", 0).Errorf("InterchainTxWrappers")
@@ -336,23 +325,6 @@ func (syncer *WrapperSyncer) handleInterchainTxWrapper(w *pb.InterchainTxWrapper
 			continue
 		}
 		wIBTP := &model.WrappedIBTP{Ibtp: ibtp, IsValid: tx.Valid}
-		if syncer.isRecover && syncer.isUnionMode() {
-			ic, ok := icm[ibtp.From]
-			if !ok {
-				recoveredIc, err := syncer.recoverHandler(ibtp)
-				if err != nil {
-					syncer.logger.Error(err)
-					continue
-				}
-				icm[ibtp.From] = recoveredIc
-				ic = recoveredIc
-			}
-			if index, ok := ic.InterchainCounter[ibtp.To]; ok {
-				if ibtp.Index <= index {
-					continue
-				}
-			}
-		}
 		syncer.logger.WithFields(logrus.Fields{
 			"ibtp_id": ibtp.ID(),
 			"type":    ibtp.Type,
@@ -368,13 +340,13 @@ func (syncer *WrapperSyncer) handleInterchainTxWrapper(w *pb.InterchainTxWrapper
 	return true
 }
 
-func (syncer *WrapperSyncer) RegisterRecoverHandler(handleRecover RecoverUnionHandler) error {
-	if handleRecover == nil {
-		return fmt.Errorf("register recover handler: empty handler")
-	}
-	syncer.recoverHandler = handleRecover
-	return nil
-}
+//func (syncer *WrapperSyncer) RegisterRecoverHandler(handleRecover RecoverUnionHandler) error {
+//	if handleRecover == nil {
+//		return fmt.Errorf("register recover handler: empty handler")
+//	}
+//	syncer.recoverHandler = handleRecover
+//	return nil
+//}
 
 func (syncer *WrapperSyncer) RegisterAppchainHandler(handler AppchainHandler) error {
 	if handler == nil {

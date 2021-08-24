@@ -9,8 +9,8 @@ import (
 	"github.com/meshplus/bitxhub-kit/crypto"
 	"github.com/meshplus/bitxhub-kit/crypto/asym"
 	"github.com/meshplus/bitxhub-model/pb"
-	rpcx "github.com/meshplus/go-bitxhub-client"
 	"github.com/meshplus/go-bitxhub-client/mock_client"
+	rpcx "github.com/meshplus/pier/hub/client"
 	"github.com/meshplus/pier/internal/appchain"
 	"github.com/stretchr/testify/require"
 )

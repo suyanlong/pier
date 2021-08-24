@@ -6,16 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/golang/mock/gomock"
 	appchainmgr "github.com/meshplus/bitxhub-core/appchain-mgr"
-	"github.com/meshplus/bitxhub-core/validator"
-	"github.com/meshplus/bitxhub-kit/log"
-	"github.com/meshplus/bitxhub-kit/storage/leveldb"
-	"github.com/meshplus/bitxhub-kit/types"
 	"github.com/meshplus/bitxhub-model/pb"
-	"github.com/meshplus/pier/internal/appchain"
-	"github.com/meshplus/pier/internal/peermgr/mock_peermgr"
-	"github.com/meshplus/pier/internal/rulemgr"
 	"github.com/stretchr/testify/require"
 )
 
@@ -32,72 +24,6 @@ const (
 func TestMockChecker_Check(t *testing.T) {
 	checker := &MockChecker{}
 	require.Nil(t, checker.Check(nil))
-}
-
-func TestDirectChecker_Check(t *testing.T) {
-	dc := New(t).(*DirectChecker)
-
-	ibtp1 := getIBTP(t, uint64(1), pb.IBTP_INTERCHAIN, from, to, proofPath)
-	ibtp2 := getIBTP(t, uint64(1), pb.IBTP_INTERCHAIN, "2", to, proofPath)
-	ibtp3 := getIBTP(t, uint64(1), pb.IBTP_INTERCHAIN, "10", to, proofPath)
-	ibtp4 := getIBTP(t, uint64(1), pb.IBTP_RECEIPT_SUCCESS, from, to, proofPath)
-	ibtp5 := getIBTP(t, uint64(1), pb.IBTP_INTERCHAIN, from2, to, proofPath)
-	ibtp6 := getIBTP(t, uint64(1), pb.IBTP_INTERCHAIN, from, to, proofPath2)
-
-	// check with load not ok
-	// not nil code
-	err := dc.Check(ibtp1)
-	require.NotNil(t, err)
-	// nonexistent appchain
-	err = dc.Check(ibtp2)
-	require.NotNil(t, err)
-	// appchain unmarshal error
-	err = dc.Check(ibtp3)
-	require.NotNil(t, err)
-	// ethereum with nil code
-	err = dc.Check(ibtp4)
-	require.NotNil(t, err)
-	// fabric with nil code
-	err = dc.Check(ibtp5)
-	require.Nil(t, err)
-
-	// check with load ok
-	app, err := getAppchain(from, "fabric")
-	require.Nil(t, err)
-	dc.appchainCache.Store(from, &appchainRule{
-		appchain:    app,
-		codeAddress: validator.SimFabricRuleAddr,
-	})
-	// check successfully
-	err = dc.Check(ibtp1)
-	require.Nil(t, err)
-	// check unsuccessfully
-	err = dc.Check(ibtp6)
-	require.NotNil(t, err)
-}
-
-func New(t *testing.T) Checker {
-	mockCtl := gomock.NewController(t)
-	mockCtl.Finish()
-	tmpDir, err := ioutil.TempDir("", "storage")
-	require.Nil(t, err)
-	storage, err := leveldb.New(tmpDir)
-	require.Nil(t, err)
-	storage.Put([]byte(rulePrefix+types.NewAddressByStr(from).String()), []byte("from"))
-
-	pm := mock_peermgr.NewMockPeerManager(mockCtl)
-	pm.EXPECT().RegisterMsgHandler(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
-	pm.EXPECT().RegisterMultiMsgHandler(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
-
-	rm, err := rulemgr.New(storage, pm, log.NewWithModule("api"))
-	require.Nil(t, err)
-
-	am, err := appchain.NewManager(from, storage, pm, log.NewWithModule("api"))
-	require.Nil(t, err)
-	am.Mgr = &MockAppchainMgr{}
-
-	dc := NewDirectChecker(rm, am)
-	return dc
 }
 
 func getAppchain(id, chainType string) (*appchainmgr.Appchain, error) {

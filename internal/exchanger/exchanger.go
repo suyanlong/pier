@@ -33,7 +33,7 @@ type Exchanger struct {
 	mnt                  monitor.Monitor
 	exec                 executor.Executor
 	syncer               syncer.Syncer // WrapperSyncer represents the necessary data for sync tx wrappers from bitxhub
-	router               router.Router
+	router               router.Router // 占时不使用
 	interchainCounter    map[string]uint64
 	executorCounter      map[string]uint64
 	callbackCounter      map[string]uint64
@@ -86,16 +86,14 @@ func (ex *Exchanger) Start() error {
 		err = ex.startWithDirectMode()
 	case repo.RelayMode:
 		err = ex.startWithRelayMode()
-	case repo.UnionMode:
-		err = ex.startWithUnionMode()
 	}
 
 	if err != nil {
 		return err
 	}
-	if ex.mode != repo.UnionMode {
-		go ex.listenAndSendIBTPFromMnt()
-	}
+
+	go ex.listenAndSendIBTPFromMnt()
+
 	if ex.mode != repo.DirectMode {
 		go ex.listenAndSendIBTPFromSyncer()
 	}
@@ -150,37 +148,6 @@ func (ex *Exchanger) startWithRelayMode() error {
 	// recover exchanger before relay any interchain msgs
 	ex.recoverRelay()
 
-	return nil
-}
-
-func (ex *Exchanger) startWithUnionMode() error {
-	if err := ex.peerMgr.Start(); err != nil {
-		return fmt.Errorf("peerMgr start: %w", err)
-	}
-
-	if err := ex.peerMgr.RegisterMsgHandler(peerMsg.Message_ROUTER_IBTP_SEND, ex.handleRouterSendIBTPMessage); err != nil {
-		return fmt.Errorf("register router ibtp handler: %w", err)
-	}
-
-	if err := ex.peerMgr.RegisterMsgHandler(peerMsg.Message_ROUTER_INTERCHAIN_SEND, ex.handleRouterInterchain); err != nil {
-		return fmt.Errorf("register router interchain handler: %w", err)
-	}
-
-	if err := ex.syncer.RegisterAppchainHandler(ex.handleProviderAppchains); err != nil {
-		return fmt.Errorf("register router handler: %w", err)
-	}
-
-	if err := ex.syncer.RegisterRecoverHandler(ex.handleRecover); err != nil {
-		return fmt.Errorf("register recover handler: %w", err)
-	}
-
-	if err := ex.router.Start(); err != nil {
-		return fmt.Errorf("router start: %w", err)
-	}
-
-	if err := ex.syncer.Start(); err != nil {
-		return fmt.Errorf("syncer start: %w", err)
-	}
 	return nil
 }
 
@@ -278,16 +245,6 @@ func (ex *Exchanger) Stop() error {
 		if err := ex.syncer.Stop(); err != nil {
 			return fmt.Errorf("syncer stop: %w", err)
 		}
-	case repo.UnionMode:
-		if err := ex.syncer.Stop(); err != nil {
-			return fmt.Errorf("syncer stop: %w", err)
-		}
-		if err := ex.peerMgr.Stop(); err != nil {
-			return fmt.Errorf("peerMgr stop: %w", err)
-		}
-		if err := ex.router.Stop(); err != nil {
-			return fmt.Errorf("router stop:%w", err)
-		}
 	}
 
 	ex.logger.Info("Exchanger stopped")
@@ -300,8 +257,6 @@ func (ex *Exchanger) sendIBTP(ibtp *pb.IBTP) error {
 
 	// 所有的这些模式全部都在路由规则里面。
 	switch ex.mode {
-	case repo.UnionMode: // 没有这个模式吗？发送消息的时候。
-		fallthrough
 	case repo.RelayMode:
 		err := ex.syncer.SendIBTP(ibtp)
 		if err != nil {

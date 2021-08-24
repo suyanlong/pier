@@ -23,8 +23,8 @@ import (
 	"github.com/meshplus/bitxhub-kit/types"
 	"github.com/meshplus/bitxhub-model/constant"
 	"github.com/meshplus/bitxhub-model/pb"
-	rpcx "github.com/meshplus/go-bitxhub-client"
 	"github.com/meshplus/go-bitxhub-client/mock_client"
+	rpcx "github.com/meshplus/pier/hub/client"
 	"github.com/meshplus/pier/internal/lite/mock_lite"
 	"github.com/meshplus/pier/internal/repo"
 	"github.com/meshplus/pier/pkg/model"
@@ -133,41 +133,6 @@ func TestSyncHeader001(t *testing.T) {
 	}
 	done <- true
 	require.Equal(t, uint64(3), syncer.height)
-}
-
-func TestSyncUnoinHeader(t *testing.T) {
-	syncer, _, lite := prepare(t, 0)
-	ctx, cancel := context.WithCancel(context.Background())
-	syncer.ctx = ctx
-	syncer.cancel = cancel
-	defer syncer.storage.Close()
-
-	// expect mock module returns
-	txs := make([]*pb.BxhTransaction, 0, 2)
-	txs = append(txs, getUnoinTx(t), getUnoinTx(t))
-
-	txs1 := make([]*pb.BxhTransaction, 0, 2)
-	txs1 = append(txs1, getUnoinTx(t), getUnoinTx(t))
-
-	w1, _ := getTxWrapper(t, txs, txs1, 1)
-	w2, root := getTxWrapper(t, txs, txs1, 2)
-	h2 := getBlockHeader(root, 2)
-
-	lite.EXPECT().QueryHeader(gomock.Any()).Return(h2, nil).AnyTimes()
-
-	syncer.isRecover = true
-	syncer.mode = repo.UnionMode
-	icm := make(map[string]*rpcx.Interchain)
-	// recover for error and normal situation
-	syncer.RegisterRecoverHandler(recoverFail)
-	syncer.handleInterchainWrapperAndPersist(w1, icm)
-	syncer.RegisterRecoverHandler(recoverHandler)
-	syncer.handleInterchainWrapperAndPersist(w1, icm)
-	syncer.height = 1
-	syncer.handleInterchainWrapperAndPersist(w2, icm)
-
-	time.Sleep(1 * time.Second)
-	require.Equal(t, uint64(2), syncer.height)
 }
 
 func recoverFail(_ *pb.IBTP) (*rpcx.Interchain, error) {

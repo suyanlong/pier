@@ -11,7 +11,7 @@ import (
 	"github.com/meshplus/bitxhub-kit/storage/leveldb"
 	"github.com/meshplus/bitxhub-kit/types"
 	"github.com/meshplus/bitxhub-model/pb"
-	rpcx "github.com/meshplus/go-bitxhub-client"
+	rpcx "github.com/meshplus/pier/hub/client"
 	"github.com/meshplus/pier/internal/txcrypto/mock_txcrypto"
 	"github.com/meshplus/pier/pkg/model"
 	"github.com/meshplus/pier/pkg/plugins/mock_client"

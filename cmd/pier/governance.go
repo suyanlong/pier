@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/meshplus/bitxhub-model/constant"
-	rpcx "github.com/meshplus/go-bitxhub-client"
+	rpcx "github.com/meshplus/pier/hub/client"
 	"github.com/urfave/cli"
 )
 

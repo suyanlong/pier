@@ -3,7 +3,7 @@ package syncer
 import (
 	appchainmgr "github.com/meshplus/bitxhub-core/appchain-mgr"
 	"github.com/meshplus/bitxhub-model/pb"
-	rpcx "github.com/meshplus/go-bitxhub-client"
+	rpcx "github.com/meshplus/pier/hub/client"
 	"github.com/meshplus/pier/pkg/model"
 )
 
@@ -49,7 +49,7 @@ type Syncer interface {
 	GetInterchainById(from string) *pb.Interchain
 
 	// RegisterRecoverHandler registers handler that recover ibtps from bitxhub
-	RegisterRecoverHandler(RecoverUnionHandler) error
+	//RegisterRecoverHandler(RecoverUnionHandler) error
 
 	// RegisterAppchainHandler registers handler that fetch appchains information
 	RegisterAppchainHandler(handler AppchainHandler) error

@@ -154,20 +154,6 @@ func (mr *MockSyncerMockRecorder) RegisterAppchainHandler(handler interface{}) *
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RegisterAppchainHandler", reflect.TypeOf((*MockSyncer)(nil).RegisterAppchainHandler), handler)
 }
 
-// RegisterRecoverHandler mocks base method.
-func (m *MockSyncer) RegisterRecoverHandler(arg0 syncer.RecoverUnionHandler) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "RegisterRecoverHandler", arg0)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// RegisterRecoverHandler indicates an expected call of RegisterRecoverHandler.
-func (mr *MockSyncerMockRecorder) RegisterRecoverHandler(arg0 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RegisterRecoverHandler", reflect.TypeOf((*MockSyncer)(nil).RegisterRecoverHandler), arg0)
-}
-
 // RegisterRollbackHandler mocks base method.
 func (m *MockSyncer) RegisterRollbackHandler(handler syncer.RollbackHandler) error {
 	m.ctrl.T.Helper()
@@ -222,4 +208,27 @@ func (m *MockSyncer) Stop() error {
 func (mr *MockSyncerMockRecorder) Stop() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Stop", reflect.TypeOf((*MockSyncer)(nil).Stop))
+}
+
+// Mockname is a mock of name interface.
+type Mockname struct {
+	ctrl     *gomock.Controller
+	recorder *MocknameMockRecorder
+}
+
+// MocknameMockRecorder is the mock recorder for Mockname.
+type MocknameMockRecorder struct {
+	mock *Mockname
+}
+
+// NewMockname creates a new mock instance.
+func NewMockname(ctrl *gomock.Controller) *Mockname {
+	mock := &Mockname{ctrl: ctrl}
+	mock.recorder = &MocknameMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *Mockname) EXPECT() *MocknameMockRecorder {
+	return m.recorder
 }
