@@ -8,7 +8,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/meshplus/bitxhub-kit/types"
 	"github.com/meshplus/bitxhub-model/pb"
-	"github.com/meshplus/go-bitxhub-client/mock_client"
+	"github.com/meshplus/pier/hub/client/mock_client"
 	"github.com/stretchr/testify/require"
 )
 
