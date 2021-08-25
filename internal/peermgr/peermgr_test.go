@@ -13,6 +13,7 @@ import (
 	network "github.com/meshplus/go-lightp2p"
 	peermgr "github.com/meshplus/pier/internal/peermgr/proto"
 	peerproto "github.com/meshplus/pier/internal/peermgr/proto"
+	"github.com/meshplus/pier/internal/port"
 	"github.com/meshplus/pier/internal/repo"
 	ma "github.com/multiformats/go-multiaddr"
 	"github.com/stretchr/testify/require"
@@ -136,34 +137,6 @@ func TestSwarm_Connect(t *testing.T) {
 	require.Equal(t, mockId, pierId)
 }
 
-func TestSwarm_SendWithStream(t *testing.T) {
-	swarm, _, _, mockMsg, _, _ := prepare(t)
-	mockStream := &MockStream{}
-
-	// test with wrong msg
-	msg2 := &peermgr.Message{Type: -1}
-	_, err := swarm.SendWithStream(mockStream, msg2)
-	require.NotNil(t, err)
-
-	// test in right way
-	_, err = swarm.SendWithStream(mockStream, mockMsg)
-	require.Nil(t, err)
-}
-
-func TestSwarm_AsyncSendWithStream(t *testing.T) {
-	swarm, _, _, mockMsg, _, _ := prepare(t)
-	mockStream := &MockStream{}
-
-	// test with wrong msg
-	msg2 := &peermgr.Message{Type: -1}
-	err := swarm.AsyncSendWithStream(mockStream, msg2)
-	require.NotNil(t, err)
-
-	// test in right way
-	err = swarm.AsyncSendWithStream(mockStream, mockMsg)
-	require.Nil(t, err)
-}
-
 func TestSwarm_Peers(t *testing.T) {
 	swarm, ids, _, _, _, _ := prepare(t)
 
@@ -181,25 +154,21 @@ func TestSwarm_RegisterMsgHandler(t *testing.T) {
 	require.NotNil(t, err)
 
 	// test with invalid message type
-	err = swarm.RegisterMsgHandler(-1, func(stream network.Stream, message *peermgr.Message) {
+	err = swarm.RegisterMsgHandler(-1, func(stream port.Port, message *peermgr.Message) {
 		require.Equal(t, peermgr.Message_APPCHAIN_REGISTER, message.Type)
 
 		msg := &peermgr.Message{Type: peermgr.Message_ACK}
-		data, err := msg.Marshal()
-		require.Nil(t, err)
-		require.Nil(t, stream.AsyncSend(data))
+		require.Nil(t, stream.AsyncSend(msg))
 		msgCount++
 	})
 	require.NotNil(t, err)
 
 	// test with right handler
-	err = swarm.RegisterMsgHandler(peermgr.Message_APPCHAIN_REGISTER, func(stream network.Stream, message *peermgr.Message) {
+	err = swarm.RegisterMsgHandler(peermgr.Message_APPCHAIN_REGISTER, func(stream port.Port, message *peermgr.Message) {
 		require.Equal(t, peermgr.Message_APPCHAIN_REGISTER, message.Type)
 
 		msg := &peermgr.Message{Type: peermgr.Message_ACK}
-		data, err := msg.Marshal()
-		require.Nil(t, err)
-		require.Nil(t, stream.AsyncSend(data))
+		require.Nil(t, stream.AsyncSend(msg))
 		msgCount++
 	})
 	require.Nil(t, err)
@@ -214,13 +183,11 @@ func TestSwarm_RegisterMultiMsgHandler(t *testing.T) {
 	require.NotNil(t, err)
 
 	// test in right way
-	err = swarm.RegisterMultiMsgHandler([]peerproto.Message_Type{peerproto.Message_APPCHAIN_REGISTER}, func(stream network.Stream, message *peermgr.Message) {
+	err = swarm.RegisterMultiMsgHandler([]peerproto.Message_Type{peerproto.Message_APPCHAIN_REGISTER}, func(stream port.Port, message *peermgr.Message) {
 		require.Equal(t, peermgr.Message_APPCHAIN_REGISTER, message.Type)
 
 		msg := &peermgr.Message{Type: peermgr.Message_ACK}
-		data, err := msg.Marshal()
-		require.Nil(t, err)
-		require.Nil(t, stream.AsyncSend(data))
+		require.Nil(t, stream.AsyncSend(msg))
 		msgCount++
 	})
 	require.Nil(t, err)
@@ -254,7 +221,7 @@ func TestSwarm_ConnectedPeerIDs(t *testing.T) {
 	require.NotNil(t, ids)
 }
 
-func prepare(t *testing.T) (*Swarm, []string, *Swarm, *peermgr.Message, string, string) {
+func prepare(t *testing.T) (*Swarm, []string, *Swarm, port.Message, string, string) {
 	nodeKeys, privKeys, config, ids := genKeysAndConfig(t, 2, repo.DirectMode)
 
 	swarm, err := New(config, nodeKeys[0], privKeys[0], 0, log.NewWithModule("swarm"))

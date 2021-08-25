@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/meshplus/pier/internal/port"
 	"net/http"
 	"path/filepath"
 
@@ -159,7 +160,8 @@ func (g *Server) getAppchain(c *gin.Context) {
 	g.handleAckAppchain(c, ackMsg)
 }
 
-func (g *Server) handleAckAppchain(c *gin.Context, msg *peerproto.Message) {
+func (g *Server) handleAckAppchain(c *gin.Context, m port.Message) {
+	msg := m.(*peerproto.Message)
 	app := appchainmgr.Appchain{}
 	if err := json.Unmarshal(msg.Payload.Data, &app); err != nil {
 		g.logger.Error(err)

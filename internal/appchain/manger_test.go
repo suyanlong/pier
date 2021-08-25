@@ -2,6 +2,7 @@ package appchain
 
 import (
 	"encoding/json"
+	"github.com/meshplus/pier/internal/port"
 	"io/ioutil"
 	"testing"
 
@@ -10,7 +11,6 @@ import (
 	"github.com/meshplus/bitxhub-core/governance"
 	"github.com/meshplus/bitxhub-kit/log"
 	"github.com/meshplus/bitxhub-kit/storage/leveldb"
-	network "github.com/meshplus/go-lightp2p"
 	"github.com/meshplus/pier/internal/peermgr"
 	"github.com/meshplus/pier/internal/peermgr/mock_peermgr"
 	peerproto "github.com/meshplus/pier/internal/peermgr/proto"
@@ -25,7 +25,7 @@ const (
 func TestRegisterAppchain(t *testing.T) {
 	manager := prepare(t)
 	appchain := appchain()
-	var s network.Stream
+	var s port.Port
 	data, err := json.Marshal(appchain)
 	require.Nil(t, err)
 
@@ -45,7 +45,7 @@ func TestUpdateAppchain(t *testing.T) {
 	data, err := json.Marshal(appchain)
 	require.Nil(t, err)
 
-	var s network.Stream
+	var s port.Port
 	msg := peermgr.Message(peerproto.Message_APPCHAIN_REGISTER, true, data)
 	manager.handleMessage(s, msg)
 	require.Nil(t, err)
@@ -77,7 +77,7 @@ func prepare(t *testing.T) *Manager {
 	mockCtl := gomock.NewController(t)
 	mockPeerMgr := mock_peermgr.NewMockPeerManager(mockCtl)
 	mockPeerMgr.EXPECT().RegisterMultiMsgHandler(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
-	mockPeerMgr.EXPECT().AsyncSendWithStream(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
+	mockPeerMgr.EXPECT().AsyncSendWithPort(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
 
 	manager, err := NewManager(pierId, store, mockPeerMgr, log.NewWithModule("peer_mgr"))
 	require.Nil(t, err)

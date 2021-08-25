@@ -2,15 +2,15 @@ package appchain
 
 import (
 	"encoding/json"
+	"github.com/meshplus/pier/internal/port"
 
 	appchainmgr "github.com/meshplus/bitxhub-core/appchain-mgr"
-	network "github.com/meshplus/go-lightp2p"
 	"github.com/meshplus/pier/internal/peermgr"
 	peerproto "github.com/meshplus/pier/internal/peermgr/proto"
 	"github.com/sirupsen/logrus"
 )
 
-func (mgr *Manager) handleMessage(s network.Stream, msg *peerproto.Message) {
+func (mgr *Manager) handleMessage(s port.Port, msg *peerproto.Message) {
 	var res []byte
 	var ok bool
 	switch msg.Type {
@@ -32,7 +32,7 @@ func (mgr *Manager) handleMessage(s network.Stream, msg *peerproto.Message) {
 	}
 
 	ackMsg := peermgr.Message(msg.Type, ok, res)
-	err := mgr.PeerManager.AsyncSendWithStream(s, ackMsg)
+	err := mgr.PeerManager.AsyncSendWithPort(s, ackMsg)
 	if err != nil {
 		mgr.logger.Error(err)
 	}

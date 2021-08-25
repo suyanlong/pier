@@ -2,11 +2,11 @@ package peermgr
 
 import (
 	"github.com/libp2p/go-libp2p-core/peer"
-	network "github.com/meshplus/go-lightp2p"
 	peermgr "github.com/meshplus/pier/internal/peermgr/proto"
+	"github.com/meshplus/pier/internal/port"
 )
 
-type MessageHandler func(network.Stream, *peermgr.Message)
+type MessageHandler func(port.Port, *peermgr.Message)
 type ConnectHandler func(string)
 
 //go:generate mockgen -destination mock_peermgr/mock_peermgr.go -package mock_peermgr -source peermgr.go
@@ -20,18 +20,21 @@ type PeerManager interface {
 	Stop() error
 
 	// AsyncSend sends message to peer with peer info.
-	AsyncSend(string, *peermgr.Message) error
+	AsyncSend(string, port.Message) error
 
 	Connect(info *peer.AddrInfo) (string, error)
 
-	// SendWithStream sends message using existed stream
-	SendWithStream(network.Stream, *peermgr.Message) (*peermgr.Message, error)
-
 	// AsyncSendWithStream sends message using existed stream
-	AsyncSendWithStream(network.Stream, *peermgr.Message) error
+	AsyncSendWithPort(port.Port, port.Message) error
+
+	// SendWithStream sends message using existed stream
+	//SendWithStreamX(port.Port, port.Message) (port.Message, error)
+	//
+	//// AsyncSendWithPort sends message using existed stream
+	//AsyncSendWithStreamX(port.Port,, port.Message) error
 
 	// Send sends message waiting response
-	Send(string, *peermgr.Message) (*peermgr.Message, error)
+	Send(string, port.Message) (*peermgr.Message, error)
 
 	// Peers
 	Peers() map[string]*peer.AddrInfo

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/meshplus/pier/internal/port"
 	"io/ioutil"
 	"testing"
 	"time"
@@ -18,7 +19,6 @@ import (
 	"github.com/meshplus/bitxhub-kit/storage"
 	"github.com/meshplus/bitxhub-kit/storage/leveldb"
 	"github.com/meshplus/bitxhub-model/pb"
-	network "github.com/meshplus/go-lightp2p"
 	"github.com/meshplus/pier/api"
 	"github.com/meshplus/pier/internal/appchain"
 	"github.com/meshplus/pier/internal/checker"
@@ -445,7 +445,7 @@ func testErrorDirect(t *testing.T) {
 	)
 	require.Nil(t, err)
 
-	var stream network.Stream
+	var stream port.Port
 	// test wrong marshaled ibtp bytes
 	badIbtpMsg := peermgr.Message(peerMsg.Message_IBTP_SEND, true, []byte("bad ibtp msg bytes"))
 	mockExchanger.handleSendIBTPMessage(stream, badIbtpMsg)
@@ -535,7 +535,6 @@ func testNormalDirect(t *testing.T) {
 	mockExecutor.EXPECT().QueryIBTPReceipt(gomock.Any()).Return(receipt, nil).AnyTimes()
 	mockPeerMgr.EXPECT().Send(gomock.Any(), metaMsg).Return(retMetaMsg, nil).AnyTimes()
 	mockPeerMgr.EXPECT().Send(gomock.Any(), gomock.Any()).Return(retMsg, nil).AnyTimes()
-	mockPeerMgr.EXPECT().AsyncSendWithStream(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
 	mockPeerMgr.EXPECT().AsyncSend(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
 
 	mockExchanger, err := New(mode, from, meta,
@@ -551,7 +550,7 @@ func testNormalDirect(t *testing.T) {
 
 	outCh <- happyPathOutIBTP
 
-	var stream network.Stream
+	var stream port.Port
 	ibtpBytes, err := happyPathOutIBTP.Marshal()
 	require.Nil(t, err)
 	ibtpMsg := peermgr.Message(peerMsg.Message_IBTP_SEND, true, ibtpBytes)

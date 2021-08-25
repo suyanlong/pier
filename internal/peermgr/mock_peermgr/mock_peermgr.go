@@ -9,9 +9,9 @@ import (
 
 	gomock "github.com/golang/mock/gomock"
 	peer "github.com/libp2p/go-libp2p-core/peer"
-	network "github.com/meshplus/go-lightp2p"
 	peermgr "github.com/meshplus/pier/internal/peermgr"
 	peermgr0 "github.com/meshplus/pier/internal/peermgr/proto"
+	port "github.com/meshplus/pier/internal/port"
 )
 
 // MockPeerManager is a mock of PeerManager interface.
@@ -51,18 +51,18 @@ func (mr *MockPeerManagerMockRecorder) AsyncSend(arg0, arg1 interface{}) *gomock
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AsyncSend", reflect.TypeOf((*MockPeerManager)(nil).AsyncSend), arg0, arg1)
 }
 
-// AsyncSendWithStream mocks base method.
-func (m *MockPeerManager) AsyncSendWithStream(arg0 network.Stream, arg1 *peermgr0.Message) error {
+// AsyncSendWithPort mocks base method.
+func (m *MockPeerManager) AsyncSendWithPort(arg0 port.Port, arg1 *peermgr0.Message) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "AsyncSendWithStream", arg0, arg1)
+	ret := m.ctrl.Call(m, "AsyncSendWithPort", arg0, arg1)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// AsyncSendWithStream indicates an expected call of AsyncSendWithStream.
-func (mr *MockPeerManagerMockRecorder) AsyncSendWithStream(arg0, arg1 interface{}) *gomock.Call {
+// AsyncSendWithPort indicates an expected call of AsyncSendWithPort.
+func (mr *MockPeerManagerMockRecorder) AsyncSendWithPort(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AsyncSendWithStream", reflect.TypeOf((*MockPeerManager)(nil).AsyncSendWithStream), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AsyncSendWithPort", reflect.TypeOf((*MockPeerManager)(nil).AsyncSendWithPort), arg0, arg1)
 }
 
 // Connect mocks base method.
@@ -178,21 +178,6 @@ func (m *MockPeerManager) Send(arg0 string, arg1 *peermgr0.Message) (*peermgr0.M
 func (mr *MockPeerManagerMockRecorder) Send(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Send", reflect.TypeOf((*MockPeerManager)(nil).Send), arg0, arg1)
-}
-
-// SendWithStream mocks base method.
-func (m *MockPeerManager) SendWithStream(arg0 network.Stream, arg1 *peermgr0.Message) (*peermgr0.Message, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SendWithStream", arg0, arg1)
-	ret0, _ := ret[0].(*peermgr0.Message)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// SendWithStream indicates an expected call of SendWithStream.
-func (mr *MockPeerManagerMockRecorder) SendWithStream(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SendWithStream", reflect.TypeOf((*MockPeerManager)(nil).SendWithStream), arg0, arg1)
 }
 
 // Start mocks base method.

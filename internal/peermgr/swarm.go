@@ -3,7 +3,6 @@ package peermgr
 import (
 	"context"
 	"fmt"
-	"github.com/meshplus/bitxhub-model/pb"
 	"github.com/meshplus/pier/internal/port"
 	"strings"
 	"sync"
@@ -36,6 +35,7 @@ type Swarm struct {
 	peers           map[string]*peer.AddrInfo
 	connectedPeers  sync.Map
 	msgHandlers     sync.Map
+	msgHandlersx    sync.Map
 	providers       uint64
 	connectHandlers []ConnectHandler
 	privKey         crypto.PrivateKey
@@ -174,37 +174,6 @@ func (swarm *Swarm) Stop() error {
 	return nil
 }
 
-func (swarm *Swarm) AsyncSend(id string, msg *peermgr.Message) error {
-	addrInfo, err := swarm.getAddrInfo(id)
-	if err != nil {
-		return err
-	}
-	data, err := msg.Marshal()
-	if err != nil {
-		return fmt.Errorf("marshal message: %w", err)
-	}
-
-	return swarm.p2p.AsyncSend(addrInfo.ID.String(), data)
-}
-
-// TODO 未使用
-func (swarm *Swarm) SendWithStream(s network.Stream, msg *peermgr.Message) (*peermgr.Message, error) {
-	data, err := msg.Marshal()
-	if err != nil {
-		return nil, err
-	}
-
-	recvData, err := s.Send(data)
-	if err != nil {
-		return nil, err
-	}
-	recvMsg := &peermgr.Message{}
-	if err := recvMsg.Unmarshal(recvData); err != nil {
-		return nil, err
-	}
-	return recvMsg, nil
-}
-
 func (swarm *Swarm) Connect(addrInfo *peer.AddrInfo) (string, error) {
 	err := swarm.p2p.Connect(*addrInfo)
 	if err != nil {
@@ -222,16 +191,24 @@ func (swarm *Swarm) Connect(addrInfo *peer.AddrInfo) (string, error) {
 	return pierId, nil
 }
 
-func (swarm *Swarm) AsyncSendWithStream(s network.Stream, msg *peermgr.Message) error {
-	data, err := msg.Marshal()
+func (swarm *Swarm) AsyncSendWithPort(s port.Port, msg port.Message) error {
+	return s.AsyncSend(msg)
+}
+
+func (swarm *Swarm) AsyncSend(id string, msg port.Message) error {
+	addrInfo, err := swarm.getAddrInfo(id)
 	if err != nil {
 		return err
 	}
+	data, err := msg.Marshal()
+	if err != nil {
+		return fmt.Errorf("marshal message: %w", err)
+	}
 
-	return s.AsyncSend(data)
+	return swarm.p2p.AsyncSend(addrInfo.ID.String(), data)
 }
 
-func (swarm *Swarm) Send(id string, msg *peermgr.Message) (*peermgr.Message, error) {
+func (swarm *Swarm) Send(id string, msg port.Message) (*peermgr.Message, error) {
 	addrInfo, err := swarm.getAddrInfo(id)
 	if err != nil {
 		return nil, err
@@ -283,7 +260,12 @@ func (s *sidercar) Name() string {
 	panic("implement me")
 }
 
-func (s *sidercar) Send(ibtp *pb.IBTP) error {
+func (s *sidercar) Send(msg port.Message) (*peermgr.Message, error) {
+	panic("implement me")
+	//s.swarm.Send(s.peerIDs,)
+}
+
+func (s *sidercar) AsyncSend(msg port.Message) error {
 	panic("implement me")
 	//s.swarm.Send(s.peerIDs,)
 }
@@ -291,7 +273,10 @@ func (s *sidercar) Send(ibtp *pb.IBTP) error {
 func (swarm *Swarm) Port() []port.Port {
 	ports := []port.Port{}
 	swarm.connectedPeers.Range(func(key, value interface{}) bool {
-		p := &sidercar{peerIDs: value.(string), swarm: swarm}
+		p := &sidercar{
+			peerIDs: value.(string),
+			swarm:   swarm,
+		}
 		ports = append(ports, p)
 		return true
 	})
@@ -401,6 +386,7 @@ func AddrToPeerInfo(multiAddr string) (*peer.AddrInfo, error) {
 
 //注册异步处理数据的方法
 func (swarm *Swarm) handleMessage(s network.Stream, data []byte) {
+	p := &sidercar{peerIDs: s.RemotePeerID(), swarm: swarm}
 	m := &peermgr.Message{}
 	if err := m.Unmarshal(data); err != nil {
 		swarm.logger.Error(err)
@@ -426,7 +412,7 @@ func (swarm *Swarm) handleMessage(s network.Stream, data []byte) {
 		return
 	}
 
-	msgHandler(s, m)
+	msgHandler(p, m)
 }
 
 func (swarm *Swarm) getRemoteAddress(id peer.ID) (string, error) {
@@ -497,16 +483,14 @@ func (swarm *Swarm) Provider(key string, passed bool) error {
 	return swarm.p2p.Provider(key, passed)
 }
 
-func (swarm *Swarm) handleGetAddressMessage(stream network.Stream, message *peermgr.Message) {
+func (swarm *Swarm) handleGetAddressMessage(p port.Port, message *peermgr.Message) {
 	addr, err := swarm.privKey.PublicKey().Address()
 	if err != nil {
 		swarm.logger.Error(err)
 		return
 	}
-
 	retMsg := Message(peermgr.Message_ACK, true, []byte(addr.String()))
-
-	err = swarm.AsyncSendWithStream(stream, retMsg)
+	err = swarm.AsyncSendWithPort(p, retMsg)
 	if err != nil {
 		swarm.logger.Error(err)
 	}

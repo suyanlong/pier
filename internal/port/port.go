@@ -1,6 +1,6 @@
 package port
 
-import "github.com/meshplus/bitxhub-model/pb"
+import peermgr "github.com/meshplus/pier/internal/peermgr/proto"
 
 // port 类型：主要是sider peer、plugin、blockchain peer。
 type Type int
@@ -47,7 +47,13 @@ type Port interface {
 	Type() string
 	Name() string
 
-	Send(ibtp *pb.IBTP) error
+	Send(msg Message) (*peermgr.Message, error)
+	AsyncSend(msg Message) error
+}
+
+type Message interface {
+	Marshal() ([]byte, error)
+	Unmarshal([]byte) error
 }
 
 type Plugin interface {
@@ -73,7 +79,11 @@ func (p port) ID() string {
 	panic("implement me")
 }
 
-func (p port) Send(ibtp *pb.IBTP) error {
+func (p port) Send(msg Message) (*peermgr.Message, error) {
+	panic("implement me")
+}
+
+func (p port) AsyncSend(msg Message) error {
 	panic("implement me")
 }
 
