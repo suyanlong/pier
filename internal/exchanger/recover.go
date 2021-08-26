@@ -116,6 +116,7 @@ func (ex *Exchanger) handleMissingIBTPFromMnt(to string, begin, end uint64) erro
 	return nil
 }
 
+//中继
 func (ex *Exchanger) handleMissingIBTPFromSyncer(from string, begin, end uint64) error {
 	if begin < 1 {
 		return fmt.Errorf("begin index for missing ibtp is required >= 1")
@@ -148,6 +149,7 @@ func (ex *Exchanger) handleMissingIBTPFromSyncer(from string, begin, end uint64)
 	return nil
 }
 
+// 共同拥有
 func (ex *Exchanger) handleMissingReceipt(from string, begin uint64, end uint64) error {
 	if begin < 1 {
 		return fmt.Errorf("begin index for missing receipt is required >= 1")

@@ -1,7 +1,6 @@
 package executor
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/meshplus/bitxhub-kit/storage"
@@ -15,25 +14,19 @@ var _ Executor = (*ChannelExecutor)(nil)
 
 // ChannelExecutor represents the necessary data for executing interchain txs
 type ChannelExecutor struct {
-	client  plugins.Client // BxhClient
+	client  plugins.Client
 	storage storage.Storage
 	//appchainDID string // appchain did
 	cryptor txcrypto.Cryptor
 	logger  logrus.FieldLogger
-	ctx     context.Context
-	cancel  context.CancelFunc
 }
 
 // New creates new instance of Executor. agent is for interacting with counterpart chain
 // client is for interacting with appchain, meta is for recording interchain tx meta information
 // and ds is for persisting some runtime messages
 func New(client plugins.Client, appchainDID string, storage storage.Storage, cryptor txcrypto.Cryptor, logger logrus.FieldLogger) (*ChannelExecutor, error) {
-	ctx, cancel := context.WithCancel(context.Background())
-
 	return &ChannelExecutor{
 		client:  client,
-		ctx:     ctx,
-		cancel:  cancel,
 		storage: storage,
 		//appchainDID: appchainDID,
 		cryptor: cryptor,
@@ -49,8 +42,6 @@ func (e *ChannelExecutor) Start() error {
 
 // Stop implements Executor
 func (e *ChannelExecutor) Stop() error {
-	e.cancel()
-
 	e.logger.Info("Executor stopped")
 	return nil
 }

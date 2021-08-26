@@ -3,7 +3,6 @@ package exchanger
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/meshplus/pier/internal/port"
 	"sync"
 	"time"
 
@@ -12,6 +11,7 @@ import (
 	"github.com/meshplus/bitxhub-model/pb"
 	"github.com/meshplus/pier/internal/peermgr"
 	peerMsg "github.com/meshplus/pier/internal/peermgr/proto"
+	"github.com/meshplus/pier/internal/port"
 	"github.com/meshplus/pier/pkg/model"
 	"github.com/sirupsen/logrus"
 )
@@ -96,6 +96,7 @@ func (ex *Exchanger) feedIBTP(wIbtp *model.WrappedIBTP) {
 	}
 }
 
+// 直连
 func (ex *Exchanger) processIBTP(wIbtp *model.WrappedIBTP) {
 	receipt, err := ex.exec.ExecuteIBTP(wIbtp)
 	if err != nil {
@@ -106,6 +107,7 @@ func (ex *Exchanger) processIBTP(wIbtp *model.WrappedIBTP) {
 	ex.sendIBTPCounter.Inc()
 }
 
+// 直连
 func (ex *Exchanger) feedReceipt(receipt *pb.IBTP) {
 	var pool *Pool
 	act, loaded := ex.ibtps.Load(receipt.To)
@@ -171,7 +173,7 @@ func (ex *Exchanger) postHandleIBTP(from string, receipt *pb.IBTP) {
 }
 
 //直链模式
-func (ex *Exchanger) handleSendIBTPMessage(stream port.Port, msg *peerMsg.Message) {
+func (ex *Exchanger) handleSendIBTPMessage(p port.Port, msg *peerMsg.Message) {
 	ex.ch <- struct{}{}
 	go func(msg *peerMsg.Message) {
 		wIbtp := &model.WrappedIBTP{}
@@ -190,7 +192,8 @@ func (ex *Exchanger) handleSendIBTPMessage(stream port.Port, msg *peerMsg.Messag
 	}(msg)
 }
 
-func (ex *Exchanger) handleSendIBTPReceiptMessage(stream port.Port, msg *peerMsg.Message) {
+//直链模式
+func (ex *Exchanger) handleSendIBTPReceiptMessage(p port.Port, msg *peerMsg.Message) {
 	if msg.Payload.Data == nil {
 		return
 	}
@@ -217,6 +220,7 @@ func (ex *Exchanger) handleSendIBTPReceiptMessage(stream port.Port, msg *peerMsg
 	ex.logger.Info("Receive ibtp receipt from other pier")
 }
 
+// 直连
 func (ex *Exchanger) handleGetIBTPMessage(p port.Port, msg *peerMsg.Message) {
 	ibtpID := string(msg.Payload.Data)
 	ibtp, err := ex.mnt.QueryIBTP(ibtpID)
@@ -238,6 +242,7 @@ func (ex *Exchanger) handleGetIBTPMessage(p port.Port, msg *peerMsg.Message) {
 	}
 }
 
+// 直连
 func (ex *Exchanger) handleNewConnection(dstPierID string) {
 	appchainMethod := []byte(ex.appchainDID)
 	msg := peermgr.Message(peerMsg.Message_INTERCHAIN_META_GET, true, appchainMethod)
@@ -273,6 +278,7 @@ func (ex *Exchanger) handleNewConnection(dstPierID string) {
 	ex.recoverDirect(dstPierID, indices.InterchainIndex, indices.ReceiptIndex)
 }
 
+// 直连
 func (ex *Exchanger) recoverDirect(dstPierID string, interchainIndex uint64, receiptIndex uint64) {
 	// recover unsent interchain ibtp
 	mntMeta := ex.mnt.QueryOuterMeta()
@@ -294,7 +300,7 @@ func (ex *Exchanger) recoverDirect(dstPierID string, interchainIndex uint64, rec
 }
 
 //直链模式
-func (ex *Exchanger) handleGetInterchainMessage(stream port.Port, msg *peerMsg.Message) {
+func (ex *Exchanger) handleGetInterchainMessage(p port.Port, msg *peerMsg.Message) {
 	mntMeta := ex.mnt.QueryOuterMeta()
 	execMeta := ex.exec.QueryInterchainMeta()
 
@@ -319,7 +325,7 @@ func (ex *Exchanger) handleGetInterchainMessage(stream port.Port, msg *peerMsg.M
 	}
 
 	retMsg := peermgr.Message(peerMsg.Message_ACK, true, data)
-	if err := ex.peerMgr.AsyncSendWithPort(stream, retMsg); err != nil {
+	if err := ex.peerMgr.AsyncSendWithPort(p, retMsg); err != nil {
 		ex.logger.Error(err)
 		return
 	}

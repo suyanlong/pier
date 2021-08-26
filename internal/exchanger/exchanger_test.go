@@ -41,8 +41,6 @@ const (
 	assetTxID = "asset exchange id for test"
 )
 
-var errorUnhappy = fmt.Errorf("nil")
-
 func TestStartRelay(t *testing.T) {
 	testNormalStartRelay(t)
 	testRecoverErrorStartRelay(t)
@@ -111,16 +109,6 @@ func testNormalStartRelay(t *testing.T) {
 	testRelayIBTPFromSyncer(t, inCh, ibtps, mockExchanger)
 
 	testRelayIBTPFromMnt(t, outCh, mntIbtps, mockExchanger)
-
-	// test for asset exchange ibtp
-	signs := []byte("signs for asset exchange")
-	mockSyncer.EXPECT().GetAssetExchangeSigns(assetTxID).Return(signs, nil).AnyTimes()
-	assetExchangeIBTP := getIBTP(t, 3, pb.IBTP_ASSET_EXCHANGE_REDEEM)
-	assetExchangeIBTP.Extra = []byte(assetTxID)
-	mockExchanger.handleIBTP(&model.WrappedIBTP{
-		Ibtp:    assetExchangeIBTP,
-		IsValid: true,
-	}, log.NewWithModule("exchanger"))
 
 	time.Sleep(500 * time.Microsecond)
 	close(outCh)
@@ -195,34 +183,11 @@ func testApplyInterchain(t *testing.T) {
 	require.Nil(t, err)
 
 	inCh := make(chan *model.WrappedIBTP, 2)
-	signs := []byte("signs for asset exchange")
 	mockSyncer.EXPECT().ListenIBTP().Return(inCh).AnyTimes()
 	go mockExchanger.listenAndSendIBTPFromSyncer()
 
 	// test for ignored interchain ibtp
 	mockExchanger.executorCounter[to] = 1
-	interchainIBTP1 := getIBTP(t, 1, pb.IBTP_ASSET_EXCHANGE_REDEEM)
-	inCh <- &model.WrappedIBTP{Ibtp: interchainIBTP1, IsValid: true}
-
-	// test for handle missing
-	interchainIBTP2 := getIBTP(t, 2, pb.IBTP_ASSET_EXCHANGE_REDEEM)
-	interchainIBTP2.Extra = []byte(assetTxID)
-	badInterchainIBTP3 := getIBTP(t, 3, 7)
-	inCh <- &model.WrappedIBTP{Ibtp: badInterchainIBTP3, IsValid: true}
-	interchainIBTP3 := getIBTP(t, 3, pb.IBTP_ASSET_EXCHANGE_REDEEM)
-	interchainIBTP3.Extra = []byte(assetTxID)
-	mockSyncer.EXPECT().QueryIBTP(gomock.Any()).Return(nil, false, fmt.Errorf("query ibtp error"))
-	inCh <- &model.WrappedIBTP{Ibtp: interchainIBTP3, IsValid: true}
-
-	// test for send ibtp normal error
-	mockSyncer.EXPECT().QueryIBTP(gomock.Any()).Return(interchainIBTP2, true, nil)
-	////mockSyncer.EXPECT().GetAssetExchangeSigns(assetTxID).Return(nil, fmt.Errorf("get signs error"))
-	mockSyncer.EXPECT().GetAssetExchangeSigns(gomock.Any()).Return(signs, nil).AnyTimes()
-	mockSyncer.EXPECT().SendIBTP(gomock.Any()).Return(fmt.Errorf("send ibtp error"))
-	mockSyncer.EXPECT().SendIBTP(gomock.Any()).Return(nil)
-	mockExecutor.EXPECT().ExecuteIBTP(gomock.Any()).Return(&pb.IBTP{}, nil).AnyTimes()
-	mockExecutor.EXPECT().QueryIBTPReceipt(gomock.Any()).Return(&pb.IBTP{}, nil)
-	inCh <- &model.WrappedIBTP{Ibtp: interchainIBTP3, IsValid: true}
 
 	// test for update source receipt meta
 	sourceReceiptMeta := make(map[string]uint64)
@@ -497,44 +462,16 @@ func testNormalDirect(t *testing.T) {
 	// test for happy path, one normal indexed ibtp and will trigger getMissing
 	happyPathMissedOutIBTP := getIBTP(t, 1, pb.IBTP_INTERCHAIN)
 	happyPathOutIBTP := getIBTP(t, 2, pb.IBTP_INTERCHAIN)
-	receipt := getIBTP(t, 1, pb.IBTP_ASSET_EXCHANGE_RECEIPT)
-	receipt1 := getIBTP(t, 2, pb.IBTP_ASSET_EXCHANGE_RECEIPT)
 	outCh := make(chan *pb.IBTP, 1)
-
-	receiptBytes, err := receipt.Marshal()
-	require.Nil(t, err)
-
-	receipt1Bytes, err := receipt1.Marshal()
-	require.Nil(t, err)
-
-	indices := &struct {
-		InterchainIndex uint64 `json:"interchain_index"`
-		ReceiptIndex    uint64 `json:"receipt_index"`
-	}{}
-	metaBytes, err := json.Marshal(indices)
-	require.Nil(t, err)
-
-	metaMsg := peermgr.Message(peerMsg.Message_INTERCHAIN_META_GET, true, []byte(from))
-	retMetaMsg := peermgr.Message(peerMsg.Message_INTERCHAIN_META_GET, true, metaBytes)
-	retMsg := peermgr.Message(peerMsg.Message_ACK, true, receiptBytes)
-	ret1Msg := peermgr.Message(peerMsg.Message_ACK, true, receipt1Bytes)
 
 	outMeta := make(map[string]uint64)
 	outMeta[to] = 1
 	inMeta := make(map[string]uint64)
 	inMeta[to] = 1
 
-	callbackMeta := make(map[string]uint64)
-
 	mockMonitor.EXPECT().ListenIBTP().Return(outCh).AnyTimes()
 	mockMonitor.EXPECT().QueryOuterMeta().Return(outMeta).MaxTimes(2)
 	mockMonitor.EXPECT().QueryIBTP(happyPathMissedOutIBTP.ID()).Return(happyPathMissedOutIBTP, nil).AnyTimes()
-	mockExecutor.EXPECT().ExecuteIBTP(gomock.Any()).Return(receipt, nil).AnyTimes()
-	mockExecutor.EXPECT().QueryInterchainMeta().Return(inMeta).AnyTimes()
-	mockExecutor.EXPECT().QueryCallbackMeta().Return(callbackMeta).AnyTimes()
-	mockExecutor.EXPECT().QueryIBTPReceipt(gomock.Any()).Return(receipt, nil).AnyTimes()
-	mockPeerMgr.EXPECT().Send(gomock.Any(), metaMsg).Return(retMetaMsg, nil).AnyTimes()
-	mockPeerMgr.EXPECT().Send(gomock.Any(), gomock.Any()).Return(retMsg, nil).AnyTimes()
 	mockPeerMgr.EXPECT().AsyncSend(gomock.Any(), gomock.Any()).Return(nil).AnyTimes()
 
 	mockExchanger, err := New(mode, from, meta,
@@ -558,9 +495,6 @@ func testNormalDirect(t *testing.T) {
 
 	ibtpGetMsg := peermgr.Message(peerMsg.Message_IBTP_GET, true, []byte(happyPathMissedOutIBTP.ID()))
 	mockExchanger.handleGetIBTPMessage(stream, ibtpGetMsg)
-
-	mockExchanger.handleSendIBTPReceiptMessage(stream, ret1Msg)
-	mockExchanger.handleSendIBTPReceiptMessage(stream, retMsg)
 
 	getInterchainMsg := peermgr.Message(peerMsg.Message_INTERCHAIN_META_GET, true, []byte(to))
 	mockExchanger.handleGetInterchainMessage(stream, getInterchainMsg)

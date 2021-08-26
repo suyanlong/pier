@@ -35,4 +35,4 @@ type Executor interface {
 }
 
 // 是否可以重构，意义不是多大。视乎与Monitor意义一样。可以抽象为同一接口。
-// BxhClient 实现，这个接口。
+// to方，即链的执行方，需要实现这个接口。

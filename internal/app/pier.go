@@ -4,19 +4,18 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/meshplus/pier/internal"
 	"path/filepath"
 	"time"
 
 	"github.com/Rican7/retry"
 	"github.com/Rican7/retry/strategy"
 	"github.com/hashicorp/go-plugin"
-	"github.com/meshplus/bitxhub-kit/storage"
 	"github.com/meshplus/bitxhub-kit/storage/leveldb"
 	"github.com/meshplus/bitxhub-model/pb"
 	"github.com/meshplus/pier/api"
 	rpcx "github.com/meshplus/pier/hub/client"
 	_ "github.com/meshplus/pier/imports"
-	"github.com/meshplus/pier/internal/agent"
 	"github.com/meshplus/pier/internal/appchain"
 	"github.com/meshplus/pier/internal/checker"
 	"github.com/meshplus/pier/internal/exchanger"
@@ -28,18 +27,12 @@ import (
 	"github.com/meshplus/pier/internal/monitor"
 	"github.com/meshplus/pier/internal/peermgr"
 	"github.com/meshplus/pier/internal/repo"
-	"github.com/meshplus/pier/internal/router"
 	"github.com/meshplus/pier/internal/syncer"
 	"github.com/meshplus/pier/internal/txcrypto"
 	"github.com/meshplus/pier/pkg/plugins"
 	_ "github.com/meshplus/pier/pkg/single"
 	"github.com/sirupsen/logrus"
 )
-
-type Launcher interface {
-	Start() error
-	Stop() error
-}
 
 // Pier represents the necessary data for starting the pier app
 type Pier struct {
@@ -48,10 +41,10 @@ type Pier struct {
 	grpcPlugin *plugin.Client  //plugin 管理接口。可以定义到plugin里面
 	monitor    monitor.Monitor //Monitor receives event from blockchain and sends it to network ：AppchainMonitor
 	//Syncer 与 bithub交互的接口机制。
-	exec      executor.Executor    //represents the necessary data for executing interchain txs in appchain：与appchain链交互执行的接口
-	lite      lite.Lite            //轻客户度
-	storage   storage.Storage      // 存储
-	exchanger exchanger.IExchanger //主动交换，pier的核心动力引擎。
+	exec executor.Executor //represents the necessary data for executing interchain txs in appchain：与appchain链交互执行的接口
+	lite lite.Lite         //轻客户度
+	//storage   storage.Storage      // 存储
+	exchanger internal.Launcher //主动交换，pier的核心动力引擎。
 	ctx       context.Context
 	cancel    context.CancelFunc
 	//appchain   *appchainmgr.Appchain //appchain管理机制
@@ -61,7 +54,7 @@ type Pier struct {
 }
 
 // NewPier instantiates pier instance.
-func NewPier(repoRoot string, config *repo.Config) (Launcher, error) {
+func NewPier(repoRoot string, config *repo.Config) (internal.Launcher, error) {
 	store, err := leveldb.New(filepath.Join(config.RepoRoot, "store"))
 	if err != nil {
 		return nil, fmt.Errorf("read from datastaore %w", err)
@@ -86,8 +79,8 @@ func NewPier(repoRoot string, config *repo.Config) (Launcher, error) {
 	var (
 		ck        checker.Checker
 		cryptor   txcrypto.Cryptor
-		ex        exchanger.IExchanger
-		lite      lite.Lite
+		ex        internal.Launcher
+		l         lite.Lite
 		sync      syncer.Syncer
 		apiServer *api.Server
 		meta      *pb.Interchain
@@ -118,7 +111,7 @@ func NewPier(repoRoot string, config *repo.Config) (Launcher, error) {
 		}
 
 		meta = &pb.Interchain{}
-		lite = &direct_lite.MockLite{}
+		l = &direct_lite.MockLite{}
 	case repo.RelayMode: //中继链架构模式。
 		ck = &checker.MockChecker{}
 
@@ -161,14 +154,14 @@ func NewPier(repoRoot string, config *repo.Config) (Launcher, error) {
 			return nil, fmt.Errorf("cryptor create: %w", err)
 		}
 
-		lite, err = lite33.New(client, store, loggers.Logger(loggers.Lite33))
+		l, err = lite33.New(client, store, loggers.Logger(loggers.Lite33))
 		if err != nil {
-			return nil, fmt.Errorf("lite create: %w", err)
+			return nil, fmt.Errorf("l create: %w", err)
 		}
 
 		// 同步bithub数据。
 		sync, err = syncer.New(addr.String(), config.Appchain.DID, repo.RelayMode,
-			syncer.WithClient(client), syncer.WithLite(lite),
+			syncer.WithClient(client), syncer.WithLite(l),
 			syncer.WithStorage(store), syncer.WithLogger(loggers.Logger(loggers.Syncer)),
 		)
 		if err != nil {
@@ -204,7 +197,7 @@ func NewPier(repoRoot string, config *repo.Config) (Launcher, error) {
 		return nil, fmt.Errorf("monitor create: %w", err)
 	}
 
-	// 执行链一方。
+	// 执行链一方。即目的链。
 	exec, err := executor.New(cli, config.Appchain.DID, store, cryptor, loggers.Logger(loggers.Executor))
 	if err != nil {
 		return nil, fmt.Errorf("executor create: %w", err)
@@ -235,123 +228,123 @@ func NewPier(repoRoot string, config *repo.Config) (Launcher, error) {
 		monitor:   mnt,
 		exchanger: ex,
 		exec:      exec,
-		lite:      lite,
-		logger:    logger,
-		storage:   store,
-		ctx:       ctx,
-		cancel:    cancel,
-		config:    config,
-	}, nil
-}
-
-func NewUnionPier(repoRoot string, config *repo.Config) (Launcher, error) {
-	store, err := leveldb.New(filepath.Join(config.RepoRoot, "store"))
-	if err != nil {
-		return nil, fmt.Errorf("read from datastaore %w", err)
-	}
-
-	logger := loggers.Logger(loggers.App)
-	privateKey, err := repo.LoadPrivateKey(repoRoot)
-	if err != nil {
-		return nil, fmt.Errorf("repo load key: %w", err)
-	}
-
-	addr, err := privateKey.PublicKey().Address()
-	if err != nil {
-		return nil, fmt.Errorf("get address from private key %w", err)
-	}
-	var (
-		ex          exchanger.IExchanger
-		lite        lite.Lite
-		sync        syncer.Syncer
-		meta        *pb.Interchain
-		ck          checker.Checker
-		peerManager peermgr.PeerManager
-	)
-
-	ck = &checker.MockChecker{}
-	nodePrivKey, err := repo.LoadNodePrivateKey(repoRoot)
-	if err != nil {
-		return nil, fmt.Errorf("repo load node key: %w", err)
-	}
-
-	// 连接指定节点。
-	peerManager, err = peermgr.New(config, nodePrivKey, privateKey, config.Mode.Union.Providers, loggers.Logger(loggers.PeerMgr))
-	if err != nil {
-		return nil, fmt.Errorf("peerMgr create: %w", err)
-	}
-
-	opts := []rpcx.Option{
-		rpcx.WithLogger(logger),
-		rpcx.WithPrivateKey(privateKey),
-	}
-	// rpcx 连接。
-	nodesInfo := make([]*rpcx.NodeInfo, 0, len(config.Mode.Union.Addrs))
-	for _, addr := range config.Mode.Union.Addrs {
-		nodeInfo := &rpcx.NodeInfo{Addr: addr}
-		if config.Security.EnableTLS {
-			nodeInfo.CertPath = filepath.Join(config.RepoRoot, config.Security.Tlsca)
-			nodeInfo.EnableTLS = config.Security.EnableTLS
-			nodeInfo.CommonName = config.Security.CommonName
-		}
-		nodesInfo = append(nodesInfo, nodeInfo)
-	}
-	opts = append(opts, rpcx.WithNodesInfo(nodesInfo...), rpcx.WithTimeoutLimit(config.Mode.Relay.TimeoutLimit))
-	client, err := rpcx.New(opts...)
-	if err != nil {
-		return nil, fmt.Errorf("create bitxhub client: %w", err)
-	}
-
-	meta = &pb.Interchain{}
-
-	lite, err = lite33.New(client, store, loggers.Logger(loggers.Lite33))
-	if err != nil {
-		return nil, fmt.Errorf("lite create: %w", err)
-	}
-
-	sync, err = syncer.New(addr.String(), config.Appchain.DID, repo.UnionMode,
-		syncer.WithClient(client), syncer.WithLite(lite), syncer.WithStorage(store), syncer.WithLogger(loggers.Logger(loggers.Syncer)),
-	)
-	if err != nil {
-		return nil, fmt.Errorf("syncer create: %w", err)
-	}
-
-	cli := agent.CreateClient(client) //创建BxhClient客户端代理
-	exec, err := executor.New(cli, addr.String(), store, nil, loggers.Logger(loggers.Executor))
-	if err != nil {
-		return nil, fmt.Errorf("executor create: %w", err)
-	}
-
-	r := router.New(peerManager, store, loggers.Logger(loggers.Router), peerManager.(*peermgr.Swarm).ConnectedPeerIDs())
-
-	ex, err = exchanger.New(config.Mode.Type, addr.String(), meta,
-		exchanger.WithExecutor(exec),
-		exchanger.WithPeerMgr(peerManager),
-		exchanger.WithChecker(ck),
-		exchanger.WithSyncer(sync),
-		exchanger.WithStorage(store),
-		exchanger.WithRouter(r),
-		exchanger.WithLogger(loggers.Logger(loggers.Exchanger)),
-	)
-	if err != nil {
-		return nil, fmt.Errorf("exchanger create: %w", err)
-	}
-
-	ctx, cancel := context.WithCancel(context.Background())
-
-	return &Pier{
-		//privateKey: privateKey,
-		meta:      meta,
-		exchanger: ex,
-		exec:      exec,
-		lite:      lite,
-		storage:   store,
+		lite:      l,
 		logger:    logger,
 		ctx:       ctx,
 		cancel:    cancel,
 		config:    config,
 	}, nil
 }
+
+//func NewUnionPier(repoRoot string, config *repo.Config) (Launcher, error) {
+//	store, err := leveldb.New(filepath.Join(config.RepoRoot, "store"))
+//	if err != nil {
+//		return nil, fmt.Errorf("read from datastaore %w", err)
+//	}
+//
+//	logger := loggers.Logger(loggers.App)
+//	privateKey, err := repo.LoadPrivateKey(repoRoot)
+//	if err != nil {
+//		return nil, fmt.Errorf("repo load key: %w", err)
+//	}
+//
+//	addr, err := privateKey.PublicKey().Address()
+//	if err != nil {
+//		return nil, fmt.Errorf("get address from private key %w", err)
+//	}
+//	var (
+//		ex          exchanger.IExchanger
+//		lite        lite.Lite
+//		sync        syncer.Syncer
+//		meta        *pb.Interchain
+//		ck          checker.Checker
+//		peerManager peermgr.PeerManager
+//	)
+//
+//	ck = &checker.MockChecker{}
+//	nodePrivKey, err := repo.LoadNodePrivateKey(repoRoot)
+//	if err != nil {
+//		return nil, fmt.Errorf("repo load node key: %w", err)
+//	}
+//
+//	// 连接指定节点。
+//	peerManager, err = peermgr.New(config, nodePrivKey, privateKey, config.Mode.Union.Providers, loggers.Logger(loggers.PeerMgr))
+//	if err != nil {
+//		return nil, fmt.Errorf("peerMgr create: %w", err)
+//	}
+//
+//	opts := []rpcx.Option{
+//		rpcx.WithLogger(logger),
+//		rpcx.WithPrivateKey(privateKey),
+//	}
+//	// rpcx 连接。
+//	nodesInfo := make([]*rpcx.NodeInfo, 0, len(config.Mode.Union.Addrs))
+//	for _, addr := range config.Mode.Union.Addrs {
+//		nodeInfo := &rpcx.NodeInfo{Addr: addr}
+//		if config.Security.EnableTLS {
+//			nodeInfo.CertPath = filepath.Join(config.RepoRoot, config.Security.Tlsca)
+//			nodeInfo.EnableTLS = config.Security.EnableTLS
+//			nodeInfo.CommonName = config.Security.CommonName
+//		}
+//		nodesInfo = append(nodesInfo, nodeInfo)
+//	}
+//	opts = append(opts, rpcx.WithNodesInfo(nodesInfo...), rpcx.WithTimeoutLimit(config.Mode.Relay.TimeoutLimit))
+//	client, err := rpcx.New(opts...)
+//	if err != nil {
+//		return nil, fmt.Errorf("create bitxhub client: %w", err)
+//	}
+//
+//	meta = &pb.Interchain{}
+//
+//	lite, err = lite33.New(client, store, loggers.Logger(loggers.Lite33))
+//	if err != nil {
+//		return nil, fmt.Errorf("lite create: %w", err)
+//	}
+//
+//	//同样需要同步rpcx上的数据。
+//	sync, err = syncer.New(addr.String(), config.Appchain.DID, repo.UnionMode,
+//		syncer.WithClient(client), syncer.WithLite(lite), syncer.WithStorage(store), syncer.WithLogger(loggers.Logger(loggers.Syncer)),
+//	)
+//	if err != nil {
+//		return nil, fmt.Errorf("syncer create: %w", err)
+//	}
+//
+//	cli := agent.CreateClient(client)                                                           //创建BxhClient客户端代理
+//	exec, err := executor.New(cli, addr.String(), store, nil, loggers.Logger(loggers.Executor)) //执行交易的一方，即目的链。
+//	if err != nil {
+//		return nil, fmt.Errorf("executor create: %w", err)
+//	}
+//
+//	r := router.New(peerManager, store, loggers.Logger(loggers.Router), peerManager.(*peermgr.Swarm).ConnectedPeerIDs())
+//
+//	ex, err = exchanger.New(config.Mode.Type, addr.String(), meta,
+//		exchanger.WithExecutor(exec),
+//		exchanger.WithPeerMgr(peerManager),
+//		exchanger.WithChecker(ck),
+//		exchanger.WithSyncer(sync),
+//		exchanger.WithStorage(store),
+//		exchanger.WithRouter(r),
+//		exchanger.WithLogger(loggers.Logger(loggers.Exchanger)),
+//	)
+//	if err != nil {
+//		return nil, fmt.Errorf("exchanger create: %w", err)
+//	}
+//
+//	ctx, cancel := context.WithCancel(context.Background())
+//
+//	return &Pier{
+//		//privateKey: privateKey,
+//		meta:      meta,
+//		exchanger: ex,
+//		exec:      exec,
+//		lite:      lite,
+//		storage:   store,
+//		logger:    logger,
+//		ctx:       ctx,
+//		cancel:    cancel,
+//		config:    config,
+//	}, nil
+//}
 
 // Start starts three main components of pier app
 func (pier *Pier) Start() error {

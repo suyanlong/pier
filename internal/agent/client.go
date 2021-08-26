@@ -254,8 +254,6 @@ func (client *BxhClient) generateCallback(original *pb.IBTP, args [][]byte, stat
 		if !status {
 			typ = pb.IBTP_RECEIPT_FAILURE
 		}
-	} else {
-		typ = pb.IBTP_ASSET_EXCHANGE_RECEIPT
 	}
 
 	return &pb.IBTP{

@@ -2,18 +2,15 @@ package exchanger
 
 import (
 	"errors"
-	"fmt"
 	"time"
 
-	"github.com/Rican7/retry"
-	"github.com/Rican7/retry/strategy"
 	"github.com/meshplus/bitxhub-model/pb"
 	"github.com/meshplus/pier/internal/syncer"
 	"github.com/meshplus/pier/pkg/model"
 	"github.com/sirupsen/logrus"
 )
 
-// handleIBTP handle ibtps from bitxhub
+//中继模式 handleIBTP handle ibtps from bitxhub
 func (ex *Exchanger) handleIBTP(wIbtp *model.WrappedIBTP, entry logrus.FieldLogger) {
 	ibtp := wIbtp.Ibtp
 	err := ex.checker.Check(ibtp)
@@ -22,17 +19,6 @@ func (ex *Exchanger) handleIBTP(wIbtp *model.WrappedIBTP, entry logrus.FieldLogg
 		return
 	}
 	entry.Debugf("IBTP pass check")
-	if pb.IBTP_ASSET_EXCHANGE_REDEEM == ibtp.Type || pb.IBTP_ASSET_EXCHANGE_REFUND == ibtp.Type {
-		if err := retry.Retry(func(attempt uint) error {
-			if err := ex.fetchSignsToIBTP(ibtp); err != nil {
-				return err
-			}
-			return nil
-		}, strategy.Wait(1*time.Second)); err != nil {
-			ex.logger.Panic(err)
-		}
-	}
-
 	receipt, err := ex.exec.ExecuteIBTP(wIbtp)
 	if err != nil {
 		ex.logger.Errorf("execute ibtp error:%s", err.Error())
@@ -44,7 +30,7 @@ func (ex *Exchanger) handleIBTP(wIbtp *model.WrappedIBTP, entry logrus.FieldLogg
 
 sendReceiptLoop:
 	for {
-		err = ex.syncer.SendIBTP(receipt)
+		err = ex.syncer.SendIBTP(receipt) // 回执一定是要到中继链上的，作为数据凭证。
 		if err != nil {
 			ex.logger.Errorf("send ibtp error: %s", err.Error())
 			if errors.Is(err, syncer.ErrMetaOutOfDate) {
@@ -54,6 +40,7 @@ sendReceiptLoop:
 			// if sending receipt failed, try to get new receipt from appchain and retry
 		queryLoop:
 			for {
+				// 死循环，直到成功。
 				receipt, err = ex.exec.QueryIBTPReceipt(ibtp)
 				if err != nil {
 					ex.logger.Errorf("Query ibtp receipt for %s error: %s", ibtp.ID(), err.Error())
@@ -69,6 +56,7 @@ sendReceiptLoop:
 	ex.logger.WithFields(logrus.Fields{"type": ibtp.Type, "id": ibtp.ID()}).Info("Handle ibtp success")
 }
 
+// 中继模式：处理链间交易回执
 func (ex *Exchanger) applyReceipt(wIbtp *model.WrappedIBTP, entry logrus.FieldLogger) {
 	ibtp := wIbtp.Ibtp
 	index := ex.callbackCounter[ibtp.To]
@@ -86,6 +74,7 @@ func (ex *Exchanger) applyReceipt(wIbtp *model.WrappedIBTP, entry logrus.FieldLo
 	ex.callbackCounter[ibtp.To] = ibtp.Index
 }
 
+// 中继链架构,处理链间交易，
 func (ex *Exchanger) applyInterchain(wIbtp *model.WrappedIBTP, entry logrus.FieldLogger) {
 	ibtp := wIbtp.Ibtp
 	index := ex.executorCounter[ibtp.From]
@@ -120,15 +109,4 @@ func (ex *Exchanger) timeCost() func() {
 		tc := time.Since(start)
 		ex.sendIBTPTimer.Add(tc)
 	}
-}
-
-func (ex *Exchanger) fetchSignsToIBTP(ibtp *pb.IBTP) error {
-	signs, err := ex.syncer.GetAssetExchangeSigns(string(ibtp.Extra))
-	if err != nil {
-		return fmt.Errorf("get asset exchange signs: %w", err)
-	}
-
-	ibtp.Extra = signs
-
-	return nil
 }

@@ -253,11 +253,11 @@ func (s *sidercar) ID() string {
 }
 
 func (s *sidercar) Type() string {
-	return "peer"
+	return "sidercar"
 }
 
 func (s *sidercar) Name() string {
-	panic("implement me")
+	return s.peerIDs
 }
 
 func (s *sidercar) Send(msg port.Message) (*peermgr.Message, error) {
@@ -270,7 +270,7 @@ func (s *sidercar) AsyncSend(msg port.Message) error {
 	//s.swarm.Send(s.peerIDs,)
 }
 
-func (swarm *Swarm) Port() []port.Port {
+func (swarm *Swarm) Ports() []port.Port {
 	ports := []port.Port{}
 	swarm.connectedPeers.Range(func(key, value interface{}) bool {
 		p := &sidercar{

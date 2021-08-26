@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/meshplus/pier/internal"
 	"net/http"
 	_ "net/http/pprof"
 	"os"
@@ -56,7 +57,7 @@ func start(ctx *cli.Context) error {
 	// init loggers map for pier
 	loggers.InitializeLogger(config)
 
-	var pier app.Launcher
+	var pier internal.Launcher
 
 	//TODO
 	//switch config.Mode.Type {
@@ -78,7 +79,7 @@ func start(ctx *cli.Context) error {
 	//	}
 	//}
 
-	pier, err = app.NewUnionPier(repoRoot, config)
+	pier, err = app.NewPier(repoRoot, config)
 	if err != nil {
 		return err
 	}
@@ -99,7 +100,7 @@ func start(ctx *cli.Context) error {
 	return nil
 }
 
-func handleShutdown(pier app.Launcher, wg *sync.WaitGroup) {
+func handleShutdown(pier internal.Launcher, wg *sync.WaitGroup) {
 	var stop = make(chan os.Signal)
 	signal.Notify(stop, syscall.SIGTERM)
 	signal.Notify(stop, syscall.SIGINT)

@@ -30,10 +30,10 @@ type Exchanger struct {
 	mode                 string
 	appchainDID          string
 	store                storage.Storage
-	mnt                  monitor.Monitor
-	exec                 executor.Executor
-	syncer               syncer.Syncer // WrapperSyncer represents the necessary data for sync tx wrappers from bitxhub
-	router               router.Router // 占时不使用
+	mnt                  monitor.Monitor   // 监听跨链交易，来源链。
+	exec                 executor.Executor // 执行跨链交易的一方。
+	syncer               syncer.Syncer     // WrapperSyncer represents the necessary data for sync tx wrappers from bitxhub
+	router               router.Router     // 占时不使用
 	interchainCounter    map[string]uint64
 	executorCounter      map[string]uint64
 	callbackCounter      map[string]uint64
@@ -92,12 +92,14 @@ func (ex *Exchanger) Start() error {
 		return err
 	}
 
-	go ex.listenAndSendIBTPFromMnt()
-
-	if ex.mode != repo.DirectMode {
-		go ex.listenAndSendIBTPFromSyncer()
+	if ex.mnt != nil {
+		go ex.listenAndSendIBTPFromMnt() // 这个同样也是，而不是在这里启动。
 	}
 
+	//核心，就是转发
+	if ex.syncer != nil { //而是根据是否有配置hub判断，而不是这个判断.
+		go ex.listenAndSendIBTPFromSyncer()
+	}
 	ex.logger.Info("Exchanger started")
 	return nil
 }
@@ -140,6 +142,7 @@ func (ex *Exchanger) startWithRelayMode() error {
 	if err := ex.syncer.RegisterRollbackHandler(ex.handleRollback); err != nil {
 		return fmt.Errorf("register router handler: %w", err)
 	}
+
 	// syncer should be started first in case to recover ibtp from monitor
 	if err := ex.syncer.Start(); err != nil {
 		return fmt.Errorf("syncer start: %w", err)
@@ -218,10 +221,9 @@ func (ex *Exchanger) listenAndSendIBTPFromSyncer() {
 			entry := ex.logger.WithFields(logrus.Fields{"type": wIbtp.Ibtp.Type, "id": wIbtp.Ibtp.ID()})
 			entry.Debugf("Exchanger receives ibtp from syncer")
 			switch wIbtp.Ibtp.Type {
-			case pb.IBTP_INTERCHAIN, pb.IBTP_ASSET_EXCHANGE_INIT,
-				pb.IBTP_ASSET_EXCHANGE_REDEEM, pb.IBTP_ASSET_EXCHANGE_REFUND:
-				ex.applyInterchain(wIbtp, entry)
-			case pb.IBTP_RECEIPT_SUCCESS, pb.IBTP_RECEIPT_FAILURE, pb.IBTP_ASSET_EXCHANGE_RECEIPT:
+			case pb.IBTP_INTERCHAIN:
+				ex.applyInterchain(wIbtp, entry) // 发送到HUB上
+			case pb.IBTP_RECEIPT_SUCCESS, pb.IBTP_RECEIPT_FAILURE:
 				ex.applyReceipt(wIbtp, entry)
 			default:
 				entry.Errorf("wrong type of ibtp")
@@ -252,6 +254,7 @@ func (ex *Exchanger) Stop() error {
 	return nil
 }
 
+// 共同
 func (ex *Exchanger) sendIBTP(ibtp *pb.IBTP) error {
 	entry := ex.logger.WithFields(logrus.Fields{"index": ibtp.Index, "type": ibtp.Type, "to": ibtp.To, "id": ibtp.ID()})
 

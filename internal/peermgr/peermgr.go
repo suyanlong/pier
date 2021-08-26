@@ -27,18 +27,13 @@ type PeerManager interface {
 	// AsyncSendWithStream sends message using existed stream
 	AsyncSendWithPort(port.Port, port.Message) error
 
-	// SendWithStream sends message using existed stream
-	//SendWithStreamX(port.Port, port.Message) (port.Message, error)
-	//
-	//// AsyncSendWithPort sends message using existed stream
-	//AsyncSendWithStreamX(port.Port,, port.Message) error
-
 	// Send sends message waiting response
 	Send(string, port.Message) (*peermgr.Message, error)
 
 	// Peers
-	Peers() map[string]*peer.AddrInfo
+	//Peers() map[string]*peer.AddrInfo
 
+	Ports() []port.Port
 	// RegisterMsgHandler
 	RegisterMsgHandler(peermgr.Message_Type, MessageHandler) error
 

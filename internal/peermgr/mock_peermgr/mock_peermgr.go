@@ -38,7 +38,7 @@ func (m *MockPeerManager) EXPECT() *MockPeerManagerMockRecorder {
 }
 
 // AsyncSend mocks base method.
-func (m *MockPeerManager) AsyncSend(arg0 string, arg1 *peermgr0.Message) error {
+func (m *MockPeerManager) AsyncSend(arg0 string, arg1 port.Message) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "AsyncSend", arg0, arg1)
 	ret0, _ := ret[0].(error)
@@ -52,7 +52,7 @@ func (mr *MockPeerManagerMockRecorder) AsyncSend(arg0, arg1 interface{}) *gomock
 }
 
 // AsyncSendWithPort mocks base method.
-func (m *MockPeerManager) AsyncSendWithPort(arg0 port.Port, arg1 *peermgr0.Message) error {
+func (m *MockPeerManager) AsyncSendWithPort(arg0 port.Port, arg1 port.Message) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "AsyncSendWithPort", arg0, arg1)
 	ret0, _ := ret[0].(error)
@@ -95,18 +95,18 @@ func (mr *MockPeerManagerMockRecorder) FindProviders(id interface{}) *gomock.Cal
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindProviders", reflect.TypeOf((*MockPeerManager)(nil).FindProviders), id)
 }
 
-// Peers mocks base method.
-func (m *MockPeerManager) Peers() map[string]*peer.AddrInfo {
+// Ports mocks base method.
+func (m *MockPeerManager) Ports() []port.Port {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Peers")
-	ret0, _ := ret[0].(map[string]*peer.AddrInfo)
+	ret := m.ctrl.Call(m, "Ports")
+	ret0, _ := ret[0].([]port.Port)
 	return ret0
 }
 
-// Peers indicates an expected call of Peers.
-func (mr *MockPeerManagerMockRecorder) Peers() *gomock.Call {
+// Ports indicates an expected call of Ports.
+func (mr *MockPeerManagerMockRecorder) Ports() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Peers", reflect.TypeOf((*MockPeerManager)(nil).Peers))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Ports", reflect.TypeOf((*MockPeerManager)(nil).Ports))
 }
 
 // Provider mocks base method.
@@ -166,7 +166,7 @@ func (mr *MockPeerManagerMockRecorder) RegisterMultiMsgHandler(arg0, arg1 interf
 }
 
 // Send mocks base method.
-func (m *MockPeerManager) Send(arg0 string, arg1 *peermgr0.Message) (*peermgr0.Message, error) {
+func (m *MockPeerManager) Send(arg0 string, arg1 port.Message) (*peermgr0.Message, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Send", arg0, arg1)
 	ret0, _ := ret[0].(*peermgr0.Message)

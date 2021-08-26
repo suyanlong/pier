@@ -2,11 +2,11 @@ package appchain
 
 import (
 	"encoding/json"
-	"github.com/meshplus/pier/internal/port"
 
 	appchainmgr "github.com/meshplus/bitxhub-core/appchain-mgr"
 	"github.com/meshplus/pier/internal/peermgr"
 	peerproto "github.com/meshplus/pier/internal/peermgr/proto"
+	"github.com/meshplus/pier/internal/port"
 	"github.com/sirupsen/logrus"
 )
 

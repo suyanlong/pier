@@ -19,13 +19,12 @@ var _ Monitor = (*AppchainMonitor)(nil)
 
 // Monitor receives event from blockchain and sends it to network
 type AppchainMonitor struct {
-	client    plugins.Client
-	recvCh    chan *pb.IBTP
-	logger    logrus.FieldLogger
-	suspended uint64
-	ctx       context.Context
-	cancel    context.CancelFunc
-	cryptor   txcrypto.Cryptor
+	client  plugins.Client
+	recvCh  chan *pb.IBTP
+	logger  logrus.FieldLogger
+	ctx     context.Context
+	cancel  context.CancelFunc
+	cryptor txcrypto.Cryptor
 }
 
 // New creates monitor instance given client interacting with appchain and interchainCounter about appchain.

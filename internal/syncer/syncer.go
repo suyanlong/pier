@@ -8,8 +8,6 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/meshplus/pier/pkg/model"
-
 	"github.com/Rican7/retry"
 	"github.com/Rican7/retry/strategy"
 	"github.com/cbergoon/merkletree"
@@ -18,7 +16,7 @@ import (
 	"github.com/meshplus/bitxhub-model/pb"
 	rpcx "github.com/meshplus/pier/hub/client"
 	"github.com/meshplus/pier/internal/lite"
-	"github.com/meshplus/pier/internal/repo"
+	"github.com/meshplus/pier/pkg/model"
 	"github.com/sirupsen/logrus"
 )
 
@@ -28,7 +26,7 @@ const maxChSize = 1 << 10
 
 // WrapperSyncer represents the necessary data for sync tx wrappers from bitxhub
 type WrapperSyncer struct {
-	client          rpcx.Client
+	client          rpcx.Client // hub 客户端。
 	lite            lite.Lite
 	storage         storage.Storage
 	logger          logrus.FieldLogger
@@ -204,11 +202,7 @@ func (syncer *WrapperSyncer) getWrappersChannel() chan *pb.InterchainTxWrappers 
 		subscriptType pb.SubscriptionRequest_Type
 		rawCh         <-chan interface{}
 	)
-	if syncer.mode == repo.UnionMode {
-		subscriptType = pb.SubscriptionRequest_UNION_INTERCHAIN_TX_WRAPPER
-	} else {
-		subscriptType = pb.SubscriptionRequest_INTERCHAIN_TX_WRAPPER
-	}
+	subscriptType = pb.SubscriptionRequest_INTERCHAIN_TX_WRAPPER
 	// retry for network reason
 	subKey := &SubscriptionKey{syncer.pierID, syncer.appchainDID}
 	subKeyData, _ := json.Marshal(subKey)
@@ -454,8 +448,4 @@ func (syncer *WrapperSyncer) getDemandHeight() uint64 {
 // updateHeight updates sync height
 func (syncer *WrapperSyncer) updateHeight() {
 	atomic.AddUint64(&syncer.height, 1)
-}
-
-func (syncer *WrapperSyncer) isUnionMode() bool {
-	return syncer.mode == repo.UnionMode
 }

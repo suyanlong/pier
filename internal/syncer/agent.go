@@ -34,42 +34,6 @@ var (
 	ErrMetaOutOfDate = fmt.Errorf("interchain meta is out of date")
 )
 
-func (syncer *WrapperSyncer) GetAssetExchangeSigns(id string) ([]byte, error) {
-	resp, err := syncer.client.GetMultiSigns(id, pb.GetMultiSignsRequest_ASSET_EXCHANGE)
-	if err != nil {
-		return nil, err
-	}
-
-	if resp == nil || resp.Sign == nil {
-		return nil, fmt.Errorf("get empty signatures for asset exchange id %s", id)
-	}
-
-	var signs []byte
-	for _, sign := range resp.Sign {
-		signs = append(signs, sign...)
-	}
-
-	return signs, nil
-}
-
-func (syncer *WrapperSyncer) GetIBTPSigns(ibtp *pb.IBTP) ([]byte, error) {
-	hash := ibtp.Hash()
-	resp, err := syncer.client.GetMultiSigns(hash.String(), pb.GetMultiSignsRequest_IBTP)
-	if err != nil {
-		return nil, err
-	}
-
-	if resp == nil || resp.Sign == nil {
-		return nil, fmt.Errorf("get empty signatures for ibtp %s", ibtp.ID())
-	}
-	signs, err := resp.Marshal()
-	if err != nil {
-		return nil, err
-	}
-
-	return signs, nil
-}
-
 func (syncer *WrapperSyncer) GetAppchains() ([]*appchainmgr.Appchain, error) {
 	tx, err := syncer.client.GenerateContractTx(pb.TransactionData_BVM, constant.AppchainMgrContractAddr.Address(), "Appchains")
 	if err != nil {
