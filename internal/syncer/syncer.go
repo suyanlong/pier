@@ -207,7 +207,7 @@ func (syncer *WrapperSyncer) getWrappersChannel() chan *pb.InterchainTxWrappers 
 	subKey := &SubscriptionKey{syncer.pierID, syncer.appchainDID}
 	subKeyData, _ := json.Marshal(subKey)
 	if err := retry.Retry(func(attempt uint) error {
-		//订阅消息
+		// 订阅消息
 		rawCh, err = syncer.client.Subscribe(syncer.ctx, subscriptType, subKeyData)
 		if err != nil {
 			return err

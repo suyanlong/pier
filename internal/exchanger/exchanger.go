@@ -154,7 +154,7 @@ func (ex *Exchanger) startWithRelayMode() error {
 	return nil
 }
 
-// 非联盟模式：中继、直链
+// 中继、直链
 func (ex *Exchanger) listenAndSendIBTPFromMnt() {
 	ch := ex.mnt.ListenIBTP()
 	for {
@@ -206,7 +206,7 @@ func (ex *Exchanger) listenAndSendIBTPFromMnt() {
 	}
 }
 
-// 非直链模式
+// 中继模式
 func (ex *Exchanger) listenAndSendIBTPFromSyncer() {
 	ch := ex.syncer.ListenIBTP()
 	for {
@@ -257,9 +257,10 @@ func (ex *Exchanger) Stop() error {
 // 共同
 func (ex *Exchanger) sendIBTP(ibtp *pb.IBTP) error {
 	entry := ex.logger.WithFields(logrus.Fields{"index": ibtp.Index, "type": ibtp.Type, "to": ibtp.To, "id": ibtp.ID()})
-
-	// 所有的这些模式全部都在路由规则里面。
-	switch ex.mode {
+	//TODO!!!! 根据交易决定
+	//mode := ibtp.mode
+	mode := repo.RelayMode
+	switch mode {
 	case repo.RelayMode:
 		err := ex.syncer.SendIBTP(ibtp)
 		if err != nil {
@@ -277,14 +278,12 @@ func (ex *Exchanger) sendIBTP(ibtp *pb.IBTP) error {
 			if err != nil {
 				panic(fmt.Sprintf("marshal ibtp: %s", err.Error()))
 			}
-			//peer间传输是另一套协议。
 			msg := peermgr.Message(peerMsg.Message_IBTP_SEND, true, data)
-
 			var dst string
-			if ibtp.Type == pb.IBTP_INTERCHAIN { //是否是跨链交易？
+			if ibtp.Type == pb.IBTP_INTERCHAIN {
 				dst = ibtp.To
 			} else {
-				dst = ibtp.From //否则原路返回？
+				dst = ibtp.From
 			}
 
 			if err := ex.peerMgr.AsyncSend(dst, msg); err != nil {
@@ -303,7 +302,7 @@ func (ex *Exchanger) sendIBTP(ibtp *pb.IBTP) error {
 }
 
 //主动发起，说明是from自己，
-func (ex *Exchanger) queryIBTP(id, target string) (*pb.IBTP, bool, error) {
+func (ex *Exchanger) queryIBTP(mode string, id, target string) (*pb.IBTP, bool, error) {
 	verifiedTx := &pb.VerifiedTx{}
 	v := ex.store.Get(model.IBTPKey(id))
 	if v != nil {
@@ -321,7 +320,7 @@ func (ex *Exchanger) queryIBTP(id, target string) (*pb.IBTP, bool, error) {
 	)
 
 	// 交易中，如果是用户，根据用户指定，如果没有按默认配置，依次排序。
-	switch ex.mode {
+	switch mode {
 	case repo.RelayMode: // 中继模式是查询bithub上的ibtp交易根据交易ID。
 		ibtp, isValid, err = ex.syncer.QueryIBTP(id)
 		if err != nil {
@@ -344,6 +343,26 @@ func (ex *Exchanger) queryIBTP(id, target string) (*pb.IBTP, bool, error) {
 		}
 	default:
 		return nil, false, fmt.Errorf("unsupported pier mode")
+	}
+
+	return ibtp, isValid, nil
+}
+
+func (ex *Exchanger) queryIBTPForRelay(id, target string) (*pb.IBTP, bool, error) {
+	verifiedTx := &pb.VerifiedTx{}
+	v := ex.store.Get(model.IBTPKey(id))
+	if v != nil {
+		if err := verifiedTx.Unmarshal(v); err != nil {
+			return nil, false, err
+		}
+		return verifiedTx.Tx.GetIBTP(), verifiedTx.Valid, nil
+	}
+	ibtp, isValid, err := ex.syncer.QueryIBTP(id)
+	if err != nil {
+		if errors.Is(err, syncer.ErrIBTPNotFound) {
+			ex.logger.Panicf("query ibtp by id %s from bitxhub: %s", id, err.Error())
+		}
+		return nil, false, fmt.Errorf("query ibtp from bitxhub: %s", err.Error())
 	}
 
 	return ibtp, isValid, nil

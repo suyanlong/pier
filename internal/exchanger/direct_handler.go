@@ -3,6 +3,7 @@ package exchanger
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/meshplus/pier/internal/repo"
 	"sync"
 	"time"
 
@@ -294,7 +295,7 @@ func (ex *Exchanger) recoverDirect(dstPierID string, interchainIndex uint64, rec
 	// recoverDirect unsent receipt to counterpart chain
 	execMeta := ex.exec.QueryInterchainMeta()
 	idx := execMeta[dstPierID]
-	if err := ex.handleMissingReceipt(dstPierID, receiptIndex+1, idx+1); err != nil {
+	if err := ex.handleMissingReceipt(repo.DirectMode, dstPierID, receiptIndex+1, idx+1); err != nil {
 		ex.logger.WithFields(logrus.Fields{"address": dstPierID, "error": err.Error()}).Panic("Get missing receipt from contract")
 	}
 }

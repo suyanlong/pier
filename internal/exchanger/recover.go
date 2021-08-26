@@ -7,6 +7,7 @@ import (
 	"github.com/Rican7/retry"
 	"github.com/Rican7/retry/strategy"
 	"github.com/meshplus/bitxhub-model/pb"
+	"github.com/meshplus/pier/internal/repo"
 	"github.com/meshplus/pier/pkg/model"
 	"github.com/sirupsen/logrus"
 )
@@ -47,7 +48,7 @@ func (ex *Exchanger) recoverRelay() {
 			beginIndex = 0
 		}
 
-		if err := ex.handleMissingReceipt(from, beginIndex+1, idx+1); err != nil {
+		if err := ex.handleMissingReceipt(repo.RelayMode, from, beginIndex+1, idx+1); err != nil {
 			ex.logger.WithFields(logrus.Fields{"address": from, "error": err.Error()}).Panic("Get missing receipt from contract")
 		}
 	}
@@ -65,7 +66,7 @@ func (ex *Exchanger) handleMissingCallback(to string, begin, end uint64) error {
 		}).Info("Get missing callbacks from bitxhub")
 
 		if err := retry.Retry(func(attempt uint) error {
-			ibtp, isValid, err := ex.queryIBTP(fmt.Sprintf("%s-%s-%d", ex.appchainDID, to, begin), to)
+			ibtp, isValid, err := ex.queryIBTPForRelay(fmt.Sprintf("%s-%s-%d", ex.appchainDID, to, begin), to)
 			if err != nil {
 				ex.logger.Errorf("Fetch ibtp: %s", err.Error())
 				return err
@@ -145,12 +146,11 @@ func (ex *Exchanger) handleMissingIBTPFromSyncer(from string, begin, end uint64)
 		ex.handleIBTP(&model.WrappedIBTP{Ibtp: ibtp, IsValid: isValid}, entry)
 		ex.executorCounter[ibtp.From] = ibtp.Index
 	}
-
 	return nil
 }
 
 // 共同拥有
-func (ex *Exchanger) handleMissingReceipt(from string, begin uint64, end uint64) error {
+func (ex *Exchanger) handleMissingReceipt(mode string, from string, begin uint64, end uint64) error {
 	if begin < 1 {
 		return fmt.Errorf("begin index for missing receipt is required >= 1")
 	}
@@ -166,7 +166,7 @@ func (ex *Exchanger) handleMissingReceipt(from string, begin uint64, end uint64)
 		entry.Info("Send missing receipt to bitxhub")
 
 		retry.Retry(func(attempt uint) error {
-			original, _, err := ex.queryIBTP(fmt.Sprintf("%s-%s-%d", from, ex.appchainDID, begin), from)
+			original, _, err := ex.queryIBTP(mode, fmt.Sprintf("%s-%s-%d", from, ex.appchainDID, begin), from)
 			if err != nil {
 				return err
 			}

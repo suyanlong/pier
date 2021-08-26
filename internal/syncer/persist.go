@@ -20,7 +20,6 @@ func (syncer *WrapperSyncer) persist(ws *pb.InterchainTxWrappers) error {
 	}
 
 	batch.Put(model.WrapperKey(ws.InterchainTxWrappers[0].Height), data)
-
 	for _, w := range ws.InterchainTxWrappers {
 		for _, tx := range w.Transactions {
 			data, err := tx.Marshal()
@@ -31,8 +30,6 @@ func (syncer *WrapperSyncer) persist(ws *pb.InterchainTxWrappers) error {
 		}
 	}
 	batch.Put(syncHeightKey(), []byte(strconv.FormatUint(syncer.height, 10)))
-
 	batch.Commit()
-
 	return nil
 }
