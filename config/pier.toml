@@ -22,9 +22,8 @@ report_caller = false
   swarm        = "info"
   syncer       = "info"
 
-[mode]
-type = "relay" # relay, direct or union
-[mode.relay]
+[hub]
+enable = true
 addrs = ["localhost:60011", "localhost:60012", "localhost:60013", "localhost:60014"]
 timeout_limit = "1s"
 quorum = 2
@@ -34,23 +33,20 @@ validators = [
     "0xb18c8575e3284e79b92100025a31378feb8100d6",
     "0x856E2B9A5FA82FD1B031D1FF6863864DBAC7995D",
 ]
-[mode.direct]
-peers = []
 
-[mode.union]
-addrs = ["localhost:60011", "localhost:60012", "localhost:60013", "localhost:60014"]
-connectors = []
-providers = 1
-
-[security]
-enable_tls = false
-tlsca = "certs/ca.pem"
-common_name = "localhost"
-
-[HA]
-mode = "single"
+#[security]
+#enable_tls = false
+#tlsca = "certs/ca.pem"
+#common_name = "localhost"
 
 [appchain]
+enable = true
 did = "did:bitxhub:fabappchain:."
 plugin = "appchain_plugin"
 config = "fabric"
+
+[peer]
+peers = ["localhost:60011", "localhost:60012", "localhost:60013", "localhost:60014"]
+connectors = []
+providers = 1
+

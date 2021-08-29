@@ -11,7 +11,6 @@ import (
 	"github.com/Rican7/retry/backoff"
 	"github.com/Rican7/retry/strategy"
 	"github.com/meshplus/bitxhub-kit/storage"
-	"github.com/meshplus/bitxhub-model/pb"
 	"github.com/meshplus/pier/api"
 	"github.com/meshplus/pier/internal/checker"
 	"github.com/meshplus/pier/internal/executor"
@@ -21,6 +20,7 @@ import (
 	"github.com/meshplus/pier/internal/repo"
 	"github.com/meshplus/pier/internal/router"
 	"github.com/meshplus/pier/internal/syncer"
+	"github.com/meshplus/pier/model/pb"
 	"github.com/meshplus/pier/pkg/model"
 	"github.com/sirupsen/logrus"
 	"go.uber.org/atomic"
@@ -34,10 +34,6 @@ type Exchanger struct {
 	exec                 executor.Executor // 执行跨链交易的一方。
 	syncer               syncer.Syncer     // WrapperSyncer represents the necessary data for sync tx wrappers from bitxhub
 	router               router.Router     // 占时不使用
-	interchainCounter    map[string]uint64
-	executorCounter      map[string]uint64
-	callbackCounter      map[string]uint64
-	sourceReceiptCounter map[string]uint64
 
 	apiServer       *api.Server //直连模式使用
 	peerMgr         peermgr.PeerManager
@@ -68,10 +64,6 @@ func New(typ, appchainDID string, meta *pb.Interchain, opts ...Option) (*Exchang
 		router:               config.router,
 		logger:               config.logger,
 		ch:                   make(chan struct{}, 100),
-		interchainCounter:    copyCounterMap(meta.InterchainCounter),
-		sourceReceiptCounter: copyCounterMap(meta.SourceReceiptCounter),
-		executorCounter:      copyCounterMap(config.exec.QueryInterchainMeta()),
-		callbackCounter:      copyCounterMap(config.exec.QueryCallbackMeta()),
 		mode:                 typ,
 		appchainDID:          appchainDID,
 		ctx:                  ctx,
@@ -92,8 +84,9 @@ func (ex *Exchanger) Start() error {
 		return err
 	}
 
+	// 这个同样也是，而不是在这里启动。
 	if ex.mnt != nil {
-		go ex.listenAndSendIBTPFromMnt() // 这个同样也是，而不是在这里启动。
+		go ex.listenAndSendIBTPFromMnt()
 	}
 
 	//核心，就是转发
@@ -118,6 +111,7 @@ func (ex *Exchanger) startWithDirectMode() error {
 		return fmt.Errorf("register query interchain msg handler: %w", err)
 	}
 
+	// API调用
 	if err := ex.peerMgr.RegisterMsgHandler(peerMsg.Message_IBTP_SEND, ex.handleSendIBTPMessage); err != nil {
 		return fmt.Errorf("register ibtp handler: %w", err)
 	}
@@ -149,8 +143,6 @@ func (ex *Exchanger) startWithRelayMode() error {
 	}
 
 	// recover exchanger before relay any interchain msgs
-	ex.recoverRelay()
-
 	return nil
 }
 
@@ -167,20 +159,6 @@ func (ex *Exchanger) listenAndSendIBTPFromMnt() {
 				ex.logger.Warn("Unexpected closed channel while listening on interchain ibtp")
 				return
 			}
-			index := ex.interchainCounter[ibtp.To]
-			if index >= ibtp.Index {
-				ex.logger.WithFields(logrus.Fields{"index": ibtp.Index, "to_counter": index, "ibtp_id": ibtp.ID()}).Info("Ignore ibtp")
-				continue
-			}
-
-			if index+1 < ibtp.Index {
-				ex.logger.WithFields(logrus.Fields{"index": ibtp.Index, "to": ibtp.To}).Info("Get missing ibtp")
-
-				if err := ex.handleMissingIBTPFromMnt(ibtp.To, index+1, ibtp.Index); err != nil {
-					ex.logger.WithFields(logrus.Fields{"index": ibtp.Index, "to": ibtp.To, "err": err.Error()}).Error("Handle missing ibtp")
-				}
-			}
-
 			if err := retry.Retry(func(attempt uint) error {
 				if err := ex.sendIBTP(ibtp); err != nil {
 					ex.logger.Errorf("Send ibtp: %s", err.Error())
@@ -265,10 +243,6 @@ func (ex *Exchanger) sendIBTP(ibtp *pb.IBTP) error {
 		err := ex.syncer.SendIBTP(ibtp)
 		if err != nil {
 			entry.Errorf("Send ibtp to bitxhub: %s", err.Error())
-			if errors.Is(err, syncer.ErrMetaOutOfDate) {
-				ex.updateInterchainMeta()
-				return nil
-			}
 			return fmt.Errorf("send ibtp to bitxhub: %s", err.Error())
 		}
 	case repo.DirectMode:
@@ -297,7 +271,6 @@ func (ex *Exchanger) sendIBTP(ibtp *pb.IBTP) error {
 		}
 	}
 	entry.Info("Send ibtp success from monitor")
-	ex.interchainCounter[ibtp.To] = ibtp.Index
 	return nil
 }
 
@@ -366,12 +339,4 @@ func (ex *Exchanger) queryIBTPForRelay(id, target string) (*pb.IBTP, bool, error
 	}
 
 	return ibtp, isValid, nil
-}
-
-func copyCounterMap(original map[string]uint64) map[string]uint64 {
-	ret := make(map[string]uint64, len(original))
-	for id, idx := range original {
-		ret[id] = idx
-	}
-	return ret
 }

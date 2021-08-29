@@ -9,7 +9,7 @@ import (
 
 	gomock "github.com/golang/mock/gomock"
 	appchain_mgr "github.com/meshplus/bitxhub-core/appchain-mgr"
-	pb "github.com/meshplus/bitxhub-model/pb"
+	pb "github.com/meshplus/pier/model/pb"
 	syncer "github.com/meshplus/pier/internal/syncer"
 	model "github.com/meshplus/pier/pkg/model"
 )

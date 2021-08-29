@@ -11,7 +11,7 @@ import (
 	gomock "github.com/golang/mock/gomock"
 	crypto "github.com/meshplus/bitxhub-kit/crypto"
 	types "github.com/meshplus/bitxhub-kit/types"
-	pb "github.com/meshplus/bitxhub-model/pb"
+	pb "github.com/meshplus/pier/model/pb"
 	rpcx "github.com/meshplus/pier/hub/client"
 )
 

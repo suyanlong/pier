@@ -2,7 +2,7 @@ package router
 
 import (
 	appchainmgr "github.com/meshplus/bitxhub-core/appchain-mgr"
-	"github.com/meshplus/bitxhub-model/pb"
+	"github.com/meshplus/pier/model/pb"
 )
 
 //go:generate mockgen -destination mock_router/mock_router.go -package mock_router -source router.go

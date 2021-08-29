@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/meshplus/bitxhub-model/constant"
+	"github.com/meshplus/pier/model/constant"
 	rpcx "github.com/meshplus/pier/hub/client"
 	"github.com/urfave/cli"
 )

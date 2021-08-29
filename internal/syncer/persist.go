@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/meshplus/bitxhub-model/pb"
+	"github.com/meshplus/pier/model/pb"
 	"github.com/meshplus/pier/pkg/model"
 )
 

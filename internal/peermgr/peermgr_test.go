@@ -33,9 +33,6 @@ func TestNew(t *testing.T) {
 	_, err = New(config, nodeKeys[0], privKeys[0], 0, logger)
 	require.Nil(t, err)
 
-	// test new swarm in union mode
-	nodeKeys, privKeys, config, _ = genKeysAndConfig(t, 2, repo.UnionMode)
-
 	_, err = New(config, nodeKeys[0], privKeys[0], 0, logger)
 	require.Nil(t, err)
 
@@ -270,12 +267,6 @@ func genKeysAndConfig(t *testing.T, peerCnt int, mode string) ([]crypto.PrivateK
 
 	config := &repo.Config{}
 	config.Mode.Type = mode
-	if config.Mode.Type == repo.DirectMode {
-		config.Mode.Direct.Peers = peers
-	} else if config.Mode.Type == repo.UnionMode {
-		config.Mode.Union.Connectors = peers
-	}
-
 	return nodeKeys, privKeys, config, ids
 }
 

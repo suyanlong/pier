@@ -8,7 +8,7 @@ import (
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
-	pb "github.com/meshplus/bitxhub-model/pb"
+	pb "github.com/meshplus/pier/model/pb"
 )
 
 // MockLite is a mock of Lite interface.

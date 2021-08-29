@@ -10,7 +10,7 @@ import (
 	appchainmgr "github.com/meshplus/bitxhub-core/appchain-mgr"
 	"github.com/meshplus/bitxhub-kit/crypto/asym"
 	"github.com/meshplus/bitxhub-kit/hexutil"
-	"github.com/meshplus/bitxhub-model/constant"
+	"github.com/meshplus/pier/model/constant"
 	rpcx "github.com/meshplus/pier/hub/client"
 	"github.com/meshplus/pier/internal/repo"
 	"github.com/tidwall/gjson"

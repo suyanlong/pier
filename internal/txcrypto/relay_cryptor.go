@@ -5,7 +5,7 @@ import (
 	"github.com/meshplus/bitxhub-kit/crypto/asym/ecdsa"
 	"github.com/meshplus/bitxhub-kit/crypto/ecdh"
 	"github.com/meshplus/bitxhub-kit/crypto/sym"
-	"github.com/meshplus/bitxhub-model/constant"
+	"github.com/meshplus/pier/model/constant"
 	rpcx "github.com/meshplus/pier/hub/client"
 )
 

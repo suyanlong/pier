@@ -5,7 +5,7 @@ import (
 
 	"github.com/meshplus/bitxhub-kit/crypto"
 	"github.com/meshplus/bitxhub-kit/types"
-	"github.com/meshplus/bitxhub-model/pb"
+	"github.com/meshplus/pier/model/pb"
 )
 
 type SubscriptionType int

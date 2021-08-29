@@ -3,7 +3,7 @@ package model
 import (
 	"fmt"
 
-	"github.com/meshplus/bitxhub-model/pb"
+	"github.com/meshplus/pier/model/pb"
 )
 
 func WrapperKey(height uint64) []byte {
@@ -19,3 +19,4 @@ type WrappedIBTP struct {
 	Ibtp    *pb.IBTP
 	IsValid bool
 }
+

@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/hashicorp/go-plugin"
-	"github.com/meshplus/bitxhub-model/pb"
+	"github.com/meshplus/pier/model/pb"
 	"google.golang.org/grpc"
 )
 

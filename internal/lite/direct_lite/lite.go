@@ -1,6 +1,6 @@
 package direct_lite
 
-import "github.com/meshplus/bitxhub-model/pb"
+import "github.com/meshplus/pier/model/pb"
 
 type MockLite struct {
 }

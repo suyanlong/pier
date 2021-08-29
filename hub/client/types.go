@@ -3,7 +3,7 @@ package rpcx
 import (
 	"fmt"
 
-	"github.com/meshplus/bitxhub-model/pb"
+	"github.com/meshplus/pier/model/pb"
 )
 
 func Int32(i int32) *pb.Arg {

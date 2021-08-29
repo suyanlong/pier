@@ -8,7 +8,7 @@ import (
 	"github.com/meshplus/pier/internal/executor"
 
 	"github.com/hashicorp/go-plugin"
-	"github.com/meshplus/bitxhub-model/pb"
+	"github.com/meshplus/pier/model/pb"
 	"github.com/meshplus/pier/internal/lite"
 	"github.com/meshplus/pier/internal/monitor"
 	"github.com/meshplus/pier/internal/repo"

@@ -9,7 +9,7 @@ import (
 
 	gomock "github.com/golang/mock/gomock"
 	appchain_mgr "github.com/meshplus/bitxhub-core/appchain-mgr"
-	pb "github.com/meshplus/bitxhub-model/pb"
+	pb "github.com/meshplus/pier/model/pb"
 )
 
 // MockRouter is a mock of Router interface.

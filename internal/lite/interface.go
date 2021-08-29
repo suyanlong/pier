@@ -1,6 +1,6 @@
 package lite
 
-import "github.com/meshplus/bitxhub-model/pb"
+import "github.com/meshplus/pier/model/pb"
 
 //go:generate mockgen -destination mock_lite/mock_lite.go -package mock_lite -source interface.go
 type Lite interface {

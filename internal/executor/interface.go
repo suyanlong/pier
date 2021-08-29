@@ -1,7 +1,7 @@
 package executor
 
 import (
-	"github.com/meshplus/bitxhub-model/pb"
+	"github.com/meshplus/pier/model/pb"
 	"github.com/meshplus/pier/pkg/model"
 )
 

@@ -3,16 +3,15 @@ package exchanger
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/meshplus/pier/internal/repo"
 	"sync"
 	"time"
 
 	"github.com/Rican7/retry"
 	"github.com/Rican7/retry/strategy"
-	"github.com/meshplus/bitxhub-model/pb"
 	"github.com/meshplus/pier/internal/peermgr"
 	peerMsg "github.com/meshplus/pier/internal/peermgr/proto"
 	"github.com/meshplus/pier/internal/port"
+	"github.com/meshplus/pier/model/pb"
 	"github.com/meshplus/pier/pkg/model"
 	"github.com/sirupsen/logrus"
 )
@@ -275,30 +274,8 @@ func (ex *Exchanger) handleNewConnection(dstPierID string) {
 	}, strategy.Wait(1*time.Second)); err != nil {
 		ex.logger.Panic(err)
 	}
-
-	ex.recoverDirect(dstPierID, indices.InterchainIndex, indices.ReceiptIndex)
 }
 
-// 直连
-func (ex *Exchanger) recoverDirect(dstPierID string, interchainIndex uint64, receiptIndex uint64) {
-	// recover unsent interchain ibtp
-	mntMeta := ex.mnt.QueryOuterMeta()
-	index, ok := mntMeta[dstPierID]
-	if !ok {
-		ex.logger.Infof("Appchain %s not exist", dstPierID)
-		return
-	}
-	if err := ex.handleMissingIBTPFromMnt(dstPierID, interchainIndex+1, index+1); err != nil {
-		ex.logger.WithFields(logrus.Fields{"address": dstPierID, "error": err.Error()}).Error("Handle missing ibtp")
-	}
-
-	// recoverDirect unsent receipt to counterpart chain
-	execMeta := ex.exec.QueryInterchainMeta()
-	idx := execMeta[dstPierID]
-	if err := ex.handleMissingReceipt(repo.DirectMode, dstPierID, receiptIndex+1, idx+1); err != nil {
-		ex.logger.WithFields(logrus.Fields{"address": dstPierID, "error": err.Error()}).Panic("Get missing receipt from contract")
-	}
-}
 
 //直链模式
 func (ex *Exchanger) handleGetInterchainMessage(p port.Port, msg *peerMsg.Message) {

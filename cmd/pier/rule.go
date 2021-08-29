@@ -5,8 +5,8 @@ import (
 	"io/ioutil"
 
 	"github.com/fatih/color"
-	"github.com/meshplus/bitxhub-model/constant"
 	rpcx "github.com/meshplus/pier/hub/client"
+	"github.com/meshplus/pier/model/constant"
 	"github.com/tidwall/gjson"
 	"github.com/urfave/cli"
 )

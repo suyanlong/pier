@@ -1,7 +1,7 @@
 package lite33
 
 import (
-	"github.com/meshplus/bitxhub-model/pb"
+	"github.com/meshplus/pier/model/pb"
 )
 
 func (lite *Lite33) verifyHeader(h *pb.BlockHeader) (bool, error) {

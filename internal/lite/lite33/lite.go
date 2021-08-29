@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/meshplus/bitxhub-kit/storage"
-	"github.com/meshplus/bitxhub-model/pb"
+	"github.com/meshplus/pier/model/pb"
 	rpcx "github.com/meshplus/pier/hub/client"
 	"github.com/sirupsen/logrus"
 )

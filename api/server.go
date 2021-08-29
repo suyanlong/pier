@@ -11,12 +11,12 @@ import (
 	"github.com/gin-gonic/gin"
 	appchainmgr "github.com/meshplus/bitxhub-core/appchain-mgr"
 	"github.com/meshplus/bitxhub-kit/crypto/asym"
-	"github.com/meshplus/bitxhub-model/pb"
 	"github.com/meshplus/pier/cmd/pier/client"
 	"github.com/meshplus/pier/internal/appchain"
 	"github.com/meshplus/pier/internal/peermgr"
 	peerproto "github.com/meshplus/pier/internal/peermgr/proto"
 	"github.com/meshplus/pier/internal/repo"
+	"github.com/meshplus/pier/model/pb"
 	"github.com/sirupsen/logrus"
 )
 

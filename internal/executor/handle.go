@@ -6,7 +6,7 @@ import (
 
 	"github.com/Rican7/retry"
 	"github.com/Rican7/retry/strategy"
-	"github.com/meshplus/bitxhub-model/pb"
+	"github.com/meshplus/pier/model/pb"
 	"github.com/meshplus/pier/pkg/model"
 	"github.com/sirupsen/logrus"
 )

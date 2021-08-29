@@ -11,10 +11,10 @@ import (
 	appchainmgr "github.com/meshplus/bitxhub-core/appchain-mgr"
 	"github.com/meshplus/bitxhub-kit/log"
 	"github.com/meshplus/bitxhub-kit/storage/leveldb"
-	"github.com/meshplus/bitxhub-model/pb"
 	"github.com/meshplus/pier/internal/peermgr"
 	"github.com/meshplus/pier/internal/peermgr/mock_peermgr"
 	peerproto "github.com/meshplus/pier/internal/peermgr/proto"
+	"github.com/meshplus/pier/model/pb"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

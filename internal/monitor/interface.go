@@ -1,6 +1,6 @@
 package monitor
 
-import "github.com/meshplus/bitxhub-model/pb"
+import "github.com/meshplus/pier/model/pb"
 
 //go:generate mockgen -destination mock_monitor/mock_monitor.go -package mock_monitor -source interface.go
 type Monitor interface {

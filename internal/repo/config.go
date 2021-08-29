@@ -16,12 +16,11 @@ type Config struct {
 	RepoRoot  string
 	Title     string    `toml:"title" json:"title"`
 	Port      Port      `toml:"port" json:"port"`
-	Mode      Mode      `toml:"mode" json:"mode"`
 	Log       Log       `toml:"log" json:"log"`
+	Mode      Mode      `toml:"mode" json:"mode"`
 	Appchain  Appchain  `toml:"appchain" json:"appchain"`
 	Appchains Appchains `toml:"appchains" json:"appchains"`
 	Security  Security  `toml:"security" json:"security"`
-	HA        HA        `toml:"ha" json:"ha"`
 }
 
 // Security are certs used to setup connection with tls
@@ -37,10 +36,6 @@ type Port struct {
 	PProf int64 `toml:"pprof" json:"pprof"`
 }
 
-type HA struct {
-	Mode string `toml:"mode" json:"mode"`
-}
-
 const (
 	DirectMode = "direct" //直连模式
 	RelayMode  = "relay"  //
@@ -48,15 +43,10 @@ const (
 )
 
 type Mode struct {
-	Type   string `toml:"type" json:"type"`
-	Relay  Relay  `toml:"relay" json:"relay"`
-	Direct Direct `toml:"direct" json:"direct"`
-	Union  Union  `toml:"union" json:"union"`
-
+	Type  string `toml:"type" json:"type"`
+	Relay Relay  `toml:"relay" json:"relay"`
 	// TODO 连接节点
 	Peers []string `toml:"peers" json:"peers"`
-	//TODO 获取节点
-	Addrs      []string `toml:"addrs" json:"addrs"`
 	Connectors []string `toml:"connectors" json:"connectors"`
 	Providers  uint64   `toml:"providers" json:"providers"`
 }
@@ -142,15 +132,7 @@ func DefaultConfig() *Config {
 					"0x856E2B9A5FA82FD1B031D1FF6863864DBAC7995D",
 				},
 			},
-			Direct: Direct{
-				Peers: []string{},
-			},
-			Union: Union{
-				Addrs:      []string{"localhost:60011"},
-				Connectors: []string{},
-				Providers:  1,
-			},
-			Addrs:      []string{"localhost:60011"},
+			Peers:      []string{},
 			Connectors: []string{},
 			Providers:  1,
 		},
@@ -177,14 +159,18 @@ func DefaultConfig() *Config {
 			Tlsca:      "certs/ca.pem",
 			CommonName: "localhost",
 		},
-		HA: HA{
-			Mode: "single",
-		},
-		Appchain: Appchain{
-			DID:    "did:bitxhub:appchain:.",
-			Plugin: "appchain_plugin",
-			Config: "fabric",
-		},
+		Appchains:Appchains{[]Appchain{
+			{
+				DID:    "did:bitxhub:appchain:.",
+				Plugin: "appchain_plugin",
+				Config: "fabric",
+			},
+			{
+				DID:    "did:bitxhub:appchain:.",
+				Plugin: "appchain_plugin",
+				Config: "fabric",
+			},
+		}},
 	}
 }
 

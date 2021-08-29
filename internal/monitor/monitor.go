@@ -9,7 +9,7 @@ import (
 
 	"github.com/Rican7/retry"
 	"github.com/Rican7/retry/strategy"
-	"github.com/meshplus/bitxhub-model/pb"
+	"github.com/meshplus/pier/model/pb"
 	"github.com/meshplus/pier/internal/txcrypto"
 	"github.com/meshplus/pier/pkg/plugins"
 	"github.com/sirupsen/logrus"

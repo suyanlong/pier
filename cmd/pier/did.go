@@ -7,7 +7,7 @@ import (
 
 	"github.com/meshplus/bitxhub-kit/crypto/asym"
 	"github.com/meshplus/bitxhub-kit/types"
-	"github.com/meshplus/bitxhub-model/constant"
+	"github.com/meshplus/pier/model/constant"
 	"github.com/meshplus/bitxid"
 	rpcx "github.com/meshplus/pier/hub/client"
 	"github.com/meshplus/pier/internal/repo"

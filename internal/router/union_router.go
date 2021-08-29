@@ -8,7 +8,7 @@ import (
 	"github.com/ipfs/go-cid"
 	appchainmgr "github.com/meshplus/bitxhub-core/appchain-mgr"
 	"github.com/meshplus/bitxhub-kit/storage"
-	"github.com/meshplus/bitxhub-model/pb"
+	"github.com/meshplus/pier/model/pb"
 	"github.com/meshplus/pier/internal/peermgr"
 	peerproto "github.com/meshplus/pier/internal/peermgr/proto"
 	"github.com/sirupsen/logrus"

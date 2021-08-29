@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/golang/mock/gomock"
-	"github.com/meshplus/bitxhub-model/pb"
+	"github.com/meshplus/pier/model/pb"
 	"github.com/meshplus/pier/internal/repo"
 	"github.com/meshplus/pier/pkg/plugins/mock_client"
 	"github.com/stretchr/testify/require"

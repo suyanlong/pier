@@ -12,7 +12,7 @@ import (
 	"github.com/Rican7/retry/strategy"
 	"github.com/hashicorp/go-plugin"
 	"github.com/meshplus/bitxhub-kit/storage/leveldb"
-	"github.com/meshplus/bitxhub-model/pb"
+	"github.com/meshplus/pier/model/pb"
 	"github.com/meshplus/pier/api"
 	rpcx "github.com/meshplus/pier/hub/client"
 	_ "github.com/meshplus/pier/imports"

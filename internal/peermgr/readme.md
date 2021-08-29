@@ -105,7 +105,13 @@ sidercar ID 也可以作为路由的ID，绑定自身的唯一 peer ID，(用于
 
 other blockchain peer ID 这个就用链ID映射吧（直链）
 
+* 定义转发
+* 定义port
+* 实现router
+* 定义消息格式
+* 定义各个接口
 
+如果是这样，to、from才是正确的。
 
 
 pier:

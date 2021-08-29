@@ -1,8 +1,9 @@
 package syncer
 
 import (
-	"github.com/meshplus/bitxhub-model/pb"
+	appchainmgr "github.com/meshplus/bitxhub-core/appchain-mgr"
 	rpcx "github.com/meshplus/pier/hub/client"
+	"github.com/meshplus/pier/model/pb"
 	"github.com/meshplus/pier/pkg/model"
 )
 
@@ -50,3 +51,18 @@ type Syncer interface {
 
 	RegisterRollbackHandler(handler RollbackHandler) error
 }
+
+type Handler interface {
+	//GetAppchains gets appchains from bitxhub node
+	GetAppchains() ([]*appchainmgr.Appchain, error)
+
+	//GetInterchainById gets interchain meta by appchain id
+	GetInterchainById(from string) *pb.Interchain
+
+	//RegisterRecoverHandler registers handler that recover ibtps from bitxhub
+	RegisterRecoverHandler(RecoverUnionHandler) error
+
+	//RegisterAppchainHandler registers handler that fetch appchains information
+	RegisterAppchainHandler(handler AppchainHandler) error
+}
+

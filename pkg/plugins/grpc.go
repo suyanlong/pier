@@ -6,7 +6,7 @@ import (
 
 	"github.com/Rican7/retry"
 	"github.com/Rican7/retry/strategy"
-	"github.com/meshplus/bitxhub-model/pb"
+	"github.com/meshplus/pier/model/pb"
 )
 
 // 实现 AppchainPluginServer接口，具体逻辑委托给业务接口Client的实现。主要是给插件进程使用。

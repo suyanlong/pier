@@ -7,7 +7,7 @@ import (
 	"time"
 
 	appchainmgr "github.com/meshplus/bitxhub-core/appchain-mgr"
-	"github.com/meshplus/bitxhub-model/pb"
+	"github.com/meshplus/pier/model/pb"
 	"github.com/stretchr/testify/require"
 )
 

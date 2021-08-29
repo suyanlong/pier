@@ -1,0 +1,219 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "plugin.proto",
+    "version": "version not set"
+  },
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {},
+  "definitions": {
+    "pbEmpty": {
+      "type": "object"
+    },
+    "pbGetInMessageResponse": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "byte"
+          }
+        }
+      }
+    },
+    "pbGetMetaResponse": {
+      "type": "object",
+      "properties": {
+        "meta": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "format": "uint64"
+          }
+        }
+      }
+    },
+    "pbIBTP": {
+      "type": "object",
+      "properties": {
+        "from": {
+          "type": "string",
+          "title": "ID of sending chain"
+        },
+        "to": {
+          "type": "string",
+          "title": "ID of receiving chain"
+        },
+        "index": {
+          "type": "string",
+          "format": "uint64",
+          "title": "Index of inter-chain transaction"
+        },
+        "type": {
+          "$ref": "#/definitions/pbIBTPType",
+          "title": "inter-chain transaction type"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "int64",
+          "title": "Timestamp of inter-chain events"
+        },
+        "proof": {
+          "type": "string",
+          "format": "byte",
+          "title": "Proof of inter-chain transactions"
+        },
+        "payload": {
+          "type": "string",
+          "format": "byte",
+          "title": "Encoded content used by inter-chain"
+        },
+        "group": {
+          "$ref": "#/definitions/pbStringUint64Map",
+          "title": "info about other txs in the same group"
+        },
+        "version": {
+          "type": "string",
+          "title": "Message version"
+        },
+        "extra": {
+          "type": "string",
+          "format": "byte",
+          "title": "Self-defined fields used by app-chain"
+        }
+      },
+      "title": "Inter-blockchain Transfer Protocol"
+    },
+    "pbIBTPType": {
+      "type": "string",
+      "enum": [
+        "INTERCHAIN",
+        "RECEIPT_SUCCESS",
+        "RECEIPT_FAILURE",
+        "ASSET_EXCHANGE_INIT",
+        "ASSET_EXCHANGE_REDEEM",
+        "ASSET_EXCHANGE_REFUND",
+        "ASSET_EXCHANGE_RECEIPT"
+      ],
+      "default": "INTERCHAIN"
+    },
+    "pbNameResponse": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "pbRollbackIBTPResponse": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "message": {
+          "type": "string"
+        }
+      }
+    },
+    "pbStringUint64Map": {
+      "type": "object",
+      "properties": {
+        "keys": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "vals": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uint64"
+          }
+        }
+      }
+    },
+    "pbSubmitIBTPResponse": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "message": {
+          "type": "string"
+        },
+        "result": {
+          "$ref": "#/definitions/pbIBTP"
+        }
+      }
+    },
+    "pbTypeResponse": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "type_url": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "runtimeStreamError": {
+      "type": "object",
+      "properties": {
+        "grpc_code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "http_code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "http_status": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    }
+  },
+  "x-stream-definitions": {
+    "pbIBTP": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "$ref": "#/definitions/pbIBTP"
+        },
+        "error": {
+          "$ref": "#/definitions/runtimeStreamError"
+        }
+      },
+      "title": "Stream result of pbIBTP"
+    }
+  }
+}
