@@ -1,16 +1,14 @@
 package syncer
 
 import (
+	rpcx "github.com/link33/sidercar/hub/client"
+	"github.com/link33/sidercar/internal/repo"
 	"github.com/meshplus/bitxhub-kit/storage"
-	rpcx "github.com/meshplus/pier/hub/client"
-	"github.com/meshplus/pier/internal/lite"
-	"github.com/meshplus/pier/internal/repo"
 	"github.com/sirupsen/logrus"
 )
 
 type Config struct {
 	client  rpcx.Client
-	lite    lite.Lite
 	storage storage.Storage
 	config  *repo.Config
 	logger  logrus.FieldLogger
@@ -21,12 +19,6 @@ type Option func(*Config)
 func WithClient(cli rpcx.Client) Option {
 	return func(c *Config) {
 		c.client = cli
-	}
-}
-
-func WithLite(lite lite.Lite) Option {
-	return func(c *Config) {
-		c.lite = lite
 	}
 }
 

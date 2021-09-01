@@ -9,10 +9,10 @@ import (
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
+	rpcx "github.com/link33/sidercar/hub/client"
+	pb "github.com/link33/sidercar/model/pb"
 	crypto "github.com/meshplus/bitxhub-kit/crypto"
 	types "github.com/meshplus/bitxhub-kit/types"
-	pb "github.com/meshplus/pier/model/pb"
-	rpcx "github.com/meshplus/pier/hub/client"
 )
 
 // MockClient is a mock of Client interface.
@@ -38,19 +38,19 @@ func (m *MockClient) EXPECT() *MockClientMockRecorder {
 	return m.recorder
 }
 
-// CheckMasterPier mocks base method.
-func (m *MockClient) CheckMasterPier(address string) (*pb.Response, error) {
+// CheckMasterSidercar mocks base method.
+func (m *MockClient) CheckMasterSidercar(address string) (*pb.Response, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CheckMasterPier", address)
+	ret := m.ctrl.Call(m, "CheckMasterSidercar", address)
 	ret0, _ := ret[0].(*pb.Response)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// CheckMasterPier indicates an expected call of CheckMasterPier.
-func (mr *MockClientMockRecorder) CheckMasterPier(address interface{}) *gomock.Call {
+// CheckMasterSidercar indicates an expected call of CheckMasterSidercar.
+func (mr *MockClientMockRecorder) CheckMasterSidercar(address interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckMasterPier", reflect.TypeOf((*MockClient)(nil).CheckMasterPier), address)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckMasterSidercar", reflect.TypeOf((*MockClient)(nil).CheckMasterSidercar), address)
 }
 
 // DelVPNode mocks base method.
@@ -491,19 +491,19 @@ func (mr *MockClientMockRecorder) SendView(tx interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SendView", reflect.TypeOf((*MockClient)(nil).SendView), tx)
 }
 
-// SetMasterPier mocks base method.
-func (m *MockClient) SetMasterPier(address, index string, timeout int64) (*pb.Response, error) {
+// SetMasterSidercar mocks base method.
+func (m *MockClient) SetMasterSidercar(address, index string, timeout int64) (*pb.Response, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SetMasterPier", address, index, timeout)
+	ret := m.ctrl.Call(m, "SetMasterSidercar", address, index, timeout)
 	ret0, _ := ret[0].(*pb.Response)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// SetMasterPier indicates an expected call of SetMasterPier.
-func (mr *MockClientMockRecorder) SetMasterPier(address, index, timeout interface{}) *gomock.Call {
+// SetMasterSidercar indicates an expected call of SetMasterSidercar.
+func (mr *MockClientMockRecorder) SetMasterSidercar(address, index, timeout interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetMasterPier", reflect.TypeOf((*MockClient)(nil).SetMasterPier), address, index, timeout)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetMasterSidercar", reflect.TypeOf((*MockClient)(nil).SetMasterSidercar), address, index, timeout)
 }
 
 // SetPrivateKey mocks base method.

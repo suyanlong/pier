@@ -11,12 +11,10 @@ import (
 	"github.com/Rican7/retry"
 	"github.com/Rican7/retry/strategy"
 	"github.com/cbergoon/merkletree"
+	rpcx "github.com/link33/sidercar/hub/client"
+	"github.com/link33/sidercar/model/pb"
 	"github.com/meshplus/bitxhub-kit/storage"
 	"github.com/meshplus/bitxhub-kit/types"
-	rpcx "github.com/meshplus/pier/hub/client"
-	"github.com/meshplus/pier/internal/lite"
-	"github.com/meshplus/pier/model/pb"
-	"github.com/meshplus/pier/pkg/model"
 	"github.com/sirupsen/logrus"
 )
 
@@ -27,11 +25,10 @@ const maxChSize = 1 << 10
 // WrapperSyncer represents the necessary data for sync tx wrappers from bitxhub
 type WrapperSyncer struct {
 	client          rpcx.Client // hub 客户端。
-	lite            lite.Lite
 	storage         storage.Storage
 	logger          logrus.FieldLogger
 	wrappersC       chan *pb.InterchainTxWrappers
-	ibtpC           chan *model.WrappedIBTP
+	ibtpC           chan *pb.IBTPX
 	appchainHandler AppchainHandler
 	recoverHandler  RecoverUnionHandler
 	rollbackHandler RollbackHandler
@@ -39,20 +36,20 @@ type WrapperSyncer struct {
 	mode        string
 	isRecover   bool
 	height      uint64
-	pierID      string
+	sidercarID  string
 	appchainDID string
 	ctx         context.Context
 	cancel      context.CancelFunc
 }
 
 type SubscriptionKey struct {
-	PierID      string `json:"pier_id"`
+	SidercarID  string `json:"sidercar_id"`
 	AppchainDID string `json:"appchain_did"`
 }
 
 // New creates instance of WrapperSyncer given agent interacting with bitxhub,
 // validators addresses of bitxhub and local storage
-func New(pierID, appchainDID string, mode string, opts ...Option) (*WrapperSyncer, error) {
+func New(sidercarID, appchainDID string, mode string, opts ...Option) (*WrapperSyncer, error) {
 	cfg, err := GenerateConfig(opts...)
 	if err != nil {
 		return nil, err
@@ -60,13 +57,12 @@ func New(pierID, appchainDID string, mode string, opts ...Option) (*WrapperSynce
 
 	ws := &WrapperSyncer{
 		wrappersC:   make(chan *pb.InterchainTxWrappers, maxChSize),
-		ibtpC:       make(chan *model.WrappedIBTP, maxChSize),
+		ibtpC:       make(chan *pb.IBTPX, maxChSize),
 		client:      cfg.client,
-		lite:        cfg.lite,
 		storage:     cfg.storage,
 		logger:      cfg.logger,
 		mode:        mode,
-		pierID:      pierID,
+		sidercarID:  sidercarID,
 		appchainDID: appchainDID,
 	}
 
@@ -106,7 +102,7 @@ func (syncer *WrapperSyncer) Start() error {
 	return nil
 }
 
-// recover will recover those missing merkle wrapper when pier is down
+// recover will recover those missing merkle wrapper when sidercar is down
 func (syncer *WrapperSyncer) recover(begin, end uint64) {
 	syncer.isRecover = true
 	defer func() {
@@ -204,7 +200,7 @@ func (syncer *WrapperSyncer) getWrappersChannel() chan *pb.InterchainTxWrappers 
 	)
 	subscriptType = pb.SubscriptionRequest_INTERCHAIN_TX_WRAPPER
 	// retry for network reason
-	subKey := &SubscriptionKey{syncer.pierID, syncer.appchainDID}
+	subKey := &SubscriptionKey{syncer.sidercarID, syncer.appchainDID}
 	subKeyData, _ := json.Marshal(subKey)
 	if err := retry.Retry(func(attempt uint) error {
 		// 订阅消息
@@ -318,7 +314,7 @@ func (syncer *WrapperSyncer) handleInterchainTxWrapper(w *pb.InterchainTxWrapper
 			syncer.logger.Errorf("empty ibtp in tx")
 			continue
 		}
-		wIBTP := &model.WrappedIBTP{Ibtp: ibtp, IsValid: tx.Valid}
+		wIBTP := &pb.IBTPX{Ibtp: ibtp, IsValid: tx.Valid}
 		syncer.logger.WithFields(logrus.Fields{
 			"ibtp_id": ibtp.ID(),
 			"type":    ibtp.Type,

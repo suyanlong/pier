@@ -743,7 +743,7 @@ func local_request_ChainBroker_DelVPNode_0(ctx context.Context, marshaler runtim
 
 }
 
-func request_ChainBroker_CheckMasterPier_0(ctx context.Context, marshaler runtime.Marshaler, client ChainBrokerClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_ChainBroker_CheckMasterSidercar_0(ctx context.Context, marshaler runtime.Marshaler, client ChainBrokerClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq Address
 	var metadata runtime.ServerMetadata
 
@@ -765,12 +765,12 @@ func request_ChainBroker_CheckMasterPier_0(ctx context.Context, marshaler runtim
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "address", err)
 	}
 
-	msg, err := client.CheckMasterPier(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.CheckMasterSidercar(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func local_request_ChainBroker_CheckMasterPier_0(ctx context.Context, marshaler runtime.Marshaler, server ChainBrokerServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_ChainBroker_CheckMasterSidercar_0(ctx context.Context, marshaler runtime.Marshaler, server ChainBrokerServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq Address
 	var metadata runtime.ServerMetadata
 
@@ -792,13 +792,13 @@ func local_request_ChainBroker_CheckMasterPier_0(ctx context.Context, marshaler 
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "address", err)
 	}
 
-	msg, err := server.CheckMasterPier(ctx, &protoReq)
+	msg, err := server.CheckMasterSidercar(ctx, &protoReq)
 	return msg, metadata, err
 
 }
 
-func request_ChainBroker_SetMasterPier_0(ctx context.Context, marshaler runtime.Marshaler, client ChainBrokerClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq PierInfo
+func request_ChainBroker_SetMasterSidercar_0(ctx context.Context, marshaler runtime.Marshaler, client ChainBrokerClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq SidercarInfo
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -809,13 +809,13 @@ func request_ChainBroker_SetMasterPier_0(ctx context.Context, marshaler runtime.
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := client.SetMasterPier(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.SetMasterSidercar(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func local_request_ChainBroker_SetMasterPier_0(ctx context.Context, marshaler runtime.Marshaler, server ChainBrokerServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq PierInfo
+func local_request_ChainBroker_SetMasterSidercar_0(ctx context.Context, marshaler runtime.Marshaler, server ChainBrokerServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq SidercarInfo
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -826,13 +826,13 @@ func local_request_ChainBroker_SetMasterPier_0(ctx context.Context, marshaler ru
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := server.SetMasterPier(ctx, &protoReq)
+	msg, err := server.SetMasterSidercar(ctx, &protoReq)
 	return msg, metadata, err
 
 }
 
 func request_ChainBroker_HeartBeat_0(ctx context.Context, marshaler runtime.Marshaler, client ChainBrokerClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq PierInfo
+	var protoReq SidercarInfo
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -849,7 +849,7 @@ func request_ChainBroker_HeartBeat_0(ctx context.Context, marshaler runtime.Mars
 }
 
 func local_request_ChainBroker_HeartBeat_0(ctx context.Context, marshaler runtime.Marshaler, server ChainBrokerServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq PierInfo
+	var protoReq SidercarInfo
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -1171,7 +1171,7 @@ func RegisterChainBrokerHandlerServer(ctx context.Context, mux *runtime.ServeMux
 
 	})
 
-	mux.Handle("GET", pattern_ChainBroker_CheckMasterPier_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_ChainBroker_CheckMasterSidercar_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -1180,18 +1180,18 @@ func RegisterChainBrokerHandlerServer(ctx context.Context, mux *runtime.ServeMux
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_ChainBroker_CheckMasterPier_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_ChainBroker_CheckMasterSidercar_0(rctx, inboundMarshaler, server, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ChainBroker_CheckMasterPier_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ChainBroker_CheckMasterSidercar_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("POST", pattern_ChainBroker_SetMasterPier_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_ChainBroker_SetMasterSidercar_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -1200,14 +1200,14 @@ func RegisterChainBrokerHandlerServer(ctx context.Context, mux *runtime.ServeMux
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_ChainBroker_SetMasterPier_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_ChainBroker_SetMasterSidercar_0(rctx, inboundMarshaler, server, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ChainBroker_SetMasterPier_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ChainBroker_SetMasterSidercar_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -1612,7 +1612,7 @@ func RegisterChainBrokerHandlerClient(ctx context.Context, mux *runtime.ServeMux
 
 	})
 
-	mux.Handle("GET", pattern_ChainBroker_CheckMasterPier_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_ChainBroker_CheckMasterSidercar_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -1621,18 +1621,18 @@ func RegisterChainBrokerHandlerClient(ctx context.Context, mux *runtime.ServeMux
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_ChainBroker_CheckMasterPier_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_ChainBroker_CheckMasterSidercar_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ChainBroker_CheckMasterPier_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ChainBroker_CheckMasterSidercar_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("POST", pattern_ChainBroker_SetMasterPier_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_ChainBroker_SetMasterSidercar_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -1641,14 +1641,14 @@ func RegisterChainBrokerHandlerClient(ctx context.Context, mux *runtime.ServeMux
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_ChainBroker_SetMasterPier_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_ChainBroker_SetMasterSidercar_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ChainBroker_SetMasterPier_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ChainBroker_SetMasterSidercar_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -1710,9 +1710,9 @@ var (
 
 	pattern_ChainBroker_DelVPNode_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "delvpnode"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ChainBroker_CheckMasterPier_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "check_master_pier", "address"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ChainBroker_CheckMasterSidercar_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "check_master_sidercar", "address"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ChainBroker_SetMasterPier_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "set_master_pier"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ChainBroker_SetMasterSidercar_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "set_master_sidercar"}, "", runtime.AssumeColonVerbOpt(true)))
 
 	pattern_ChainBroker_HeartBeat_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "heart_beat"}, "", runtime.AssumeColonVerbOpt(true)))
 )
@@ -1752,9 +1752,9 @@ var (
 
 	forward_ChainBroker_DelVPNode_0 = runtime.ForwardResponseMessage
 
-	forward_ChainBroker_CheckMasterPier_0 = runtime.ForwardResponseMessage
+	forward_ChainBroker_CheckMasterSidercar_0 = runtime.ForwardResponseMessage
 
-	forward_ChainBroker_SetMasterPier_0 = runtime.ForwardResponseMessage
+	forward_ChainBroker_SetMasterSidercar_0 = runtime.ForwardResponseMessage
 
 	forward_ChainBroker_HeartBeat_0 = runtime.ForwardResponseMessage
 )

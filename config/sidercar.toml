@@ -1,0 +1,56 @@
+title = "Sidercar"
+
+[port]
+http = 44544
+pprof = 44555
+
+[log]
+level = "info"
+dir = "logs"
+filename = "sidercar.log"
+report_caller = false
+[log.module]
+  api_server   = "info"
+  appchain_mgr = "info"
+  bxh_lite     = "info"
+  executor     = "info"
+  exchanger    = "info"
+  monitor      = "info"
+  peer_mgr     = "info"
+  router       = "info"
+  rule_mgr     = "info"
+  swarm        = "info"
+  syncer       = "info"
+
+#[hub]
+#enable = true
+#type = "hub"
+#did = "did:bitxhub:fabappchain:."
+#plugin = "appchain_plugin"
+#config = "hub"
+#addrs = ["localhost:60011"]
+
+#[security]
+#enable_tls = false
+#tlsca = "certs/ca.pem"
+#common_name = "localhost"
+
+[[appchain]]
+enable = true
+type = "appchain"
+did = "did:bitxhub:fabappchain:."
+plugin = "appchain_plugin"
+config = "fabric"
+
+[[appchain]]
+enable = true
+type = "hub"
+did = "did:bitxhub:chain33:."
+plugin = "appchain_plugin"
+config = "chain33"
+
+[peer]
+peers = ["localhost:60011", "localhost:60012", "localhost:60013", "localhost:60014"]
+connectors = []
+providers = 1
+

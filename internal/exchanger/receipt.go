@@ -1,11 +1,11 @@
 package exchanger
 
 import (
-	"github.com/meshplus/pier/pkg/model"
+	"github.com/link33/sidercar/model/pb"
 )
 
 //中继模式
-func (ex *Exchanger) feedIBTPReceipt(receipt *model.WrappedIBTP) {
+func (ex *Exchanger) feedIBTPReceipt(receipt *pb.IBTPX) {
 	var pool *Pool
 	act, loaded := ex.receipts.Load(receipt.Ibtp.To)
 	if !loaded {

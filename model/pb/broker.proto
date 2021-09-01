@@ -115,20 +115,20 @@ service ChainBroker {
     };
   }
 
-  rpc CheckMasterPier (Address) returns (Response) {
+  rpc CheckMasterSidercar (Address) returns (Response) {
     option (google.api.http) = {
-      get: "/v1/check_master_pier/{address}"
+      get: "/v1/check_master_sidercar/{address}"
     };
   }
 
-  rpc SetMasterPier (PierInfo) returns (Response) {
+  rpc SetMasterSidercar (SidercarInfo) returns (Response) {
     option (google.api.http) = {
-      post: "/v1/set_master_pier"
+      post: "/v1/set_master_sidercar"
       body: "*"
     };
   }
 
-  rpc HeartBeat (PierInfo) returns (Response) {
+  rpc HeartBeat (SidercarInfo) returns (Response) {
     option (google.api.http) = {
       post: "/v1/heart_beat"
       body: "*"
@@ -251,13 +251,13 @@ message DelVPNodeRequest {
   string pid = 1;
 }
 
-message PierInfo {
+message SidercarInfo {
   string address = 1;
   string index = 2;
   int64  timeout = 3;
 }
 
-message CheckPierResponse {
+message CheckSidercarResponse {
   enum Status {
     ERROR_MASTER = 0;
     HAS_MASTER = 1;

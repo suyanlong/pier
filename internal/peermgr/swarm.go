@@ -3,7 +3,8 @@ package peermgr
 import (
 	"context"
 	"fmt"
-	"github.com/meshplus/pier/internal/port"
+	"github.com/link33/sidercar/internal/port"
+	"github.com/link33/sidercar/model/pb"
 	"strings"
 	"sync"
 	"time"
@@ -13,17 +14,16 @@ import (
 	"github.com/ipfs/go-cid"
 	crypto2 "github.com/libp2p/go-libp2p-core/crypto"
 	"github.com/libp2p/go-libp2p-core/peer"
+	"github.com/link33/sidercar/internal/repo"
 	"github.com/meshplus/bitxhub-kit/crypto"
 	"github.com/meshplus/bitxhub-kit/crypto/asym/ecdsa"
 	network "github.com/meshplus/go-lightp2p"
-	peermgr "github.com/meshplus/pier/internal/peermgr/proto"
-	"github.com/meshplus/pier/internal/repo"
 	ma "github.com/multiformats/go-multiaddr"
 	"github.com/sirupsen/logrus"
 )
 
 const (
-	protocolID          = "/pier/1.0.0" // magic protocol
+	protocolID          = "/sidercar/1.0.0" // magic protocol
 	defaultProvidersNum = 1
 )
 
@@ -34,8 +34,6 @@ type Swarm struct {
 	logger          logrus.FieldLogger
 	peers           map[string]*peer.AddrInfo
 	connectedPeers  sync.Map
-	msgHandlers     sync.Map
-	msgHandlersx    sync.Map
 	providers       uint64
 	connectHandlers []ConnectHandler
 	privKey         crypto.PrivateKey
@@ -52,22 +50,8 @@ func New(config *repo.Config, nodePrivKey crypto.PrivateKey, privKey crypto.Priv
 	}
 	var local string
 	var remotes map[string]*peer.AddrInfo
-	//switch config.Mode.Type {
-	//case repo.UnionMode:
-	//	local, remotes, err = loadPeers(config.Mode.Union.Connectors, libp2pPrivKey)
-	//	if err != nil {
-	//		return nil, fmt.Errorf("load peers: %w", err)
-	//	}
-	//case repo.DirectMode:
-	//	local, remotes, err = loadPeers(config.Mode.Direct.Peers, libp2pPrivKey)
-	//	if err != nil {
-	//		return nil, fmt.Errorf("load peers: %w", err)
-	//	}
-	//default:
-	//	return nil, fmt.Errorf("unsupport mode type")
-	//}
 
-	local, remotes, err = loadPeers(config.Mode.Peers, libp2pPrivKey)
+	local, remotes, err = loadPeers(config.Peer.Peers, libp2pPrivKey)
 
 	var protocolIDs = []string{protocolID}
 
@@ -101,7 +85,7 @@ func New(config *repo.Config, nodePrivKey crypto.PrivateKey, privKey crypto.Priv
 func (swarm *Swarm) Start() error {
 	swarm.p2p.SetMessageHandler(swarm.handleMessage)
 
-	if err := swarm.RegisterMsgHandler(peermgr.Message_ADDRESS_GET, swarm.handleGetAddressMessage); err != nil {
+	if err := swarm.RegisterMsgHandler(pb.Message_ADDRESS_GET, swarm.handleGetAddressMessage); err != nil {
 		return fmt.Errorf("register get address msg handler: %w", err)
 	}
 
@@ -109,7 +93,7 @@ func (swarm *Swarm) Start() error {
 		return fmt.Errorf("p2p module start: %w", err)
 	}
 
-	//need to connect one other pier at least
+	//need to connect one other sidercar at least
 	wg := &sync.WaitGroup{}
 	wg.Add(1)
 
@@ -141,14 +125,6 @@ func (swarm *Swarm) Start() error {
 				}).Info("Connect successfully")
 
 				swarm.connectedPeers.Store(address, addr)
-
-				swarm.lock.RLock()
-				defer swarm.lock.RUnlock()
-				for _, handler := range swarm.connectHandlers {
-					go func(connectHandler ConnectHandler, address string) {
-						connectHandler(address)
-					}(handler, address)
-				}
 				wg.Done()
 				return nil
 			},
@@ -179,16 +155,17 @@ func (swarm *Swarm) Connect(addrInfo *peer.AddrInfo) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	pierId, err := swarm.getRemoteAddress(addrInfo.ID)
+	sidercarId, err := swarm.getRemoteAddress(addrInfo.ID)
 	if err != nil {
 		return "", err
 	}
 	swarm.logger.WithFields(logrus.Fields{
-		"pierId":   pierId,
-		"addrInfo": addrInfo,
+		"sidercarId": sidercarId,
+		"addrInfo":   addrInfo,
 	}).Info("Connect peer")
-	swarm.connectedPeers.Store(pierId, addrInfo)
-	return pierId, nil
+	swarm.connectedPeers.Store(sidercarId, addrInfo)
+
+	return sidercarId, nil
 }
 
 func (swarm *Swarm) AsyncSendWithPort(s port.Port, msg port.Message) error {
@@ -208,7 +185,7 @@ func (swarm *Swarm) AsyncSend(id string, msg port.Message) error {
 	return swarm.p2p.AsyncSend(addrInfo.ID.String(), data)
 }
 
-func (swarm *Swarm) Send(id string, msg port.Message) (*peermgr.Message, error) {
+func (swarm *Swarm) Send(id string, msg port.Message) (*pb.Message, error) {
 	addrInfo, err := swarm.getAddrInfo(id)
 	if err != nil {
 		return nil, err
@@ -224,7 +201,7 @@ func (swarm *Swarm) Send(id string, msg port.Message) (*peermgr.Message, error) 
 		return nil, fmt.Errorf("sync send: %w", err)
 	}
 
-	m := &peermgr.Message{}
+	m := &pb.Message{}
 	if err := m.Unmarshal(ret); err != nil {
 		return nil, err
 	}
@@ -233,7 +210,6 @@ func (swarm *Swarm) Send(id string, msg port.Message) (*peermgr.Message, error) 
 }
 
 // ConnectedPeerIDs gets connected PeerIDs
-// TODO
 func (swarm *Swarm) ConnectedPeerIDs() []string {
 	peerIDs := []string{}
 	swarm.connectedPeers.Range(func(key, value interface{}) bool {
@@ -241,33 +217,6 @@ func (swarm *Swarm) ConnectedPeerIDs() []string {
 		return true
 	})
 	return peerIDs
-}
-
-type sidercar struct {
-	peerIDs string
-	swarm   *Swarm
-}
-
-func (s *sidercar) ID() string {
-	return s.peerIDs
-}
-
-func (s *sidercar) Type() string {
-	return "sidercar"
-}
-
-func (s *sidercar) Name() string {
-	return s.peerIDs
-}
-
-func (s *sidercar) Send(msg port.Message) (*peermgr.Message, error) {
-	panic("implement me")
-	//s.swarm.Send(s.peerIDs,)
-}
-
-func (s *sidercar) AsyncSend(msg port.Message) error {
-	panic("implement me")
-	//s.swarm.Send(s.peerIDs,)
 }
 
 func (swarm *Swarm) Ports() []port.Port {
@@ -290,31 +239,6 @@ func (swarm *Swarm) Peers() map[string]*peer.AddrInfo {
 	}
 
 	return m
-}
-
-func (swarm *Swarm) RegisterMsgHandler(messageType peermgr.Message_Type, handler MessageHandler) error {
-	if handler == nil {
-		return fmt.Errorf("register msg handler: empty handler")
-	}
-
-	for msgType := range peermgr.Message_Type_name {
-		if msgType == int32(messageType) {
-			swarm.msgHandlers.Store(messageType, handler)
-			return nil
-		}
-	}
-
-	return fmt.Errorf("register msg handler: invalid message type")
-}
-
-func (swarm *Swarm) RegisterMultiMsgHandler(messageTypes []peermgr.Message_Type, handler MessageHandler) error {
-	for _, typ := range messageTypes {
-		if err := swarm.RegisterMsgHandler(typ, handler); err != nil {
-			return err
-		}
-	}
-
-	return nil
 }
 
 func (swarm *Swarm) getAddrInfo(id string) (*peer.AddrInfo, error) {
@@ -387,36 +311,16 @@ func AddrToPeerInfo(multiAddr string) (*peer.AddrInfo, error) {
 //注册异步处理数据的方法
 func (swarm *Swarm) handleMessage(s network.Stream, data []byte) {
 	p := &sidercar{peerIDs: s.RemotePeerID(), swarm: swarm}
-	m := &peermgr.Message{}
+	m := &pb.Message{}
 	if err := m.Unmarshal(data); err != nil {
 		swarm.logger.Error(err)
 		return
 	}
-
-	//加载执行注册的函数
-	handler, ok := swarm.msgHandlers.Load(m.Type)
-	if !ok {
-		swarm.logger.WithFields(logrus.Fields{
-			"error": fmt.Errorf("can't handle msg[type: %v]", m.Type),
-			"type":  m.Type.String(),
-		}).Error("Handle message")
-		return
-	}
-
-	msgHandler, ok := handler.(MessageHandler)
-	if !ok {
-		swarm.logger.WithFields(logrus.Fields{
-			"error": fmt.Errorf("invalid handler for msg [type: %v]", m.Type),
-			"type":  m.Type.String(),
-		}).Error("Handle message")
-		return
-	}
-
-	msgHandler(p, m)
+	p.rev <- m
 }
 
 func (swarm *Swarm) getRemoteAddress(id peer.ID) (string, error) {
-	msg := Message(peermgr.Message_ADDRESS_GET, true, nil)
+	msg := Message(pb.Message_ADDRESS_GET, true, nil)
 	reqData, err := msg.Marshal()
 	if err != nil {
 		return "", err
@@ -425,21 +329,12 @@ func (swarm *Swarm) getRemoteAddress(id peer.ID) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("sync send: %w", err)
 	}
-	ret := &peermgr.Message{}
+	ret := &pb.Message{}
 	if err := ret.Unmarshal(retData); err != nil {
 		return "", err
 	}
 
 	return string(ret.Payload.Data), nil
-}
-
-func (swarm *Swarm) RegisterConnectHandler(handler ConnectHandler) error {
-	swarm.lock.Lock()
-	defer swarm.lock.Unlock()
-
-	swarm.connectHandlers = append(swarm.connectHandlers, handler)
-
-	return nil
 }
 
 func (swarm *Swarm) FindProviders(id string) (string, error) {
@@ -463,13 +358,13 @@ func (swarm *Swarm) FindProviders(id string) (string, error) {
 			"provider_id": provider.ID.String(),
 		}).Info("Find provider")
 
-		pierId, err := swarm.Connect(&provider)
+		sidercarId, err := swarm.Connect(&provider)
 		if err != nil {
-			swarm.logger.WithFields(logrus.Fields{"peerId": pierId,
+			swarm.logger.WithFields(logrus.Fields{"peerId": sidercarId,
 				"cid": provider.ID.String()}).Error("connect error: ", err)
 			continue
 		}
-		return pierId, nil
+		return sidercarId, nil
 	}
 
 	swarm.logger.WithFields(logrus.Fields{
@@ -483,13 +378,13 @@ func (swarm *Swarm) Provider(key string, passed bool) error {
 	return swarm.p2p.Provider(key, passed)
 }
 
-func (swarm *Swarm) handleGetAddressMessage(p port.Port, message *peermgr.Message) {
+func (swarm *Swarm) handleGetAddressMessage(p port.Port, message *pb.Message) {
 	addr, err := swarm.privKey.PublicKey().Address()
 	if err != nil {
 		swarm.logger.Error(err)
 		return
 	}
-	retMsg := Message(peermgr.Message_ACK, true, []byte(addr.String()))
+	retMsg := Message(pb.Message_ACK, true, []byte(addr.String()))
 	err = swarm.AsyncSendWithPort(p, retMsg)
 	if err != nil {
 		swarm.logger.Error(err)

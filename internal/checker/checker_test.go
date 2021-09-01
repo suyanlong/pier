@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/link33/sidercar/model/pb"
 	appchainmgr "github.com/meshplus/bitxhub-core/appchain-mgr"
-	"github.com/meshplus/pier/model/pb"
 	"github.com/stretchr/testify/require"
 )
 

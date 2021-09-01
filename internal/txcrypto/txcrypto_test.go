@@ -2,16 +2,16 @@ package txcrypto
 
 import (
 	"fmt"
+	"github.com/link33/sidercar/internal/manger"
 	"testing"
 
 	"github.com/golang/mock/gomock"
+	rpcx "github.com/link33/sidercar/hub/client"
+	"github.com/link33/sidercar/hub/client/mock_client"
+	"github.com/link33/sidercar/model/pb"
 	"github.com/meshplus/bitxhub-core/appchain-mgr/mock_appchainMgr"
 	"github.com/meshplus/bitxhub-kit/crypto"
 	"github.com/meshplus/bitxhub-kit/crypto/asym"
-	"github.com/meshplus/pier/model/pb"
-	rpcx "github.com/meshplus/pier/hub/client"
-	"github.com/meshplus/pier/hub/client/mock_client"
-	"github.com/meshplus/pier/internal/appchain"
 	"github.com/stretchr/testify/require"
 )
 
@@ -86,7 +86,7 @@ func TestDirectCryptor(t *testing.T) {
 
 	require.Nil(t, err)
 	addr2 := address2.String()
-	mgr := &appchain.Manager{
+	mgr := &manger.Manager{
 		Mgr: mockAppchainMgr,
 	}
 	rc1, err := NewDirectCryptor(mgr, privKey1)

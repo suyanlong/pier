@@ -6,7 +6,7 @@ import (
 
 	"github.com/Rican7/retry"
 	"github.com/Rican7/retry/strategy"
-	"github.com/meshplus/pier/model/pb"
+	"github.com/link33/sidercar/model/pb"
 )
 
 // 实现 AppchainPluginServer接口，具体逻辑委托给业务接口Client的实现。主要是给插件进程使用。
@@ -16,7 +16,7 @@ type GRPCServer struct {
 }
 
 func (s *GRPCServer) Initialize(_ context.Context, req *pb.InitializeRequest) (*pb.Empty, error) {
-	err := s.Impl.Initialize(req.ConfigPath, req.PierId, req.Extra)
+	err := s.Impl.Initialize(req.ConfigPath, req.SidercarId, req.Extra)
 	return &pb.Empty{}, err
 }
 
@@ -140,11 +140,14 @@ func (s *GRPCServer) Type(context.Context, *pb.Empty) (*pb.TypeResponse, error) 
 type GRPCClient struct {
 	client      pb.AppchainPluginClient
 	doneContext context.Context
+	kernel      Kernel
+	DID         string
 }
 
-func (g *GRPCClient) Initialize(configPath string, pierID string, extra []byte) error {
+func (g *GRPCClient) Initialize(configPath string, ID string, extra []byte) error {
+	g.DID = ID
 	_, err := g.client.Initialize(g.doneContext, &pb.InitializeRequest{
-		PierId:     pierID,
+		SidercarId: "", //TODO
 		ConfigPath: configPath,
 		Extra:      extra,
 	})
@@ -332,4 +335,20 @@ func (g *GRPCClient) Type() string {
 	}
 
 	return response.Type
+}
+
+func (g *GRPCClient) Kill() {
+	g.kernel.Kill()
+}
+
+func (g *GRPCClient) Exited() bool {
+	return g.kernel.Exited()
+}
+
+func (g *GRPCClient) Bind(kern Kernel) {
+	g.kernel = kern
+}
+
+func (g *GRPCClient) ID() string {
+	return g.DID
 }

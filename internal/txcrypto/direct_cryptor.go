@@ -2,21 +2,21 @@ package txcrypto
 
 import (
 	"fmt"
+	"github.com/link33/sidercar/internal/manger"
 
 	"github.com/btcsuite/btcd/btcec"
 	"github.com/meshplus/bitxhub-kit/crypto"
 	"github.com/meshplus/bitxhub-kit/crypto/ecdh"
 	"github.com/meshplus/bitxhub-kit/crypto/sym"
-	"github.com/meshplus/pier/internal/appchain"
 )
 
 type DirectCryptor struct {
-	appchainMgr *appchain.Manager
+	appchainMgr *manger.Manager
 	privKey     crypto.PrivateKey
 	keyMap      map[string][]byte
 }
 
-func NewDirectCryptor(appchainMgr *appchain.Manager, privKey crypto.PrivateKey) (Cryptor, error) {
+func NewDirectCryptor(appchainMgr *manger.Manager, privKey crypto.PrivateKey) (Cryptor, error) {
 	keyMap := make(map[string][]byte)
 
 	return &DirectCryptor{

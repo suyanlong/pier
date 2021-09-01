@@ -7,7 +7,7 @@ import (
 
 	"github.com/hashicorp/go-hclog"
 	"github.com/hashicorp/go-plugin"
-	"github.com/meshplus/pier/internal/repo"
+	"github.com/link33/sidercar/internal/repo"
 )
 
 var logger = hclog.New(&hclog.LoggerOptions{
@@ -16,8 +16,8 @@ var logger = hclog.New(&hclog.LoggerOptions{
 	Level:  hclog.Trace,
 })
 
-func CreateClient(pierID string, appchainConfig repo.Appchain, extra []byte) (Client, *plugin.Client, error) {
-	// Pier is the host. Start by launching the plugin process.
+func CreateClient(sidercarID string, appchainConfig repo.Appchain, extra []byte) (Client, *plugin.Client, error) {
+	// Sidercar is the host. Start by launching the plugin process.
 	rootPath, err := repo.PathRoot()
 	if err != nil {
 		return nil, nil, err
@@ -55,7 +55,7 @@ func CreateClient(pierID string, appchainConfig repo.Appchain, extra []byte) (Cl
 	}
 
 	// initialize our client plugin
-	err = appchain.Initialize(pluginConfigPath, pierID, extra)
+	err = appchain.Initialize(pluginConfigPath, sidercarID, extra)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -63,6 +63,50 @@ func CreateClient(pierID string, appchainConfig repo.Appchain, extra []byte) (Cl
 	return appchain, client, nil
 }
 
-func CreateClients(appchainConfigs repo.Appchains, extra []byte) {
+func CreateClients(appchainConfigs repo.Appchains, extra []byte) []Client {
+	// Sidercar is the host. Start by launching the plugin process.
+	rootPath, err := repo.PathRoot()
+	if err != nil {
+		panic(err)
+	}
+	var clients []Client
+	for _, appchainConfig := range appchainConfigs.Appchains {
+		pluginConfigPath := filepath.Join(rootPath, appchainConfig.Config)
+		pluginPath := filepath.Join(rootPath, "plugins", appchainConfig.Config)
+		kernel := plugin.NewClient(&plugin.ClientConfig{
+			HandshakeConfig: Handshake,
+			Plugins:         PluginMap,
+			Cmd:             exec.Command("sh", "-c", pluginPath),
+			Logger:          logger,
+			AllowedProtocols: []plugin.Protocol{
+				plugin.ProtocolGRPC}, //只支持grpc
+		})
+		// Connect via RPC
+		rpcClient, err := kernel.Client()
+		if err != nil {
+			panic(err)
+		}
+		// Request the plugin
+		raw, err := rpcClient.Dispense(PluginName)
+		if err != nil {
+			panic(err)
+		}
+		var appchain Client
+		switch raw.(type) {
+		case *GRPCClient:
+			appchain = raw.(*GRPCClient)
+		default:
+			panic(fmt.Errorf("unsupported kernel type"))
+		}
 
+		// initialize our kernel plugin
+		err = appchain.Initialize(pluginConfigPath, appchainConfig.DID, extra)
+		if err != nil {
+			panic(err)
+		}
+		appchain.Bind(kernel)
+		clients = append(clients, appchain)
+	}
+
+	return clients
 }

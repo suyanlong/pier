@@ -1,8 +1,8 @@
 package loggers
 
 import (
+	"github.com/link33/sidercar/internal/repo"
 	"github.com/meshplus/bitxhub-kit/log"
-	"github.com/meshplus/pier/internal/repo"
 	"github.com/sirupsen/logrus"
 )
 

@@ -45,8 +45,8 @@ Monitor receives event from blockchain and sends it to network
 
 ## executor
 ChannelExecutor represents the necessary data for executing interchain txs in appchain。
-pier:在直连、联盟模式下是主要是和appchain交互，下沉到client下面，每个插件可以实现它。
-pier:在中继模式下，使用创建BxhClient客户端代理。
+sidercar:在直连、联盟模式下是主要是和appchain交互，下沉到client下面，每个插件可以实现它。
+sidercar:在中继模式下，使用创建BxhClient客户端代理。
 
 
 
@@ -114,9 +114,9 @@ other blockchain peer ID 这个就用链ID映射吧（直链）
 如果是这样，to、from才是正确的。
 
 
-pier:
-* UnionMode：pier之间组成联盟。路由与转发。
-* 直链模式：pier 节点直链，不经过中继链。
+sidercar:
+* UnionMode：sidercar之间组成联盟。路由与转发。
+* 直链模式：sidercar 节点直链，不经过中继链。
 * RelayMode：中继连架构。
 
 ## sidercar设计
@@ -153,7 +153,7 @@ Syncer：是指中继架构下的hub客户端。
 * 适配
 这些是最基本的功能，后面的功能，可以持续迭代进去。
 
-Monitor、Executor:都是绑定自身的appchain的对象实现的接口，一个pier绑定一条链ID，
+Monitor、Executor:都是绑定自身的appchain的对象实现的接口，一个sidercar绑定一条链ID，
 
 如何做到别的网关收到以后，会转发给下一个网关，也就是说，自己这边没有appchainID,交由其它的网关进行处理。
 
@@ -165,7 +165,7 @@ Monitor、Executor:都是绑定自身的appchain的对象实现的接口，一�
 
 ## 输入与输出才有会ID，并且都是唯一。
 * pluginID与绑定的blockchainID相同。
-* pierID  各自唯一
+* sidercarID  各自唯一
 * blockchainID 一条链的ID
 * pluginID与blockchainID可能会相同。
 
@@ -174,7 +174,9 @@ Monitor、Executor:都是绑定自身的appchain的对象实现的接口，一�
 * 路由IBTPX数据包
 * 校验
 * 审计、治理
-* pierID 做背书、签名、留言。
+* sidercarID 做背书、签名、留言。
+* 节点内可以通信不需要加密，节点间需要。
+* 整个网络只能有一个hub。
 * 
 
 ## DID设计

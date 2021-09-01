@@ -4,8 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/meshplus/pier/model/pb"
-	"github.com/meshplus/pier/pkg/model"
+	"github.com/link33/sidercar/model/pb"
 )
 
 func (syncer *WrapperSyncer) persist(ws *pb.InterchainTxWrappers) error {
@@ -19,14 +18,14 @@ func (syncer *WrapperSyncer) persist(ws *pb.InterchainTxWrappers) error {
 		return fmt.Errorf("marshal wrapper: %w", err)
 	}
 
-	batch.Put(model.WrapperKey(ws.InterchainTxWrappers[0].Height), data)
+	batch.Put(pb.WrapperKey(ws.InterchainTxWrappers[0].Height), data)
 	for _, w := range ws.InterchainTxWrappers {
 		for _, tx := range w.Transactions {
 			data, err := tx.Marshal()
 			if err != nil {
 				return fmt.Errorf("verifiedTx marshal: %w", err)
 			}
-			batch.Put(model.IBTPKey(tx.GetTx().GetIBTP().ID()), data)
+			batch.Put(pb.IBTPKey(tx.GetTx().GetIBTP().ID()), data)
 		}
 	}
 	batch.Put(syncHeightKey(), []byte(strconv.FormatUint(syncer.height, 10)))

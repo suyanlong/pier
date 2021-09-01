@@ -1,16 +1,18 @@
 package peermgr
 
-import peerproto "github.com/meshplus/pier/internal/peermgr/proto"
+import (
+	"github.com/link33/sidercar/model/pb"
+)
 
 const (
 	V1 = "1.0"
 )
 
-func Message(typ peerproto.Message_Type, ok bool, data []byte) *peerproto.Message {
-	return &peerproto.Message{
+func Message(typ pb.Message_Type, ok bool, data []byte) *pb.Message {
+	return &pb.Message{
 		Type:    typ,
 		Version: V1,
-		Payload: &peerproto.Payload{
+		Payload: &pb.Payload{
 			Ok:   ok,
 			Data: data,
 		},

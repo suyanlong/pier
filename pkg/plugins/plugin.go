@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/hashicorp/go-plugin"
-	"github.com/meshplus/pier/model/pb"
+	"github.com/link33/sidercar/model/pb"
 	"google.golang.org/grpc"
 )
 
@@ -12,8 +12,8 @@ import (
 var (
 	Handshake = plugin.HandshakeConfig{
 		ProtocolVersion:  4,
-		MagicCookieKey:   "PIER_APPCHAIN_PLUGIN",
-		MagicCookieValue: "PIER",
+		MagicCookieKey:   "SIDERCAR_APPCHAIN_PLUGIN",
+		MagicCookieValue: "SIDERCAR",
 	}
 	PluginName = "appchain-plugin"
 )

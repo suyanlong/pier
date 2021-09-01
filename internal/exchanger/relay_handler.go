@@ -3,13 +3,12 @@ package exchanger
 import (
 	"time"
 
-	"github.com/meshplus/pier/model/pb"
-	"github.com/meshplus/pier/pkg/model"
+	"github.com/link33/sidercar/model/pb"
 	"github.com/sirupsen/logrus"
 )
 
 //中继模式 handleIBTP handle ibtps from bitxhub
-func (ex *Exchanger) handleIBTP(wIbtp *model.WrappedIBTP, entry logrus.FieldLogger) {
+func (ex *Exchanger) handleIBTP(wIbtp *pb.IBTPX, entry logrus.FieldLogger) {
 	ibtp := wIbtp.Ibtp
 	err := ex.checker.Check(ibtp)
 	if err != nil {
@@ -51,12 +50,12 @@ sendReceiptLoop:
 }
 
 // 中继模式：处理链间交易回执
-func (ex *Exchanger) applyReceipt(wIbtp *model.WrappedIBTP, entry logrus.FieldLogger) {
+func (ex *Exchanger) applyReceipt(wIbtp *pb.IBTPX, entry logrus.FieldLogger) {
 	ex.handleIBTP(wIbtp, entry)
 }
 
 // 中继链架构,处理链间交易，
-func (ex *Exchanger) applyInterchain(wIbtp *model.WrappedIBTP, entry logrus.FieldLogger) {
+func (ex *Exchanger) applyInterchain(wIbtp *pb.IBTPX, entry logrus.FieldLogger) {
 	ex.handleIBTP(wIbtp, entry)
 }
 
@@ -66,7 +65,7 @@ func (ex *Exchanger) handleRollback(ibtp *pb.IBTP) {
 		// if this is receipt type of ibtp, no need to rollback
 		return
 	}
-	ex.feedIBTPReceipt(&model.WrappedIBTP{Ibtp: ibtp, IsValid: false})
+	ex.feedIBTPReceipt(&pb.IBTPX{Ibtp: ibtp, IsValid: false})
 }
 
 func (ex *Exchanger) timeCost() func() {

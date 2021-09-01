@@ -3,7 +3,7 @@ package loggers
 import (
 	"testing"
 
-	"github.com/meshplus/pier/internal/repo"
+	"github.com/link33/sidercar/internal/repo"
 	"github.com/stretchr/testify/require"
 )
 
@@ -11,7 +11,7 @@ func TestLogger(t *testing.T) {
 	config := &repo.Config{
 		Log: repo.Log{
 			Dir:          "logs",
-			Filename:     "pier.log",
+			Filename:     "sidercar.log",
 			ReportCaller: false,
 			Level:        "info",
 			Module: repo.LogModule{

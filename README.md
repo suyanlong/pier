@@ -1,7 +1,7 @@
-# Pier
+# sidercar
 
-![build](https://github.com/meshplus/pier/workflows/build/badge.svg)
-[![codecov](https://codecov.io/gh/meshplus/pier/branch/master/graph/badge.svg)](https://codecov.io/gh/meshplus/pier)
+![build](https://github.com/link33/sidercar/workflows/build/badge.svg)
+[![codecov](https://codecov.io/gh/meshplus/sidercar/branch/master/graph/badge.svg)](https://codecov.io/gh/meshplus/sidercar)
 
 ## Build
 
@@ -11,7 +11,7 @@ Using the follow command to install necessary tools.
 make prepare
 ```
 
-And then install pier using the following command.
+And then install sidercar using the following command.
 
 ```bash
 make install
@@ -19,21 +19,21 @@ make install
 
 ## Initialization
 
-Using the follow command to initialize pier.
+Using the follow command to initialize sidercar.
 ```bash
-pier init
+sidercar init
 ```
-Default repo path is `~/.pier`. If you want to specify the repo path, you can use `--repo` flag.
+Default repo path is `~/sidercar`. If you want to specify the repo path, you can use `--repo` flag.
 
 ```bash
-pier init --repo=$HOME/.pier
+sidercar init --repo=$HOME/sidercar
 ```
 
-After initializing pier, it will generate the follow directory:
+After initializing sidercar, it will generate the follow directory:
 
 ```
-~/.pier
-├── pier.toml
+~/sidercar
+├── sidercar.toml
 ├── key.json
 
 ```
@@ -41,7 +41,7 @@ After initializing pier, it will generate the follow directory:
 ## Configuration
 
 ```toml
-title = "pier"
+title = "sidercar"
 
 [port]
 pprof = 44555
@@ -49,7 +49,7 @@ pprof = 44555
 [log]
 level = "debug"
 dir = "logs"
-filename = "pier.log"
+filename = "sidercar.log"
 report_caller = false
 
 [bitxhub]
@@ -74,16 +74,16 @@ config = "fabric"
 
 `bitxhub.validators`: bitxhub validator's addresses
 
-`appchain.plugin`: relative path in pier repo of appchain plugin
+`appchain.plugin`: relative path in sidercar repo of appchain plugin
 
 `appchain.config`: relative path of appchain config directory
 
 ## Usage
 
-More details about usage is in [Pier handbook](https://github.com/meshplus/pier/wiki/Pier%E4%BD%BF%E7%94%A8%E6%96%87%E6%A1%A3)
+More details about usage is in [sidercar handbook](https://github.com/link33/sidercar/wiki/sidercar%E4%BD%BF%E7%94%A8%E6%96%87%E6%A1%A3)
 
 ## License
 
-The Pier library (i.e. all code outside of the cmd and internal directory) is licensed under the GNU Lesser General Public License v3.0, also included in our repository in the LICENSE.LESSER file.
+The sidercar library (i.e. all code outside of the cmd and internal directory) is licensed under the GNU Lesser General Public License v3.0, also included in our repository in the LICENSE.LESSER file.
 
-The Pier binaries (i.e. all code inside of the cmd and internal directory) is licensed under the GNU General Public License v3.0, also included in our repository in the LICENSE file.
+The sidercar binaries (i.e. all code inside of the cmd and internal directory) is licensed under the GNU General Public License v3.0, also included in our repository in the LICENSE file.

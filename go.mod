@@ -1,4 +1,4 @@
-module github.com/meshplus/pier
+module github.com/link33/sidercar
 
 go 1.13
 

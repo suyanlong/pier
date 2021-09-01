@@ -8,31 +8,29 @@ import (
 
 	"github.com/Rican7/retry"
 	"github.com/Rican7/retry/strategy"
-	"github.com/meshplus/pier/internal/peermgr"
-	peerMsg "github.com/meshplus/pier/internal/peermgr/proto"
-	"github.com/meshplus/pier/internal/port"
-	"github.com/meshplus/pier/model/pb"
-	"github.com/meshplus/pier/pkg/model"
+	"github.com/link33/sidercar/internal/peermgr"
+	"github.com/link33/sidercar/internal/port"
+	"github.com/link33/sidercar/model/pb"
 	"github.com/sirupsen/logrus"
 )
 
 type Pool struct {
 	ibtps *sync.Map
-	ch    chan *model.WrappedIBTP
+	ch    chan *pb.IBTPX
 }
 
 func NewPool() *Pool {
 	return &Pool{
 		ibtps: &sync.Map{},
-		ch:    make(chan *model.WrappedIBTP, 40960),
+		ch:    make(chan *pb.IBTPX, 40960),
 	}
 }
 
-func (pool *Pool) feed(ibtp *model.WrappedIBTP) {
+func (pool *Pool) feed(ibtp *pb.IBTPX) {
 	pool.ch <- ibtp
 }
 
-func (pool *Pool) put(ibtp *model.WrappedIBTP) {
+func (pool *Pool) put(ibtp *pb.IBTPX) {
 	pool.ibtps.Store(ibtp.Ibtp.Index, ibtp)
 }
 
@@ -40,16 +38,16 @@ func (pool *Pool) delete(idx uint64) {
 	pool.ibtps.Delete(idx)
 }
 
-func (pool *Pool) get(index uint64) *model.WrappedIBTP {
+func (pool *Pool) get(index uint64) *pb.IBTPX {
 	ibtp, ok := pool.ibtps.Load(index)
 	if !ok {
 		return nil
 	}
 
-	return ibtp.(*model.WrappedIBTP)
+	return ibtp.(*pb.IBTPX)
 }
 
-func (ex *Exchanger) feedIBTP(wIbtp *model.WrappedIBTP) {
+func (ex *Exchanger) feedIBTP(wIbtp *pb.IBTPX) {
 	var pool *Pool
 	ibtp := wIbtp.Ibtp
 	act, loaded := ex.ibtps.Load(ibtp.From)
@@ -97,7 +95,7 @@ func (ex *Exchanger) feedIBTP(wIbtp *model.WrappedIBTP) {
 }
 
 // 直连
-func (ex *Exchanger) processIBTP(wIbtp *model.WrappedIBTP) {
+func (ex *Exchanger) processIBTP(wIbtp *pb.IBTPX) {
 	receipt, err := ex.exec.ExecuteIBTP(wIbtp)
 	if err != nil {
 		ex.logger.Errorf("Execute ibtp error: %s", err.Error())
@@ -117,7 +115,7 @@ func (ex *Exchanger) feedReceipt(receipt *pb.IBTP) {
 	} else {
 		pool = act.(*Pool)
 	}
-	pool.feed(&model.WrappedIBTP{Ibtp: receipt, IsValid: true})
+	pool.feed(&pb.IBTPX{Ibtp: receipt, IsValid: true})
 
 	if !loaded {
 		go func(pool *Pool) {
@@ -157,7 +155,7 @@ func (ex *Exchanger) feedReceipt(receipt *pb.IBTP) {
 
 func (ex *Exchanger) postHandleIBTP(from string, receipt *pb.IBTP) {
 	if receipt == nil {
-		retMsg := peermgr.Message(peerMsg.Message_IBTP_RECEIPT_SEND, true, nil)
+		retMsg := pb.Message(peerMsg.Message_IBTP_RECEIPT_SEND, true, nil)
 		err := ex.peerMgr.AsyncSend(from, retMsg)
 		if err != nil {
 			ex.logger.Errorf("Send back empty ibtp receipt: %s", err.Error())
@@ -166,7 +164,7 @@ func (ex *Exchanger) postHandleIBTP(from string, receipt *pb.IBTP) {
 	}
 
 	data, _ := receipt.Marshal()
-	retMsg := peermgr.Message(peerMsg.Message_IBTP_RECEIPT_SEND, true, data)
+	retMsg := pb.Message(peerMsg.Message_IBTP_RECEIPT_SEND, true, data)
 	if err := ex.peerMgr.AsyncSend(from, retMsg); err != nil {
 		ex.logger.Errorf("Send back ibtp receipt: %s", err.Error())
 	}
@@ -176,7 +174,7 @@ func (ex *Exchanger) postHandleIBTP(from string, receipt *pb.IBTP) {
 func (ex *Exchanger) handleSendIBTPMessage(p port.Port, msg *peerMsg.Message) {
 	ex.ch <- struct{}{}
 	go func(msg *peerMsg.Message) {
-		wIbtp := &model.WrappedIBTP{}
+		wIbtp := &pb.IBTPX{}
 		if err := json.Unmarshal(msg.Payload.Data, wIbtp); err != nil {
 			ex.logger.Errorf("Unmarshal ibtp: %s", err.Error())
 			return
@@ -217,7 +215,7 @@ func (ex *Exchanger) handleSendIBTPReceiptMessage(p port.Port, msg *peerMsg.Mess
 
 	ex.feedReceipt(receipt)
 
-	ex.logger.Info("Receive ibtp receipt from other pier")
+	ex.logger.Info("Receive ibtp receipt from other sidercar")
 }
 
 // 直连
@@ -234,7 +232,7 @@ func (ex *Exchanger) handleGetIBTPMessage(p port.Port, msg *peerMsg.Message) {
 		return
 	}
 
-	retMsg := peermgr.Message(peerMsg.Message_ACK, true, data)
+	retMsg := pb.Message(peerMsg.Message_ACK, true, data)
 
 	err = ex.peerMgr.AsyncSendWithPort(p, retMsg)
 	if err != nil {
@@ -243,9 +241,9 @@ func (ex *Exchanger) handleGetIBTPMessage(p port.Port, msg *peerMsg.Message) {
 }
 
 // 直连
-func (ex *Exchanger) handleNewConnection(dstPierID string) {
+func (ex *Exchanger) handleNewConnection(dstSidercarID string) {
 	appchainMethod := []byte(ex.appchainDID)
-	msg := peermgr.Message(peerMsg.Message_INTERCHAIN_META_GET, true, appchainMethod)
+	msg := pb.Message(peerMsg.Message_INTERCHAIN_META_GET, true, appchainMethod)
 
 	indices := &struct {
 		InterchainIndex uint64 `json:"interchain_index"`
@@ -253,7 +251,7 @@ func (ex *Exchanger) handleNewConnection(dstPierID string) {
 	}{}
 
 	loop := func() error {
-		interchainMeta, err := ex.peerMgr.Send(dstPierID, msg)
+		interchainMeta, err := ex.peerMgr.Send(dstSidercarID, msg)
 		if err != nil {
 			return err
 		}
@@ -275,7 +273,6 @@ func (ex *Exchanger) handleNewConnection(dstPierID string) {
 		ex.logger.Panic(err)
 	}
 }
-
 
 //直链模式
 func (ex *Exchanger) handleGetInterchainMessage(p port.Port, msg *peerMsg.Message) {
@@ -302,7 +299,7 @@ func (ex *Exchanger) handleGetInterchainMessage(p port.Port, msg *peerMsg.Messag
 		panic(err)
 	}
 
-	retMsg := peermgr.Message(peerMsg.Message_ACK, true, data)
+	retMsg := pb.Message(peerMsg.Message_ACK, true, data)
 	if err := ex.peerMgr.AsyncSendWithPort(p, retMsg); err != nil {
 		ex.logger.Error(err)
 		return

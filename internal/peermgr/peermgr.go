@@ -2,11 +2,10 @@ package peermgr
 
 import (
 	"github.com/libp2p/go-libp2p-core/peer"
-	peermgr "github.com/meshplus/pier/internal/peermgr/proto"
-	"github.com/meshplus/pier/internal/port"
+	"github.com/link33/sidercar/internal/port"
 )
 
-type MessageHandler func(port.Port, *peermgr.Message)
+type MessageHandler func(port.Port, *pb.Message)
 type ConnectHandler func(string)
 
 //go:generate mockgen -destination mock_peermgr/mock_peermgr.go -package mock_peermgr -source peermgr.go
@@ -28,20 +27,12 @@ type PeerManager interface {
 	AsyncSendWithPort(port.Port, port.Message) error
 
 	// Send sends message waiting response
-	Send(string, port.Message) (*peermgr.Message, error)
+	Send(string, port.Message) (*pb.Message, error)
 
 	// Peers
 	//Peers() map[string]*peer.AddrInfo
 
 	Ports() []port.Port
-	// RegisterMsgHandler
-	RegisterMsgHandler(peermgr.Message_Type, MessageHandler) error
-
-	// RegisterMultiMsgHandler
-	RegisterMultiMsgHandler([]peermgr.Message_Type, MessageHandler) error
-
-	// RegisterConnectHandler
-	RegisterConnectHandler(ConnectHandler) error
 }
 
 type DHTManager interface {

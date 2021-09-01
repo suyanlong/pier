@@ -1,12 +1,12 @@
 package txcrypto
 
 import (
+	rpcx "github.com/link33/sidercar/hub/client"
+	"github.com/link33/sidercar/model/constant"
 	"github.com/meshplus/bitxhub-kit/crypto"
 	"github.com/meshplus/bitxhub-kit/crypto/asym/ecdsa"
 	"github.com/meshplus/bitxhub-kit/crypto/ecdh"
 	"github.com/meshplus/bitxhub-kit/crypto/sym"
-	"github.com/meshplus/pier/model/constant"
-	rpcx "github.com/meshplus/pier/hub/client"
 )
 
 type RelayCryptor struct {

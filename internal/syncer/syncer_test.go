@@ -14,6 +14,11 @@ import (
 
 	"github.com/cbergoon/merkletree"
 	"github.com/golang/mock/gomock"
+	rpcx "github.com/link33/sidercar/hub/client"
+	"github.com/link33/sidercar/hub/client/mock_client"
+	"github.com/link33/sidercar/internal/repo"
+	"github.com/link33/sidercar/model/constant"
+	"github.com/link33/sidercar/model/pb"
 	appchainmgr "github.com/meshplus/bitxhub-core/appchain-mgr"
 	"github.com/meshplus/bitxhub-core/governance"
 	"github.com/meshplus/bitxhub-kit/crypto"
@@ -21,13 +26,6 @@ import (
 	"github.com/meshplus/bitxhub-kit/log"
 	"github.com/meshplus/bitxhub-kit/storage/leveldb"
 	"github.com/meshplus/bitxhub-kit/types"
-	"github.com/meshplus/pier/model/constant"
-	"github.com/meshplus/pier/model/pb"
-	rpcx "github.com/meshplus/pier/hub/client"
-	"github.com/meshplus/pier/hub/client/mock_client"
-	"github.com/meshplus/pier/internal/lite/mock_lite"
-	"github.com/meshplus/pier/internal/repo"
-	"github.com/meshplus/pier/pkg/model"
 	"github.com/stretchr/testify/require"
 )
 
@@ -125,7 +123,7 @@ func TestSyncHeader001(t *testing.T) {
 
 	// recover should have persist height 3 wrapper
 	receiveWrapper := &pb.InterchainTxWrappers{}
-	val := syncer.storage.Get(model.WrapperKey(3))
+	val := syncer.storage.Get(pb.WrapperKey(3))
 
 	require.Nil(t, receiveWrapper.Unmarshal(val))
 	for i, tx := range w3.InterchainTxWrappers[0].Transactions {
@@ -204,7 +202,7 @@ func TestSyncHeader002(t *testing.T) {
 
 	// recover should have persist height 3 wrapper
 	receiveWrapper := &pb.InterchainTxWrappers{}
-	val := syncer.storage.Get(model.WrapperKey(3))
+	val := syncer.storage.Get(pb.WrapperKey(3))
 
 	require.Nil(t, receiveWrapper.Unmarshal(val))
 	for i, tx := range w3.InterchainTxWrappers[0].Transactions {

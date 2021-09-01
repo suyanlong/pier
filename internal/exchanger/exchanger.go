@@ -10,30 +10,24 @@ import (
 	"github.com/Rican7/retry"
 	"github.com/Rican7/retry/backoff"
 	"github.com/Rican7/retry/strategy"
+	"github.com/link33/sidercar/api"
+	"github.com/link33/sidercar/internal/checker"
+	"github.com/link33/sidercar/internal/peermgr"
+	"github.com/link33/sidercar/internal/repo"
+	"github.com/link33/sidercar/internal/router"
+	"github.com/link33/sidercar/internal/syncer"
+	"github.com/link33/sidercar/model/pb"
 	"github.com/meshplus/bitxhub-kit/storage"
-	"github.com/meshplus/pier/api"
-	"github.com/meshplus/pier/internal/checker"
-	"github.com/meshplus/pier/internal/executor"
-	"github.com/meshplus/pier/internal/monitor"
-	"github.com/meshplus/pier/internal/peermgr"
-	peerMsg "github.com/meshplus/pier/internal/peermgr/proto"
-	"github.com/meshplus/pier/internal/repo"
-	"github.com/meshplus/pier/internal/router"
-	"github.com/meshplus/pier/internal/syncer"
-	"github.com/meshplus/pier/model/pb"
-	"github.com/meshplus/pier/pkg/model"
 	"github.com/sirupsen/logrus"
 	"go.uber.org/atomic"
 )
 
 type Exchanger struct {
-	mode                 string
-	appchainDID          string
-	store                storage.Storage
-	mnt                  monitor.Monitor   // 监听跨链交易，来源链。
-	exec                 executor.Executor // 执行跨链交易的一方。
-	syncer               syncer.Syncer     // WrapperSyncer represents the necessary data for sync tx wrappers from bitxhub
-	router               router.Router     // 占时不使用
+	mode        string
+	appchainDID string
+	store       storage.Storage
+	syncer      syncer.Syncer // WrapperSyncer represents the necessary data for sync tx wrappers from bitxhub
+	router      router.Router // 占时不使用
 
 	apiServer       *api.Server //直连模式使用
 	peerMgr         peermgr.PeerManager
@@ -54,20 +48,20 @@ func New(typ, appchainDID string, meta *pb.Interchain, opts ...Option) (*Exchang
 
 	ctx, cancel := context.WithCancel(context.Background())
 	return &Exchanger{
-		checker:              config.checker,
-		exec:                 config.exec,
-		apiServer:            config.apiServer,
-		mnt:                  config.mnt,
-		peerMgr:              config.peerMgr,
-		syncer:               config.syncer,
-		store:                config.store,
-		router:               config.router,
-		logger:               config.logger,
-		ch:                   make(chan struct{}, 100),
-		mode:                 typ,
-		appchainDID:          appchainDID,
-		ctx:                  ctx,
-		cancel:               cancel,
+		checker:     config.checker,
+		exec:        config.exec,
+		apiServer:   config.apiServer,
+		mnt:         config.mnt,
+		peerMgr:     config.peerMgr,
+		syncer:      config.syncer,
+		store:       config.store,
+		router:      config.router,
+		logger:      config.logger,
+		ch:          make(chan struct{}, 100),
+		mode:        typ,
+		appchainDID: appchainDID,
+		ctx:         ctx,
+		cancel:      cancel,
 	}, nil
 }
 
@@ -246,13 +240,13 @@ func (ex *Exchanger) sendIBTP(ibtp *pb.IBTP) error {
 			return fmt.Errorf("send ibtp to bitxhub: %s", err.Error())
 		}
 	case repo.DirectMode:
-		// send ibtp to another pier
+		// send ibtp to another sidercar
 		if err := retry.Retry(func(attempt uint) error {
 			data, err := ibtp.Marshal()
 			if err != nil {
 				panic(fmt.Sprintf("marshal ibtp: %s", err.Error()))
 			}
-			msg := peermgr.Message(peerMsg.Message_IBTP_SEND, true, data)
+			msg := pb.Message(peerMsg.Message_IBTP_SEND, true, data)
 			var dst string
 			if ibtp.Type == pb.IBTP_INTERCHAIN {
 				dst = ibtp.To
@@ -261,7 +255,7 @@ func (ex *Exchanger) sendIBTP(ibtp *pb.IBTP) error {
 			}
 
 			if err := ex.peerMgr.AsyncSend(dst, msg); err != nil {
-				ex.logger.Errorf("Send ibtp to pier %s: %s", ibtp.ID(), err.Error())
+				ex.logger.Errorf("Send ibtp to sidercar %s: %s", ibtp.ID(), err.Error())
 				return err
 			}
 
@@ -277,7 +271,7 @@ func (ex *Exchanger) sendIBTP(ibtp *pb.IBTP) error {
 //主动发起，说明是from自己，
 func (ex *Exchanger) queryIBTP(mode string, id, target string) (*pb.IBTP, bool, error) {
 	verifiedTx := &pb.VerifiedTx{}
-	v := ex.store.Get(model.IBTPKey(id))
+	v := ex.store.Get(pb.IBTPKey(id))
 	if v != nil {
 		if err := verifiedTx.Unmarshal(v); err != nil {
 			return nil, false, err
@@ -303,8 +297,8 @@ func (ex *Exchanger) queryIBTP(mode string, id, target string) (*pb.IBTP, bool, 
 			return nil, false, fmt.Errorf("query ibtp from bitxhub: %s", err.Error())
 		}
 	case repo.DirectMode:
-		// query ibtp from another pier
-		msg := peermgr.Message(peerMsg.Message_IBTP_GET, true, []byte(id))
+		// query ibtp from another sidercar
+		msg := pb.Message(peerMsg.Message_IBTP_GET, true, []byte(id))
 		result, err := ex.peerMgr.Send(target, msg)
 		if err != nil {
 			return nil, false, err
@@ -315,7 +309,7 @@ func (ex *Exchanger) queryIBTP(mode string, id, target string) (*pb.IBTP, bool, 
 			return nil, false, err
 		}
 	default:
-		return nil, false, fmt.Errorf("unsupported pier mode")
+		return nil, false, fmt.Errorf("unsupported sidercar mode")
 	}
 
 	return ibtp, isValid, nil
@@ -323,7 +317,7 @@ func (ex *Exchanger) queryIBTP(mode string, id, target string) (*pb.IBTP, bool, 
 
 func (ex *Exchanger) queryIBTPForRelay(id, target string) (*pb.IBTP, bool, error) {
 	verifiedTx := &pb.VerifiedTx{}
-	v := ex.store.Get(model.IBTPKey(id))
+	v := ex.store.Get(pb.IBTPKey(id))
 	if v != nil {
 		if err := verifiedTx.Unmarshal(v); err != nil {
 			return nil, false, err

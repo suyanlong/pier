@@ -3,9 +3,9 @@ package rpcx
 import (
 	"context"
 
+	"github.com/link33/sidercar/model/pb"
 	"github.com/meshplus/bitxhub-kit/crypto"
 	"github.com/meshplus/bitxhub-kit/types"
-	"github.com/meshplus/pier/model/pb"
 )
 
 type SubscriptionType int
@@ -112,13 +112,13 @@ type Client interface {
 
 	// IPFSGetToLocal gets from ipfs and saves to local file path
 	IPFSGetToLocal(path string, localfPath string) (*pb.Response, error)
-	//Check whethe there is a master pier connect to the BitXHub.
-	CheckMasterPier(address string) (*pb.Response, error)
+	//Check whethe there is a master sidercar connect to the BitXHub.
+	CheckMasterSidercar(address string) (*pb.Response, error)
 
-	//Set the master pier connect to the BitXHub.
-	SetMasterPier(address string, index string, timeout int64) (*pb.Response, error)
+	//Set the master sidercar connect to the BitXHub.
+	SetMasterSidercar(address string, index string, timeout int64) (*pb.Response, error)
 
-	//Update the master pier status
+	//Update the master sidercar status
 	HeartBeat(address string, index string) (*pb.Response, error)
 }
 
