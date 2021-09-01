@@ -1,4 +1,4 @@
-package sidercar
+package sidecar
 
 import (
 	"fmt"

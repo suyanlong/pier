@@ -9,9 +9,9 @@ import (
 
 	gomock "github.com/golang/mock/gomock"
 	peer "github.com/libp2p/go-libp2p-core/peer"
-	peermgr "github.com/link33/sidercar/internal/peermgr"
-	port "github.com/link33/sidercar/internal/port"
-	pb "github.com/link33/sidercar/model/pb"
+	peermgr "github.com/link33/sidecar/internal/peermgr"
+	port "github.com/link33/sidecar/internal/port"
+	pb "github.com/link33/sidecar/model/pb"
 )
 
 // MockPeerManager is a mock of PeerManager interface.

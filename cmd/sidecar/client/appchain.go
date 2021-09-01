@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 	"strconv"
 
-	"github.com/link33/sidercar/internal/repo"
+	"github.com/link33/sidecar/internal/repo"
 	appchainmgr "github.com/meshplus/bitxhub-core/appchain-mgr"
 	"github.com/meshplus/bitxhub-kit/crypto"
 	"github.com/meshplus/bitxhub-kit/crypto/asym"
@@ -21,15 +21,15 @@ type Approve struct {
 
 var clientCMD = cli.Command{
 	Name:  "client",
-	Usage: "Command about appchain in sidercar",
+	Usage: "Command about appchain in sidecar",
 	Subcommands: []cli.Command{
 		{
 			Name:  "register",
-			Usage: "Register appchain in sidercar",
+			Usage: "Register appchain in sidecar",
 			Flags: []cli.Flag{
 				cli.StringFlag{
-					Name:     "sidercar-id",
-					Usage:    "Specify target sidercar id",
+					Name:     "sidecar-id",
+					Usage:    "Specify target sidecar id",
 					Required: true,
 				},
 				cli.StringFlag{
@@ -63,15 +63,15 @@ var clientCMD = cli.Command{
 					Required: true,
 				},
 			},
-			Action: registerSidercarAppchain,
+			Action: registerSidecarAppchain,
 		},
 		{
 			Name:  "update",
-			Usage: "Update appchain in sidercar",
+			Usage: "Update appchain in sidecar",
 			Flags: []cli.Flag{
 				cli.StringFlag{
-					Name:     "sidercar-id",
-					Usage:    "Specify target sidercar id",
+					Name:     "sidecar-id",
+					Usage:    "Specify target sidecar id",
 					Required: false,
 				},
 				cli.StringFlag{
@@ -105,11 +105,11 @@ var clientCMD = cli.Command{
 					Required: false,
 				},
 			},
-			Action: updateSidercarAppchain,
+			Action: updateSidecarAppchain,
 		},
 		{
 			Name:  "audit",
-			Usage: "Audit appchain in sidercar",
+			Usage: "Audit appchain in sidecar",
 			Flags: []cli.Flag{
 				cli.StringFlag{
 					Name:     "id",
@@ -127,19 +127,19 @@ var clientCMD = cli.Command{
 					Required: true,
 				},
 			},
-			Action: auditSidercarAppchain,
+			Action: auditSidecarAppchain,
 		},
 		{
 			Name:  "get",
 			Usage: "Get appchain info",
 			Flags: []cli.Flag{
 				cli.StringFlag{
-					Name:     "sidercar-id",
-					Usage:    "Specific target sidercar id",
+					Name:     "sidecar-id",
+					Usage:    "Specific target sidecar id",
 					Required: true,
 				},
 			},
-			Action: getSidercarAppchain,
+			Action: getSidecarAppchain,
 		},
 	},
 }
@@ -148,15 +148,15 @@ func LoadClientCMD() cli.Command {
 	return clientCMD
 }
 
-func registerSidercarAppchain(ctx *cli.Context) error {
-	return saveSidercarAppchain(ctx, RegisterAppchainUrl)
+func registerSidecarAppchain(ctx *cli.Context) error {
+	return saveSidecarAppchain(ctx, RegisterAppchainUrl)
 }
 
-func updateSidercarAppchain(ctx *cli.Context) error {
-	return saveSidercarAppchain(ctx, UpdateAppchainUrl)
+func updateSidecarAppchain(ctx *cli.Context) error {
+	return saveSidecarAppchain(ctx, UpdateAppchainUrl)
 }
 
-func auditSidercarAppchain(ctx *cli.Context) error {
+func auditSidecarAppchain(ctx *cli.Context) error {
 	id := ctx.String("id")
 	isApproved := ctx.String("is-approved")
 	desc := ctx.String("desc")
@@ -190,8 +190,8 @@ func auditSidercarAppchain(ctx *cli.Context) error {
 	return nil
 }
 
-func saveSidercarAppchain(ctx *cli.Context, path string) error {
-	sidercar := ctx.String("sidercar-id")
+func saveSidecarAppchain(ctx *cli.Context, path string) error {
+	sidecar := ctx.String("sidecar-id")
 	name := ctx.String("name")
 	typ := ctx.String("type")
 	desc := ctx.String("desc")
@@ -199,7 +199,7 @@ func saveSidercarAppchain(ctx *cli.Context, path string) error {
 	validatorsPath := ctx.String("validators")
 	consensusType := ctx.String("consensus-type")
 
-	url, err := getURL(ctx, fmt.Sprintf("%s?sidercar_id=%s", path, sidercar))
+	url, err := getURL(ctx, fmt.Sprintf("%s?sidecar_id=%s", path, sidecar))
 	if err != nil {
 		return err
 	}
@@ -265,7 +265,7 @@ func saveSidercarAppchain(ctx *cli.Context, path string) error {
 		return fmt.Errorf("marshal appchain error: %w", err)
 	}
 
-	url, err = getURL(ctx, fmt.Sprintf("%s?sidercar_id=%s", path, sidercar))
+	url, err = getURL(ctx, fmt.Sprintf("%s?sidecar_id=%s", path, sidecar))
 	if err != nil {
 		return err
 	}
@@ -279,10 +279,10 @@ func saveSidercarAppchain(ctx *cli.Context, path string) error {
 	return nil
 }
 
-func getSidercarAppchain(ctx *cli.Context) error {
-	targetSidercarID := ctx.String("sidercar-id")
+func getSidecarAppchain(ctx *cli.Context) error {
+	targetSidecarID := ctx.String("sidecar-id")
 
-	url, err := getURL(ctx, fmt.Sprintf("%s?sidercar_id=%s", GetAppchainUrl, targetSidercarID))
+	url, err := getURL(ctx, fmt.Sprintf("%s?sidecar_id=%s", GetAppchainUrl, targetSidecarID))
 	if err != nil {
 		return err
 	}

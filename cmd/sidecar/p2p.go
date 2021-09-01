@@ -6,7 +6,7 @@ import (
 
 	crypto2 "github.com/libp2p/go-libp2p-core/crypto"
 	"github.com/libp2p/go-libp2p-core/peer"
-	"github.com/link33/sidercar/internal/repo"
+	"github.com/link33/sidecar/internal/repo"
 	"github.com/meshplus/bitxhub-kit/crypto/asym"
 	"github.com/meshplus/bitxhub-kit/crypto/asym/ecdsa"
 	"github.com/urfave/cli"
@@ -18,7 +18,7 @@ var p2pCMD = cli.Command{
 	Subcommands: []cli.Command{
 		{
 			Name:   "id",
-			Usage:  "get sidercar unique id in p2p network",
+			Usage:  "get sidecar unique id in p2p network",
 			Action: p2pID,
 		},
 	},

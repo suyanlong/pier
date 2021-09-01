@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/link33/sidercar/model/pb"
+	"github.com/link33/sidecar/model/pb"
 )
 
 func (syncer *WrapperSyncer) persist(ws *pb.InterchainTxWrappers) error {

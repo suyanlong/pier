@@ -3,5 +3,5 @@
 package imports
 
 import (
-	_ "github.com/bitxhub/sidercar-ha"
+	_ "github.com/bitxhub/sidecar-ha"
 )

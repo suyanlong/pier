@@ -5,9 +5,9 @@ import (
 	"fmt"
 
 	"github.com/gin-gonic/gin"
-	"github.com/link33/sidercar/cmd/sidercar/client"
-	"github.com/link33/sidercar/internal/repo"
-	"github.com/link33/sidercar/model/pb"
+	"github.com/link33/sidecar/cmd/sidecar/client"
+	"github.com/link33/sidecar/internal/repo"
+	"github.com/link33/sidecar/model/pb"
 	"github.com/sirupsen/logrus"
 )
 

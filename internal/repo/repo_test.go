@@ -40,7 +40,7 @@ func TestInit(t *testing.T) {
 	require.Nil(t, err)
 	require.Equal(t, root, rootWithDefault)
 
-	err = InitConfig(filepath.Join(root, "sidercar.toml"))
+	err = InitConfig(filepath.Join(root, "sidecar.toml"))
 	require.Nil(t, err)
 
 	keyPath := KeyPath(root)

@@ -1,6 +1,6 @@
 package appchain
 
-import "github.com/link33/sidercar/model/pb"
+import "github.com/link33/sidecar/model/pb"
 
 //go:generate mockgen -destination mock_monitor/mock_monitor.go -package mock_monitor -source interface.go
 type Monitor interface {

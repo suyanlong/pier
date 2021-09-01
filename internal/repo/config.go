@@ -16,7 +16,7 @@ const (
 	UnionMode  = "union"  //联盟模式，中继架构。代表的是部署架构，不够灵活。不能随时变动。
 )
 
-// Config represents the necessary config data for starting sidercar
+// Config represents the necessary config data for starting sidecar
 type Config struct {
 	RepoRoot  string
 	Title     string    `toml:"title" json:"title"`
@@ -85,15 +85,15 @@ type Appchains struct {
 // DefaultConfig returns config with default value
 func DefaultConfig() *Config {
 	return &Config{
-		RepoRoot: "sidercar",
-		Title:    "sidercar configuration file",
+		RepoRoot: "sidecar",
+		Title:    "sidecar configuration file",
 		Port: Port{
 			Http:  8080,
 			PProf: 44555,
 		},
 		Log: Log{
 			Dir:          "logs",
-			Filename:     "sidercar.log",
+			Filename:     "sidecar.log",
 			ReportCaller: false,
 			Level:        "info",
 			Module: LogModule{
@@ -138,13 +138,13 @@ func UnmarshalConfig(repoRoot string) (*Config, error) {
 	configPath := filepath.Join(repoRoot, ConfigName)
 
 	if !fileutil.Exist(configPath) {
-		return nil, fmt.Errorf("file %s doesn't exist, please initialize sidercar firstly", configPath)
+		return nil, fmt.Errorf("file %s doesn't exist, please initialize sidecar firstly", configPath)
 	}
 
 	viper.SetConfigFile(configPath)
 	viper.SetConfigType("toml")
 	viper.AutomaticEnv()
-	viper.SetEnvPrefix("SIDERCAR")
+	viper.SetEnvPrefix("SIDECAR")
 	replacer := strings.NewReplacer(".", "_")
 	viper.SetEnvKeyReplacer(replacer)
 	if err := viper.ReadInConfig(); err != nil {

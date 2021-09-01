@@ -3,7 +3,7 @@ package peermgr
 import (
 	"fmt"
 
-	"github.com/link33/sidercar/model/pb"
+	"github.com/link33/sidecar/model/pb"
 )
 
 func (swarm *Swarm) RegisterMultiMsgHandler(messageTypes []pb.Message_Type, handler MessageHandler) error {

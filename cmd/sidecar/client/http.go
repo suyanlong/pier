@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/link33/sidercar/internal/repo"
+	"github.com/link33/sidecar/internal/repo"
 	"github.com/urfave/cli"
 )
 

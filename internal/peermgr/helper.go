@@ -1,7 +1,7 @@
 package peermgr
 
 import (
-	"github.com/link33/sidercar/model/pb"
+	"github.com/link33/sidecar/model/pb"
 )
 
 const (

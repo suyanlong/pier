@@ -64,7 +64,7 @@ var xxx_messageInfo_Empty proto.InternalMessageInfo
 
 type InitializeRequest struct {
 	ConfigPath string `protobuf:"bytes,1,opt,name=config_path,json=configPath,proto3" json:"config_path,omitempty"`
-	SidercarId string `protobuf:"bytes,2,opt,name=sidercar_id,json=sidercarId,proto3" json:"sidercar_id,omitempty"`
+	SidecarId  string `protobuf:"bytes,2,opt,name=sidecar_id,json=sidecarId,proto3" json:"sidecar_id,omitempty"`
 	Extra      []byte `protobuf:"bytes,3,opt,name=extra,proto3" json:"extra,omitempty"`
 }
 
@@ -108,9 +108,9 @@ func (m *InitializeRequest) GetConfigPath() string {
 	return ""
 }
 
-func (m *InitializeRequest) GetSidercarId() string {
+func (m *InitializeRequest) GetSidecarId() string {
 	if m != nil {
-		return m.SidercarId
+		return m.SidecarId
 	}
 	return ""
 }
@@ -1327,10 +1327,10 @@ func (m *InitializeRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x1a
 	}
-	if len(m.SidercarId) > 0 {
-		i -= len(m.SidercarId)
-		copy(dAtA[i:], m.SidercarId)
-		i = encodeVarintPlugin(dAtA, i, uint64(len(m.SidercarId)))
+	if len(m.SidecarId) > 0 {
+		i -= len(m.SidecarId)
+		copy(dAtA[i:], m.SidecarId)
+		i = encodeVarintPlugin(dAtA, i, uint64(len(m.SidecarId)))
 		i--
 		dAtA[i] = 0x12
 	}
@@ -1713,7 +1713,7 @@ func (m *InitializeRequest) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovPlugin(uint64(l))
 	}
-	l = len(m.SidercarId)
+	l = len(m.SidecarId)
 	if l > 0 {
 		n += 1 + l + sovPlugin(uint64(l))
 	}
@@ -1988,7 +1988,7 @@ func (m *InitializeRequest) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field SidercarId", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field SidecarId", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -2016,7 +2016,7 @@ func (m *InitializeRequest) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.SidercarId = string(dAtA[iNdEx:postIndex])
+			m.SidecarId = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {

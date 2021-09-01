@@ -7,9 +7,9 @@ import (
 	"io/ioutil"
 	"path/filepath"
 
-	rpcx "github.com/link33/sidercar/hub/client"
-	"github.com/link33/sidercar/internal/repo"
-	"github.com/link33/sidercar/model/constant"
+	rpcx "github.com/link33/sidecar/hub/client"
+	"github.com/link33/sidecar/internal/repo"
+	"github.com/link33/sidecar/model/constant"
 	appchainmgr "github.com/meshplus/bitxhub-core/appchain-mgr"
 	"github.com/meshplus/bitxhub-kit/crypto/asym"
 	"github.com/meshplus/bitxhub-kit/hexutil"
@@ -25,11 +25,11 @@ var appchainBxhCMD = cli.Command{
 		didCommand,
 		{
 			Name:  "register",
-			Usage: "Register sidercar to bitxhub",
+			Usage: "Register sidecar to bitxhub",
 			Flags: []cli.Flag{
 				methodFlag,
 			},
-			Action: registerSidercar,
+			Action: registerSidecar,
 		},
 		{
 			Name:  "update",
@@ -139,8 +139,8 @@ var appchainBxhCMD = cli.Command{
 	},
 }
 
-func registerSidercar(ctx *cli.Context) error {
-	// todo: add register sidercar logic
+func registerSidecar(ctx *cli.Context) error {
+	// todo: add register sidecar logic
 	return nil
 }
 

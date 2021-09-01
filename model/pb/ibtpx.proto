@@ -9,7 +9,7 @@ message IBTPX {
     IBTP ibtp = 1;
     // route mode
     string mode = 2; //dirct、relay
-    repeated string routeSign = 3;//路由节点签名路径，主要是对data hash签名，主要是相互校验。sidercar节点之间相互校验。sidercar 节点需要注册到中继连上。还可以过滤已经发送过的交易、也可以作恶惩罚。
+    repeated string routeSign = 3;//路由节点签名路径，主要是对data hash签名，主要是相互校验。sidecar节点之间相互校验。sidecar 节点需要注册到中继连上。还可以过滤已经发送过的交易、也可以作恶惩罚。
     string routeMethod = 4;//single、multicast、broadcast、
     repeated string routeMethodArg = 5;//路由节点，默认第一个节点。或者转发消息。
     bool IsValid = 6;

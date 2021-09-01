@@ -6,9 +6,9 @@ import (
 
 	"github.com/Rican7/retry"
 	"github.com/Rican7/retry/strategy"
-	rpcx "github.com/link33/sidercar/hub/client"
-	"github.com/link33/sidercar/model/constant"
-	"github.com/link33/sidercar/model/pb"
+	rpcx "github.com/link33/sidecar/hub/client"
+	"github.com/link33/sidecar/model/constant"
+	"github.com/link33/sidecar/model/pb"
 
 	appchainmgr "github.com/meshplus/bitxhub-core/appchain-mgr"
 	"github.com/meshplus/bitxhub-kit/types"

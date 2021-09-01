@@ -10,13 +10,13 @@ import (
 	"github.com/Rican7/retry"
 	"github.com/Rican7/retry/backoff"
 	"github.com/Rican7/retry/strategy"
-	"github.com/link33/sidercar/api"
-	"github.com/link33/sidercar/internal/checker"
-	"github.com/link33/sidercar/internal/peermgr"
-	"github.com/link33/sidercar/internal/repo"
-	"github.com/link33/sidercar/internal/router"
-	"github.com/link33/sidercar/internal/syncer"
-	"github.com/link33/sidercar/model/pb"
+	"github.com/link33/sidecar/api"
+	"github.com/link33/sidecar/internal/checker"
+	"github.com/link33/sidecar/internal/peermgr"
+	"github.com/link33/sidecar/internal/repo"
+	"github.com/link33/sidecar/internal/router"
+	"github.com/link33/sidecar/internal/syncer"
+	"github.com/link33/sidecar/model/pb"
 	"github.com/meshplus/bitxhub-kit/storage"
 	"github.com/sirupsen/logrus"
 	"go.uber.org/atomic"
@@ -232,7 +232,7 @@ func (ex *Exchanger) sendIBTP(ibtp *pb.IBTP) error {
 			return fmt.Errorf("send ibtp to bitxhub: %s", err.Error())
 		}
 	case repo.DirectMode:
-		// send ibtp to another sidercar
+		// send ibtp to another sidecar
 		if err := retry.Retry(func(attempt uint) error {
 			data, err := ibtp.Marshal()
 			if err != nil {
@@ -247,7 +247,7 @@ func (ex *Exchanger) sendIBTP(ibtp *pb.IBTP) error {
 			}
 
 			if err := ex.peerMgr.AsyncSend(dst, msg); err != nil {
-				ex.logger.Errorf("Send ibtp to sidercar %s: %s", ibtp.ID(), err.Error())
+				ex.logger.Errorf("Send ibtp to sidecar %s: %s", ibtp.ID(), err.Error())
 				return err
 			}
 
@@ -289,7 +289,7 @@ func (ex *Exchanger) queryIBTP(mode string, id, target string) (*pb.IBTP, bool, 
 			return nil, false, fmt.Errorf("query ibtp from bitxhub: %s", err.Error())
 		}
 	case repo.DirectMode:
-		// query ibtp from another sidercar
+		// query ibtp from another sidecar
 		msg := pb.Message(pb.Message_IBTP_GET, true, []byte(id))
 		result, err := ex.peerMgr.Send(target, msg)
 		if err != nil {
@@ -301,7 +301,7 @@ func (ex *Exchanger) queryIBTP(mode string, id, target string) (*pb.IBTP, bool, 
 			return nil, false, err
 		}
 	default:
-		return nil, false, fmt.Errorf("unsupported sidercar mode")
+		return nil, false, fmt.Errorf("unsupported sidecar mode")
 	}
 
 	return ibtp, isValid, nil

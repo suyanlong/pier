@@ -1,7 +1,7 @@
 package appchain
 
 import (
-	"github.com/link33/sidercar/model/pb"
+	"github.com/link33/sidecar/model/pb"
 )
 
 //go:generate mockgen -destination mock_executor/mock_executor.go -package mock_executor -source interface.go

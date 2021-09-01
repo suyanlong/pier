@@ -6,14 +6,14 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/link33/sidercar/internal/repo"
+	"github.com/link33/sidecar/internal/repo"
 	"github.com/meshplus/bitxhub-kit/fileutil"
 	"github.com/urfave/cli"
 )
 
 var initCMD = cli.Command{
 	Name:  "init",
-	Usage: "Initialize sidercar local configuration",
+	Usage: "Initialize sidecar local configuration",
 	Action: func(ctx *cli.Context) error {
 		repoRoot, err := repo.PathRootWithDefault(ctx.GlobalString("repo"))
 		if err != nil {
@@ -21,7 +21,7 @@ var initCMD = cli.Command{
 		}
 
 		if fileutil.Exist(filepath.Join(repoRoot, repo.ConfigName)) {
-			fmt.Println("sidercar configuration file already exists")
+			fmt.Println("sidecar configuration file already exists")
 			fmt.Println("reinitializing would overwrite your configuration, Y/N?")
 			input := bufio.NewScanner(os.Stdin)
 			input.Scan()

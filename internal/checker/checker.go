@@ -1,6 +1,6 @@
 package checker
 
-import "github.com/link33/sidercar/model/pb"
+import "github.com/link33/sidecar/model/pb"
 
 type MockChecker struct {
 }

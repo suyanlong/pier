@@ -2,14 +2,14 @@ package peermgr
 
 import (
 	"fmt"
-	"github.com/link33/sidercar/model/pb"
+	"github.com/link33/sidecar/model/pb"
 	"testing"
 	"time"
 
 	libp2pcry "github.com/libp2p/go-libp2p-core/crypto"
 	peer2 "github.com/libp2p/go-libp2p-core/peer"
-	"github.com/link33/sidercar/internal/port"
-	"github.com/link33/sidercar/internal/repo"
+	"github.com/link33/sidecar/internal/port"
+	"github.com/link33/sidecar/internal/repo"
 	"github.com/meshplus/bitxhub-kit/crypto"
 	"github.com/meshplus/bitxhub-kit/crypto/asym"
 	"github.com/meshplus/bitxhub-kit/log"
@@ -20,9 +20,9 @@ import (
 
 var portMap = &port.PortMap{}
 
-func newSidercar(addr *peer2.AddrInfo, pm PeerManager) port.Port {
+func newSidecar(addr *peer2.AddrInfo, pm PeerManager) port.Port {
 	rec := make(chan *pb.IBTPX)
-	return &sidercar{
+	return &sidecar{
 		addr:  addr,
 		swarm: pm,
 		tag:   "",
@@ -95,7 +95,7 @@ func TestSwarm_AsyncSend(t *testing.T) {
 	addr, err := AddrToPeerInfo(mockMultiAddr)
 	require.Nil(t, err)
 
-	mockSwarm.connectedPeers.Store(mockId, newSidercar(addr, mockSwarm))
+	mockSwarm.connectedPeers.Store(mockId, newSidecar(addr, mockSwarm))
 
 	err = mockSwarm.AsyncSend(mockId, mockMsg)
 	require.Nil(t, err)
@@ -112,7 +112,7 @@ func TestSwarm_Send(t *testing.T) {
 	addr, err := AddrToPeerInfo(mockMultiAddr)
 	require.Nil(t, err)
 
-	mockSwarm.connectedPeers.Store(mockId, newSidercar(addr, mockSwarm))
+	mockSwarm.connectedPeers.Store(mockId, newSidecar(addr, mockSwarm))
 
 	_, err = mockSwarm.Send(mockId, mockMsg)
 	require.Nil(t, err)
@@ -140,9 +140,9 @@ func TestSwarm_Connect(t *testing.T) {
 	// test in right way
 	addr, err := AddrToPeerInfo(mockMultiAddr)
 	require.Nil(t, err)
-	sidercarId, err := mockSwarm.Connect(addr)
+	sidecarId, err := mockSwarm.Connect(addr)
 	require.Nil(t, err)
-	require.Equal(t, mockId, sidercarId)
+	require.Equal(t, mockId, sidecarId)
 }
 
 func TestSwarm_Peers(t *testing.T) {
@@ -211,9 +211,9 @@ func TestSwarm_RegisterConnectHandler(t *testing.T) {
 func TestSwarm_FindProviders(t *testing.T) {
 	_, _, mockSwarm, _, _, mockId := prepare(t)
 
-	sidercarId, err := mockSwarm.FindProviders(mockId)
+	sidecarId, err := mockSwarm.FindProviders(mockId)
 	require.Nil(t, err)
-	require.Equal(t, "QmSoLV4Bbm51jM9C4gDYZQ9Cy3U6aXMJDAbzgu2fzawe34", sidercarId)
+	require.Equal(t, "QmSoLV4Bbm51jM9C4gDYZQ9Cy3U6aXMJDAbzgu2fzawe34", sidecarId)
 }
 
 func TestSwarm_Provider(t *testing.T) {
@@ -443,7 +443,7 @@ func (mn *MockNetwork) Start() error {
 // Stop stop the network service.
 func (mn *MockNetwork) Stop() error {
 	if mn.PeersNum() == 0 {
-		return fmt.Errorf("Stop: there is no connected sidercar")
+		return fmt.Errorf("Stop: there is no connected sidecar")
 	}
 	return nil
 }

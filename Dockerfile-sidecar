@@ -2,15 +2,15 @@ FROM frolvlad/alpine-glibc
 # Environmental preparation
 COPY ./build/libwasmer.so /lib
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/lib
-RUN mkdir -p /root/sidercar/plugins
-WORKDIR /root/sidercar
+RUN mkdir -p /root/sidecar/plugins
+WORKDIR /root/sidecar
 
 # Copy essential binaries from the bin
-COPY ./bin/sidercar /usr/local/bin/
+COPY ./bin/sidecar /usr/local/bin/
 
 # Generate configuration
-RUN sidercar --repo=/root/sidercar init
+RUN sidecar --repo=/root/sidecar init
 
 EXPOSE 44555 44544
 
-CMD ["sidercar", "start"]
+CMD ["sidecar", "start"]

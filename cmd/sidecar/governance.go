@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 
-	rpcx "github.com/link33/sidercar/hub/client"
-	"github.com/link33/sidercar/model/constant"
+	rpcx "github.com/link33/sidecar/hub/client"
+	"github.com/link33/sidecar/model/constant"
 	"github.com/urfave/cli"
 )
 

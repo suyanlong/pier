@@ -1,7 +1,7 @@
 
 SHELL := /bin/bash
 CURRENT_PATH = $(shell pwd)
-APP_NAME = sidercar
+APP_NAME = sidecar
 
 # build with verison infos
 VERSION_DIR = github.com/link33/${APP_NAME}
@@ -57,14 +57,14 @@ prepare:
 install: packr
 	rm -f imports/imports.go
 	$(GO) install -ldflags '${GOLDFLAGS}' ./cmd/${APP_NAME}
-	@printf "${GREEN}Build sidercar successfully${NC}\n"
+	@printf "${GREEN}Build sidecar successfully${NC}\n"
 
 build: packr
 	@mkdir -p bin
 	rm -f imports/imports.go
 	$(GO) build -ldflags '${GOLDFLAGS}' ./cmd/${APP_NAME}
-	@mv ./sidercar bin
-	@printf "${GREEN}Build sidercar successfully!${NC}\n"
+	@mv ./sidecar bin
+	@printf "${GREEN}Build sidecar successfully!${NC}\n"
 
 installent: packr
 	cp imports/imports.go.template imports/imports.go
@@ -76,15 +76,15 @@ buildent: packr
 	cp imports/imports.go.template imports/imports.go
 	@sed "s?)?$(MODS)@)?" go.mod  | tr '@' '\n' > goent.mod
 	$(GO) build -tags ent -ldflags '${GOLDFLAGS}' -modfile goent.mod ./cmd/${APP_NAME}
-	@mv ./sidercar bin
-	@printf "${GREEN}Build sidercar ent successfully!${NC}\n"
+	@mv ./sidecar bin
+	@printf "${GREEN}Build sidecar ent successfully!${NC}\n"
 
 mod:
 	sed "s?)?$(MODS)\n)?" go.mod
 
 docker-build: packr
 	$(GO) install -ldflags '${STATIC_LDFLAGS}' ./cmd/${APP_NAME}
-	@echo "Build sidercar successfully"
+	@echo "Build sidecar successfully"
 
 ## make build-linux: Go build linux executable file
 build-linux:

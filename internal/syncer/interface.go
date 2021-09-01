@@ -1,8 +1,8 @@
 package syncer
 
 import (
-	rpcx "github.com/link33/sidercar/hub/client"
-	"github.com/link33/sidercar/model/pb"
+	rpcx "github.com/link33/sidecar/hub/client"
+	"github.com/link33/sidecar/model/pb"
 
 	appchainmgr "github.com/meshplus/bitxhub-core/appchain-mgr"
 )
@@ -24,7 +24,7 @@ type Syncer interface {
 	// if error occurs, it means this ibtp is not existed on bitxhub
 	QueryIBTP(ibtpID string) (*pb.IBTP, bool, error)
 
-	// ListenIBTP listen on the ibtps destined for this sidercar from bitxhub
+	// ListenIBTP listen on the ibtps destined for this sidecar from bitxhub
 	ListenIBTP() <-chan *pb.IBTPX
 
 	// SendIBTP sends interchain or receipt type of ibtp to bitxhub

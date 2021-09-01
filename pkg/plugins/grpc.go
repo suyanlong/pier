@@ -6,7 +6,7 @@ import (
 
 	"github.com/Rican7/retry"
 	"github.com/Rican7/retry/strategy"
-	"github.com/link33/sidercar/model/pb"
+	"github.com/link33/sidecar/model/pb"
 )
 
 // 实现 AppchainPluginServer接口，具体逻辑委托给业务接口Client的实现。主要是给插件进程使用。
@@ -16,7 +16,7 @@ type GRPCServer struct {
 }
 
 func (s *GRPCServer) Initialize(_ context.Context, req *pb.InitializeRequest) (*pb.Empty, error) {
-	err := s.Impl.Initialize(req.ConfigPath, req.SidercarId, req.Extra)
+	err := s.Impl.Initialize(req.ConfigPath, req.SidecarId, req.Extra)
 	return &pb.Empty{}, err
 }
 
@@ -147,7 +147,7 @@ type GRPCClient struct {
 func (g *GRPCClient) Initialize(configPath string, ID string, extra []byte) error {
 	g.DID = ID
 	_, err := g.client.Initialize(g.doneContext, &pb.InitializeRequest{
-		SidercarId: "", //TODO
+		SidecarId:  "", //TODO
 		ConfigPath: configPath,
 		Extra:      extra,
 	})

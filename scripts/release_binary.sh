@@ -13,15 +13,15 @@ if ! type packr >/dev/null 2>&1; then
   go get -u github.com/gobuffalo/packr/packr
 fi
 
-print_blue "===> 2. build sidercar"
+print_blue "===> 2. build sidecar"
 cd "${PROJECT_PATH}" && make build
 
 print_blue "===> 3. pack binarys"
 cd "${RELEASE_PATH}"
 if [ "$(uname)" == "Darwin" ]; then
   cp ../build/wasm/lib/darwin-amd64/libwasmer.dylib .
-  tar zcvf sidercar_darwin_x86_64_"${APP_VERSION}".tar.gz ./sidercar ./libwasmer.dylib
+  tar zcvf sidecar_darwin_x86_64_"${APP_VERSION}".tar.gz ./sidecar ./libwasmer.dylib
 else
   cp ../build/wasm/lib/linux-amd64/libwasmer.so .
-  tar zcvf sidercar_linux-amd64_"${APP_VERSION}".tar.gz ./sidercar ./libwasmer.so
+  tar zcvf sidecar_linux-amd64_"${APP_VERSION}".tar.gz ./sidecar ./libwasmer.so
 fi

@@ -8,8 +8,8 @@ import (
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
-	syncer "github.com/link33/sidercar/internal/syncer"
-	pb "github.com/link33/sidercar/model/pb"
+	syncer "github.com/link33/sidecar/internal/syncer"
+	pb "github.com/link33/sidecar/model/pb"
 	appchain_mgr "github.com/meshplus/bitxhub-core/appchain-mgr"
 )
 

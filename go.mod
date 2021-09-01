@@ -1,4 +1,4 @@
-module github.com/link33/sidercar
+module github.com/link33/sidecar
 
 go 1.17
 

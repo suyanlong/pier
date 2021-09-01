@@ -1,9 +1,9 @@
 package plugins
 
 import (
-	"github.com/link33/sidercar/internal"
-	"github.com/link33/sidercar/model/pb"
-	//"github.com/link33/sidercar/internal/port"
+	"github.com/link33/sidecar/internal"
+	"github.com/link33/sidecar/model/pb"
+	//"github.com/link33/sidecar/internal/port"
 )
 
 type Kernel interface {

@@ -1,8 +1,8 @@
 package appchain
 
 import (
-	"github.com/link33/sidercar/internal/port"
-	"github.com/link33/sidercar/model/pb"
+	"github.com/link33/sidecar/internal/port"
+	"github.com/link33/sidecar/model/pb"
 )
 
 func (a *appChain) ID() string {

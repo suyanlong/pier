@@ -147,31 +147,31 @@ func (GetMultiSignsRequest_Type) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_f209535e190f2bed, []int{13, 0}
 }
 
-type CheckSidercarResponse_Status int32
+type CheckSidecarResponse_Status int32
 
 const (
-	CheckSidercarResponse_ERROR_MASTER CheckSidercarResponse_Status = 0
-	CheckSidercarResponse_HAS_MASTER   CheckSidercarResponse_Status = 1
-	CheckSidercarResponse_NO_MASTER    CheckSidercarResponse_Status = 2
+	CheckSidecarResponse_ERROR_MASTER CheckSidecarResponse_Status = 0
+	CheckSidecarResponse_HAS_MASTER   CheckSidecarResponse_Status = 1
+	CheckSidecarResponse_NO_MASTER    CheckSidecarResponse_Status = 2
 )
 
-var CheckSidercarResponse_Status_name = map[int32]string{
+var CheckSidecarResponse_Status_name = map[int32]string{
 	0: "ERROR_MASTER",
 	1: "HAS_MASTER",
 	2: "NO_MASTER",
 }
 
-var CheckSidercarResponse_Status_value = map[string]int32{
+var CheckSidecarResponse_Status_value = map[string]int32{
 	"ERROR_MASTER": 0,
 	"HAS_MASTER":   1,
 	"NO_MASTER":    2,
 }
 
-func (x CheckSidercarResponse_Status) String() string {
-	return proto.EnumName(CheckSidercarResponse_Status_name, int32(x))
+func (x CheckSidecarResponse_Status) String() string {
+	return proto.EnumName(CheckSidecarResponse_Status_name, int32(x))
 }
 
-func (CheckSidercarResponse_Status) EnumDescriptor() ([]byte, []int) {
+func (CheckSidecarResponse_Status) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_f209535e190f2bed, []int{21, 0}
 }
 
@@ -1177,24 +1177,24 @@ func (m *DelVPNodeRequest) GetPid() string {
 	return ""
 }
 
-type SidercarInfo struct {
+type SidecarInfo struct {
 	Address string `protobuf:"bytes,1,opt,name=address,proto3" json:"address,omitempty"`
 	Index   string `protobuf:"bytes,2,opt,name=index,proto3" json:"index,omitempty"`
 	Timeout int64  `protobuf:"varint,3,opt,name=timeout,proto3" json:"timeout,omitempty"`
 }
 
-func (m *SidercarInfo) Reset()         { *m = SidercarInfo{} }
-func (m *SidercarInfo) String() string { return proto.CompactTextString(m) }
-func (*SidercarInfo) ProtoMessage()    {}
-func (*SidercarInfo) Descriptor() ([]byte, []int) {
+func (m *SidecarInfo) Reset()         { *m = SidecarInfo{} }
+func (m *SidecarInfo) String() string { return proto.CompactTextString(m) }
+func (*SidecarInfo) ProtoMessage()    {}
+func (*SidecarInfo) Descriptor() ([]byte, []int) {
 	return fileDescriptor_f209535e190f2bed, []int{20}
 }
-func (m *SidercarInfo) XXX_Unmarshal(b []byte) error {
+func (m *SidecarInfo) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *SidercarInfo) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *SidecarInfo) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_SidercarInfo.Marshal(b, m, deterministic)
+		return xxx_messageInfo_SidecarInfo.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -1204,56 +1204,56 @@ func (m *SidercarInfo) XXX_Marshal(b []byte, deterministic bool) ([]byte, error)
 		return b[:n], nil
 	}
 }
-func (m *SidercarInfo) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_SidercarInfo.Merge(m, src)
+func (m *SidecarInfo) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SidecarInfo.Merge(m, src)
 }
-func (m *SidercarInfo) XXX_Size() int {
+func (m *SidecarInfo) XXX_Size() int {
 	return m.Size()
 }
-func (m *SidercarInfo) XXX_DiscardUnknown() {
-	xxx_messageInfo_SidercarInfo.DiscardUnknown(m)
+func (m *SidecarInfo) XXX_DiscardUnknown() {
+	xxx_messageInfo_SidecarInfo.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_SidercarInfo proto.InternalMessageInfo
+var xxx_messageInfo_SidecarInfo proto.InternalMessageInfo
 
-func (m *SidercarInfo) GetAddress() string {
+func (m *SidecarInfo) GetAddress() string {
 	if m != nil {
 		return m.Address
 	}
 	return ""
 }
 
-func (m *SidercarInfo) GetIndex() string {
+func (m *SidecarInfo) GetIndex() string {
 	if m != nil {
 		return m.Index
 	}
 	return ""
 }
 
-func (m *SidercarInfo) GetTimeout() int64 {
+func (m *SidecarInfo) GetTimeout() int64 {
 	if m != nil {
 		return m.Timeout
 	}
 	return 0
 }
 
-type CheckSidercarResponse struct {
-	Status  CheckSidercarResponse_Status `protobuf:"varint,1,opt,name=status,proto3,enum=pb.CheckSidercarResponse_Status" json:"status,omitempty"`
-	Address string                       `protobuf:"bytes,2,opt,name=address,proto3" json:"address,omitempty"`
+type CheckSidecarResponse struct {
+	Status  CheckSidecarResponse_Status `protobuf:"varint,1,opt,name=status,proto3,enum=pb.CheckSidecarResponse_Status" json:"status,omitempty"`
+	Address string                      `protobuf:"bytes,2,opt,name=address,proto3" json:"address,omitempty"`
 }
 
-func (m *CheckSidercarResponse) Reset()         { *m = CheckSidercarResponse{} }
-func (m *CheckSidercarResponse) String() string { return proto.CompactTextString(m) }
-func (*CheckSidercarResponse) ProtoMessage()    {}
-func (*CheckSidercarResponse) Descriptor() ([]byte, []int) {
+func (m *CheckSidecarResponse) Reset()         { *m = CheckSidecarResponse{} }
+func (m *CheckSidecarResponse) String() string { return proto.CompactTextString(m) }
+func (*CheckSidecarResponse) ProtoMessage()    {}
+func (*CheckSidecarResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_f209535e190f2bed, []int{21}
 }
-func (m *CheckSidercarResponse) XXX_Unmarshal(b []byte) error {
+func (m *CheckSidecarResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *CheckSidercarResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *CheckSidecarResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_CheckSidercarResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_CheckSidecarResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -1263,26 +1263,26 @@ func (m *CheckSidercarResponse) XXX_Marshal(b []byte, deterministic bool) ([]byt
 		return b[:n], nil
 	}
 }
-func (m *CheckSidercarResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_CheckSidercarResponse.Merge(m, src)
+func (m *CheckSidecarResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CheckSidecarResponse.Merge(m, src)
 }
-func (m *CheckSidercarResponse) XXX_Size() int {
+func (m *CheckSidecarResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *CheckSidercarResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_CheckSidercarResponse.DiscardUnknown(m)
+func (m *CheckSidecarResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_CheckSidecarResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_CheckSidercarResponse proto.InternalMessageInfo
+var xxx_messageInfo_CheckSidecarResponse proto.InternalMessageInfo
 
-func (m *CheckSidercarResponse) GetStatus() CheckSidercarResponse_Status {
+func (m *CheckSidecarResponse) GetStatus() CheckSidecarResponse_Status {
 	if m != nil {
 		return m.Status
 	}
-	return CheckSidercarResponse_ERROR_MASTER
+	return CheckSidecarResponse_ERROR_MASTER
 }
 
-func (m *CheckSidercarResponse) GetAddress() string {
+func (m *CheckSidecarResponse) GetAddress() string {
 	if m != nil {
 		return m.Address
 	}
@@ -1338,7 +1338,7 @@ func init() {
 	proto.RegisterEnum("pb.Request_Type", Request_Type_name, Request_Type_value)
 	proto.RegisterEnum("pb.SubscriptionRequest_Type", SubscriptionRequest_Type_name, SubscriptionRequest_Type_value)
 	proto.RegisterEnum("pb.GetMultiSignsRequest_Type", GetMultiSignsRequest_Type_name, GetMultiSignsRequest_Type_value)
-	proto.RegisterEnum("pb.CheckSidercarResponse_Status", CheckSidercarResponse_Status_name, CheckSidercarResponse_Status_value)
+	proto.RegisterEnum("pb.CheckSidecarResponse_Status", CheckSidecarResponse_Status_name, CheckSidecarResponse_Status_value)
 	proto.RegisterEnum("pb.HeartBeatRespones_Status", HeartBeatRespones_Status_name, HeartBeatRespones_Status_value)
 	proto.RegisterType((*GetBlockHeaderRequest)(nil), "pb.GetBlockHeaderRequest")
 	proto.RegisterType((*GetInterchainTxWrappersRequest)(nil), "pb.GetInterchainTxWrappersRequest")
@@ -1361,8 +1361,8 @@ func init() {
 	proto.RegisterType((*InterchainTxWrappers)(nil), "pb.InterchainTxWrappers")
 	proto.RegisterType((*GetTPSRequest)(nil), "pb.GetTPSRequest")
 	proto.RegisterType((*DelVPNodeRequest)(nil), "pb.DelVPNodeRequest")
-	proto.RegisterType((*SidercarInfo)(nil), "pb.SidercarInfo")
-	proto.RegisterType((*CheckSidercarResponse)(nil), "pb.CheckSidercarResponse")
+	proto.RegisterType((*SidecarInfo)(nil), "pb.SidecarInfo")
+	proto.RegisterType((*CheckSidecarResponse)(nil), "pb.CheckSidecarResponse")
 	proto.RegisterType((*HeartBeatRespones)(nil), "pb.HeartBeatRespones")
 }
 
@@ -1508,9 +1508,9 @@ type ChainBrokerClient interface {
 	GetTPS(ctx context.Context, in *GetTPSRequest, opts ...grpc.CallOption) (*Response, error)
 	GetPendingNonceByAccount(ctx context.Context, in *Address, opts ...grpc.CallOption) (*Response, error)
 	DelVPNode(ctx context.Context, in *DelVPNodeRequest, opts ...grpc.CallOption) (*Response, error)
-	CheckMasterSidercar(ctx context.Context, in *Address, opts ...grpc.CallOption) (*Response, error)
-	SetMasterSidercar(ctx context.Context, in *SidercarInfo, opts ...grpc.CallOption) (*Response, error)
-	HeartBeat(ctx context.Context, in *SidercarInfo, opts ...grpc.CallOption) (*Response, error)
+	CheckMasterSidecar(ctx context.Context, in *Address, opts ...grpc.CallOption) (*Response, error)
+	SetMasterSidecar(ctx context.Context, in *SidecarInfo, opts ...grpc.CallOption) (*Response, error)
+	HeartBeat(ctx context.Context, in *SidecarInfo, opts ...grpc.CallOption) (*Response, error)
 }
 
 type chainBrokerClient struct {
@@ -1743,25 +1743,25 @@ func (c *chainBrokerClient) DelVPNode(ctx context.Context, in *DelVPNodeRequest,
 	return out, nil
 }
 
-func (c *chainBrokerClient) CheckMasterSidercar(ctx context.Context, in *Address, opts ...grpc.CallOption) (*Response, error) {
+func (c *chainBrokerClient) CheckMasterSidecar(ctx context.Context, in *Address, opts ...grpc.CallOption) (*Response, error) {
 	out := new(Response)
-	err := c.cc.Invoke(ctx, "/pb.ChainBroker/CheckMasterSidercar", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/pb.ChainBroker/CheckMasterSidecar", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *chainBrokerClient) SetMasterSidercar(ctx context.Context, in *SidercarInfo, opts ...grpc.CallOption) (*Response, error) {
+func (c *chainBrokerClient) SetMasterSidecar(ctx context.Context, in *SidecarInfo, opts ...grpc.CallOption) (*Response, error) {
 	out := new(Response)
-	err := c.cc.Invoke(ctx, "/pb.ChainBroker/SetMasterSidercar", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/pb.ChainBroker/SetMasterSidecar", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *chainBrokerClient) HeartBeat(ctx context.Context, in *SidercarInfo, opts ...grpc.CallOption) (*Response, error) {
+func (c *chainBrokerClient) HeartBeat(ctx context.Context, in *SidecarInfo, opts ...grpc.CallOption) (*Response, error) {
 	out := new(Response)
 	err := c.cc.Invoke(ctx, "/pb.ChainBroker/HeartBeat", in, out, opts...)
 	if err != nil {
@@ -1789,9 +1789,9 @@ type ChainBrokerServer interface {
 	GetTPS(context.Context, *GetTPSRequest) (*Response, error)
 	GetPendingNonceByAccount(context.Context, *Address) (*Response, error)
 	DelVPNode(context.Context, *DelVPNodeRequest) (*Response, error)
-	CheckMasterSidercar(context.Context, *Address) (*Response, error)
-	SetMasterSidercar(context.Context, *SidercarInfo) (*Response, error)
-	HeartBeat(context.Context, *SidercarInfo) (*Response, error)
+	CheckMasterSidecar(context.Context, *Address) (*Response, error)
+	SetMasterSidecar(context.Context, *SidecarInfo) (*Response, error)
+	HeartBeat(context.Context, *SidecarInfo) (*Response, error)
 }
 
 // UnimplementedChainBrokerServer can be embedded to have forward compatible implementations.
@@ -1849,13 +1849,13 @@ func (*UnimplementedChainBrokerServer) GetPendingNonceByAccount(ctx context.Cont
 func (*UnimplementedChainBrokerServer) DelVPNode(ctx context.Context, req *DelVPNodeRequest) (*Response, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DelVPNode not implemented")
 }
-func (*UnimplementedChainBrokerServer) CheckMasterSidercar(ctx context.Context, req *Address) (*Response, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CheckMasterSidercar not implemented")
+func (*UnimplementedChainBrokerServer) CheckMasterSidecar(ctx context.Context, req *Address) (*Response, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CheckMasterSidecar not implemented")
 }
-func (*UnimplementedChainBrokerServer) SetMasterSidercar(ctx context.Context, req *SidercarInfo) (*Response, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SetMasterSidercar not implemented")
+func (*UnimplementedChainBrokerServer) SetMasterSidecar(ctx context.Context, req *SidecarInfo) (*Response, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetMasterSidecar not implemented")
 }
-func (*UnimplementedChainBrokerServer) HeartBeat(ctx context.Context, req *SidercarInfo) (*Response, error) {
+func (*UnimplementedChainBrokerServer) HeartBeat(ctx context.Context, req *SidecarInfo) (*Response, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method HeartBeat not implemented")
 }
 
@@ -2178,44 +2178,44 @@ func _ChainBroker_DelVPNode_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ChainBroker_CheckMasterSidercar_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _ChainBroker_CheckMasterSidecar_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Address)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ChainBrokerServer).CheckMasterSidercar(ctx, in)
+		return srv.(ChainBrokerServer).CheckMasterSidecar(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/pb.ChainBroker/CheckMasterSidercar",
+		FullMethod: "/pb.ChainBroker/CheckMasterSidecar",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ChainBrokerServer).CheckMasterSidercar(ctx, req.(*Address))
+		return srv.(ChainBrokerServer).CheckMasterSidecar(ctx, req.(*Address))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ChainBroker_SetMasterSidercar_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(SidercarInfo)
+func _ChainBroker_SetMasterSidecar_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SidecarInfo)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ChainBrokerServer).SetMasterSidercar(ctx, in)
+		return srv.(ChainBrokerServer).SetMasterSidecar(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/pb.ChainBroker/SetMasterSidercar",
+		FullMethod: "/pb.ChainBroker/SetMasterSidecar",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ChainBrokerServer).SetMasterSidercar(ctx, req.(*SidercarInfo))
+		return srv.(ChainBrokerServer).SetMasterSidecar(ctx, req.(*SidecarInfo))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _ChainBroker_HeartBeat_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(SidercarInfo)
+	in := new(SidecarInfo)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -2227,7 +2227,7 @@ func _ChainBroker_HeartBeat_Handler(srv interface{}, ctx context.Context, dec fu
 		FullMethod: "/pb.ChainBroker/HeartBeat",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ChainBrokerServer).HeartBeat(ctx, req.(*SidercarInfo))
+		return srv.(ChainBrokerServer).HeartBeat(ctx, req.(*SidecarInfo))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -2293,12 +2293,12 @@ var _ChainBroker_serviceDesc = grpc.ServiceDesc{
 			Handler:    _ChainBroker_DelVPNode_Handler,
 		},
 		{
-			MethodName: "CheckMasterSidercar",
-			Handler:    _ChainBroker_CheckMasterSidercar_Handler,
+			MethodName: "CheckMasterSidecar",
+			Handler:    _ChainBroker_CheckMasterSidecar_Handler,
 		},
 		{
-			MethodName: "SetMasterSidercar",
-			Handler:    _ChainBroker_SetMasterSidercar_Handler,
+			MethodName: "SetMasterSidecar",
+			Handler:    _ChainBroker_SetMasterSidecar_Handler,
 		},
 		{
 			MethodName: "HeartBeat",
@@ -3053,7 +3053,7 @@ func (m *DelVPNodeRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *SidercarInfo) Marshal() (dAtA []byte, err error) {
+func (m *SidecarInfo) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -3063,12 +3063,12 @@ func (m *SidercarInfo) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *SidercarInfo) MarshalTo(dAtA []byte) (int, error) {
+func (m *SidecarInfo) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *SidercarInfo) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *SidecarInfo) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -3095,7 +3095,7 @@ func (m *SidercarInfo) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *CheckSidercarResponse) Marshal() (dAtA []byte, err error) {
+func (m *CheckSidecarResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -3105,12 +3105,12 @@ func (m *CheckSidercarResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *CheckSidercarResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *CheckSidecarResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *CheckSidercarResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *CheckSidecarResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -3483,7 +3483,7 @@ func (m *DelVPNodeRequest) Size() (n int) {
 	return n
 }
 
-func (m *SidercarInfo) Size() (n int) {
+func (m *SidecarInfo) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -3503,7 +3503,7 @@ func (m *SidercarInfo) Size() (n int) {
 	return n
 }
 
-func (m *CheckSidercarResponse) Size() (n int) {
+func (m *CheckSidecarResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -5569,7 +5569,7 @@ func (m *DelVPNodeRequest) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *SidercarInfo) Unmarshal(dAtA []byte) error {
+func (m *SidecarInfo) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -5592,10 +5592,10 @@ func (m *SidercarInfo) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: SidercarInfo: wiretype end group for non-group")
+			return fmt.Errorf("proto: SidecarInfo: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: SidercarInfo: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: SidecarInfo: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -5705,7 +5705,7 @@ func (m *SidercarInfo) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *CheckSidercarResponse) Unmarshal(dAtA []byte) error {
+func (m *CheckSidecarResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -5728,10 +5728,10 @@ func (m *CheckSidercarResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: CheckSidercarResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: CheckSidecarResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: CheckSidercarResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: CheckSidecarResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -5748,7 +5748,7 @@ func (m *CheckSidercarResponse) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.Status |= CheckSidercarResponse_Status(b&0x7F) << shift
+				m.Status |= CheckSidecarResponse_Status(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}

@@ -3,7 +3,7 @@ package rpcx
 import (
 	"context"
 
-	"github.com/link33/sidercar/model/pb"
+	"github.com/link33/sidecar/model/pb"
 	"github.com/meshplus/bitxhub-kit/crypto"
 	"github.com/meshplus/bitxhub-kit/types"
 )
@@ -112,13 +112,13 @@ type Client interface {
 
 	// IPFSGetToLocal gets from ipfs and saves to local file path
 	IPFSGetToLocal(path string, localfPath string) (*pb.Response, error)
-	//Check whethe there is a master sidercar connect to the BitXHub.
-	CheckMasterSidercar(address string) (*pb.Response, error)
+	//Check whethe there is a master sidecar connect to the BitXHub.
+	CheckMasterSidecar(address string) (*pb.Response, error)
 
-	//Set the master sidercar connect to the BitXHub.
-	SetMasterSidercar(address string, index string, timeout int64) (*pb.Response, error)
+	//Set the master sidecar connect to the BitXHub.
+	SetMasterSidecar(address string, index string, timeout int64) (*pb.Response, error)
 
-	//Update the master sidercar status
+	//Update the master sidecar status
 	HeartBeat(address string, index string) (*pb.Response, error)
 }
 

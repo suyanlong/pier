@@ -1,8 +1,8 @@
 package syncer
 
 import (
-	rpcx "github.com/link33/sidercar/hub/client"
-	"github.com/link33/sidercar/internal/repo"
+	rpcx "github.com/link33/sidecar/hub/client"
+	"github.com/link33/sidecar/internal/repo"
 	"github.com/meshplus/bitxhub-kit/storage"
 	"github.com/sirupsen/logrus"
 )

@@ -3,16 +3,16 @@ package appchain
 import (
 	"context"
 	"fmt"
-	"github.com/link33/sidercar/internal/port"
+	"github.com/link33/sidecar/internal/port"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/Rican7/retry"
 	"github.com/Rican7/retry/strategy"
-	"github.com/link33/sidercar/internal/txcrypto"
-	"github.com/link33/sidercar/model/pb"
-	"github.com/link33/sidercar/pkg/plugins"
+	"github.com/link33/sidecar/internal/txcrypto"
+	"github.com/link33/sidecar/model/pb"
+	"github.com/link33/sidecar/pkg/plugins"
 	"github.com/sirupsen/logrus"
 )
 

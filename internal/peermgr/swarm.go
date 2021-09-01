@@ -3,8 +3,8 @@ package peermgr
 import (
 	"context"
 	"fmt"
-	"github.com/link33/sidercar/internal/port"
-	"github.com/link33/sidercar/model/pb"
+	"github.com/link33/sidecar/internal/port"
+	"github.com/link33/sidecar/model/pb"
 	"strings"
 	"sync"
 	"time"
@@ -14,7 +14,7 @@ import (
 	"github.com/ipfs/go-cid"
 	crypto2 "github.com/libp2p/go-libp2p-core/crypto"
 	"github.com/libp2p/go-libp2p-core/peer"
-	"github.com/link33/sidercar/internal/repo"
+	"github.com/link33/sidecar/internal/repo"
 	"github.com/meshplus/bitxhub-kit/crypto"
 	"github.com/meshplus/bitxhub-kit/crypto/asym/ecdsa"
 	network "github.com/meshplus/go-lightp2p"
@@ -23,7 +23,7 @@ import (
 )
 
 const (
-	protocolID          = "/sidercar/1.0.0" // magic protocol
+	protocolID          = "/sidecar/1.0.0" // magic protocol
 	defaultProvidersNum = 1
 )
 
@@ -95,7 +95,7 @@ func (swarm *Swarm) Start() error {
 		return fmt.Errorf("p2p module start: %w", err)
 	}
 
-	//need to connect one other sidercar at least
+	//need to connect one other sidecar at least
 	wg := &sync.WaitGroup{}
 	wg.Add(1)
 
@@ -127,7 +127,7 @@ func (swarm *Swarm) Start() error {
 				}).Info("Connect successfully")
 
 				rec := make(chan *pb.IBTPX)
-				p := &sidercar{
+				p := &sidecar{
 					addr:  addr,
 					swarm: swarm,
 					tag:   "",
@@ -175,7 +175,7 @@ func (swarm *Swarm) handleMessage(s network.Stream, data []byte) {
 		}
 		p, is := swarm.connectedPeers.Load(s.RemotePeerID())
 		if is {
-			ps, iss := p.(*sidercar)
+			ps, iss := p.(*sidecar)
 			if iss {
 				ps.rev <- ibtpx
 				return
@@ -183,7 +183,7 @@ func (swarm *Swarm) handleMessage(s network.Stream, data []byte) {
 		}
 		addr, _ := peer.AddrInfoFromP2pAddr(s.RemotePeerAddr())
 		rec := make(chan *pb.IBTPX)
-		newPort := &sidercar{
+		newPort := &sidecar{
 			addr:  addr,
 			swarm: swarm,
 			tag:   "",
@@ -219,7 +219,7 @@ func (swarm *Swarm) Connect(addrInfo *peer.AddrInfo) (string, error) {
 	}).Info("Connect peer")
 
 	rec := make(chan *pb.IBTPX)
-	p := &sidercar{
+	p := &sidecar{
 		addr:  addrInfo,
 		swarm: swarm,
 		tag:   "",
@@ -370,13 +370,13 @@ func (swarm *Swarm) FindProviders(id string) (string, error) {
 			"provider_id": provider.ID.String(),
 		}).Info("Find provider")
 
-		sidercarId, err := swarm.Connect(&provider)
+		sidecarId, err := swarm.Connect(&provider)
 		if err != nil {
-			swarm.logger.WithFields(logrus.Fields{"peerId": sidercarId,
+			swarm.logger.WithFields(logrus.Fields{"peerId": sidecarId,
 				"cid": provider.ID.String()}).Error("connect error: ", err)
 			continue
 		}
-		return sidercarId, nil
+		return sidecarId, nil
 	}
 
 	swarm.logger.WithFields(logrus.Fields{

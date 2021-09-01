@@ -2,13 +2,13 @@ package txcrypto
 
 import (
 	"fmt"
-	"github.com/link33/sidercar/internal/manger"
+	"github.com/link33/sidecar/internal/manger"
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	rpcx "github.com/link33/sidercar/hub/client"
-	"github.com/link33/sidercar/hub/client/mock_client"
-	"github.com/link33/sidercar/model/pb"
+	rpcx "github.com/link33/sidecar/hub/client"
+	"github.com/link33/sidecar/hub/client/mock_client"
+	"github.com/link33/sidecar/model/pb"
 	"github.com/meshplus/bitxhub-core/appchain-mgr/mock_appchainMgr"
 	"github.com/meshplus/bitxhub-kit/crypto"
 	"github.com/meshplus/bitxhub-kit/crypto/asym"

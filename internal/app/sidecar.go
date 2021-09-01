@@ -10,20 +10,20 @@ import (
 	"github.com/meshplus/bitxhub-kit/storage/leveldb"
 	"github.com/sirupsen/logrus"
 
-	_ "github.com/link33/sidercar/imports"
-	"github.com/link33/sidercar/internal"
-	"github.com/link33/sidercar/internal/appchain"
-	"github.com/link33/sidercar/internal/loggers"
-	"github.com/link33/sidercar/internal/manger"
-	"github.com/link33/sidercar/internal/peermgr"
-	"github.com/link33/sidercar/internal/port"
-	"github.com/link33/sidercar/internal/repo"
-	"github.com/link33/sidercar/internal/txcrypto"
-	"github.com/link33/sidercar/pkg/plugins"
+	_ "github.com/link33/sidecar/imports"
+	"github.com/link33/sidecar/internal"
+	"github.com/link33/sidecar/internal/appchain"
+	"github.com/link33/sidecar/internal/loggers"
+	"github.com/link33/sidecar/internal/manger"
+	"github.com/link33/sidecar/internal/peermgr"
+	"github.com/link33/sidecar/internal/port"
+	"github.com/link33/sidecar/internal/repo"
+	"github.com/link33/sidecar/internal/txcrypto"
+	"github.com/link33/sidecar/pkg/plugins"
 )
 
-// Sidercar represents the necessary data for starting the sidercar app
-type Sidercar struct {
+// Sidecar represents the necessary data for starting the sidecar app
+type Sidecar struct {
 	privateKey crypto.PrivateKey
 	storage    storage.Storage
 	ctx        context.Context
@@ -33,8 +33,8 @@ type Sidercar struct {
 	manger     internal.Launcher
 }
 
-// NewSidercar instantiates sidercar instance.
-func NewSidercar(repoRoot string, config *repo.Config) (internal.Launcher, error) {
+// NewSidecar instantiates sidecar instance.
+func NewSidecar(repoRoot string, config *repo.Config) (internal.Launcher, error) {
 	store, err := leveldb.New(filepath.Join(config.RepoRoot, "store"))
 	Asset(err)
 	logger := loggers.Logger(loggers.App)
@@ -62,7 +62,7 @@ func NewSidercar(repoRoot string, config *repo.Config) (internal.Launcher, error
 	mg, err := manger.NewManager(addr.String(), portMap, pm, appchainMgr, loggers.Logger(loggers.Manger))
 	Asset(err)
 	ctx, cancel := context.WithCancel(context.Background())
-	return &Sidercar{
+	return &Sidecar{
 		storage: store,
 		logger:  logger,
 		ctx:     ctx,
@@ -72,13 +72,13 @@ func NewSidercar(repoRoot string, config *repo.Config) (internal.Launcher, error
 	}, nil
 }
 
-// Start starts three main components of sidercar app
-func (s *Sidercar) Start() error {
+// Start starts three main components of sidecar app
+func (s *Sidecar) Start() error {
 	return s.manger.Start()
 }
 
-// Stop stops three main components of sidercar app
-func (s *Sidercar) Stop() error {
+// Stop stops three main components of sidecar app
+func (s *Sidecar) Stop() error {
 	return s.manger.Stop()
 }
 

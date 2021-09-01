@@ -196,9 +196,9 @@
         ]
       }
     },
-    "/v1/check_master_sidercar/{address}": {
+    "/v1/check_master_sidecar/{address}": {
       "get": {
-        "operationId": "CheckMasterSidercar",
+        "operationId": "CheckMasterSidecar",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -263,7 +263,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/pbSidercarInfo"
+              "$ref": "#/definitions/pbSidecarInfo"
             }
           }
         ],
@@ -424,9 +424,9 @@
         ]
       }
     },
-    "/v1/set_master_sidercar": {
+    "/v1/set_master_sidecar": {
       "post": {
-        "operationId": "SetMasterSidercar",
+        "operationId": "SetMasterSidecar",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -441,7 +441,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/pbSidercarInfo"
+              "$ref": "#/definitions/pbSidecarInfo"
             }
           }
         ],
@@ -944,7 +944,7 @@
         }
       }
     },
-    "pbSidercarInfo": {
+    "pbSidecarInfo": {
       "type": "object",
       "properties": {
         "address": {

@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/link33/sidercar/internal"
+	"github.com/link33/sidecar/internal"
 	"net/http"
 	_ "net/http/pprof"
 	"os"
@@ -12,9 +12,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/link33/sidercar/internal/app"
-	"github.com/link33/sidercar/internal/loggers"
-	"github.com/link33/sidercar/internal/repo"
+	"github.com/link33/sidecar/internal/app"
+	"github.com/link33/sidecar/internal/loggers"
+	"github.com/link33/sidecar/internal/repo"
 	"github.com/meshplus/bitxhub-kit/log"
 	"github.com/urfave/cli"
 )
@@ -54,12 +54,12 @@ func start(ctx *cli.Context) error {
 	if err != nil {
 		return fmt.Errorf("log initialize: %w", err)
 	}
-	// init loggers map for sidercar
+	// init loggers map for sidecar
 	loggers.InitializeLogger(config)
 
-	var sidercar internal.Launcher
+	var sidecar internal.Launcher
 
-	sidercar, err = app.NewSidercar(repoRoot, config)
+	sidecar, err = app.NewSidecar(repoRoot, config)
 	if err != nil {
 		return err
 	}
@@ -68,19 +68,19 @@ func start(ctx *cli.Context) error {
 
 	var wg sync.WaitGroup
 	wg.Add(1)
-	handleShutdown(sidercar, &wg)
+	handleShutdown(sidecar, &wg)
 
-	if err := sidercar.Start(); err != nil {
+	if err := sidecar.Start(); err != nil {
 		return err
 	}
 
 	wg.Wait()
 
-	logger.Info("Sidercar exits")
+	logger.Info("Sidecar exits")
 	return nil
 }
 
-func handleShutdown(sidercar internal.Launcher, wg *sync.WaitGroup) {
+func handleShutdown(sidecar internal.Launcher, wg *sync.WaitGroup) {
 	var stop = make(chan os.Signal)
 	signal.Notify(stop, syscall.SIGTERM)
 	signal.Notify(stop, syscall.SIGINT)
@@ -88,8 +88,8 @@ func handleShutdown(sidercar internal.Launcher, wg *sync.WaitGroup) {
 	go func() {
 		<-stop
 		fmt.Println("received interrupt signal, shutting down...")
-		if err := sidercar.Stop(); err != nil {
-			logger.Error("sidercar stop: ", err)
+		if err := sidecar.Stop(); err != nil {
+			logger.Error("sidecar stop: ", err)
 		}
 
 		wg.Done()

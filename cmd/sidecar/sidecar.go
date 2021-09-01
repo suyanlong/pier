@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/fatih/color"
-	"github.com/link33/sidercar/cmd/sidercar/client"
+	"github.com/link33/sidecar/cmd/sidecar/client"
 	"github.com/meshplus/bitxhub-kit/log"
 	"github.com/urfave/cli"
 )
@@ -14,7 +14,7 @@ var logger = log.NewWithModule("cmd")
 
 func main() {
 	app := cli.NewApp()
-	app.Name = "Sidercar"
+	app.Name = "Sidecar"
 	app.Usage = "Manipulate the crosschain node"
 	app.Compiled = time.Now()
 
@@ -22,11 +22,11 @@ func main() {
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:  "repo",
-			Usage: "Sidercar repository path",
+			Usage: "Sidecar repository path",
 		},
 		cli.BoolFlag{
 			Name:  "tls",
-			Usage: "enable tls between sidercar and bitxhub or not",
+			Usage: "enable tls between sidecar and bitxhub or not",
 		},
 	}
 

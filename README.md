@@ -1,7 +1,7 @@
-# sidercar
+# sidecar
 
-![build](https://github.com/link33/sidercar/workflows/build/badge.svg)
-[![codecov](https://codecov.io/gh/link33/sidercar/branch/master/graph/badge.svg)](https://codecov.io/gh/link33/sidercar)
+![build](https://github.com/link33/sidecar/workflows/build/badge.svg)
+[![codecov](https://codecov.io/gh/link33/sidecar/branch/master/graph/badge.svg)](https://codecov.io/gh/link33/sidecar)
 
 ## Build
 
@@ -11,7 +11,7 @@ Using the follow command to install necessary tools.
 make prepare
 ```
 
-And then install sidercar using the following command.
+And then install sidecar using the following command.
 
 ```bash
 make install
@@ -19,21 +19,21 @@ make install
 
 ## Initialization
 
-Using the follow command to initialize sidercar.
+Using the follow command to initialize sidecar.
 ```bash
-sidercar init
+sidecar init
 ```
-Default repo path is `~/sidercar`. If you want to specify the repo path, you can use `--repo` flag.
+Default repo path is `~/sidecar`. If you want to specify the repo path, you can use `--repo` flag.
 
 ```bash
-sidercar init --repo=$HOME/sidercar
+sidecar init --repo=$HOME/sidecar
 ```
 
-After initializing sidercar, it will generate the follow directory:
+After initializing sidecar, it will generate the follow directory:
 
 ```
-~/sidercar
-├── sidercar.toml
+~/sidecar
+├── sidecar.toml
 ├── key.json
 
 ```
@@ -41,7 +41,7 @@ After initializing sidercar, it will generate the follow directory:
 ## Configuration
 
 ```toml
-title = "sidercar"
+title = "sidecar"
 
 [port]
 pprof = 44555
@@ -49,7 +49,7 @@ pprof = 44555
 [log]
 level = "debug"
 dir = "logs"
-filename = "sidercar.log"
+filename = "sidecar.log"
 report_caller = false
 
 [appchain]
@@ -61,7 +61,7 @@ config = "fabric"
 
 `log.level`: log level: debug, info, warn, error, fatal
 
-`appchain.plugin`: relative path in sidercar repo of appchain plugin
+`appchain.plugin`: relative path in sidecar repo of appchain plugin
 
 `appchain.config`: relative path of appchain config directory
 

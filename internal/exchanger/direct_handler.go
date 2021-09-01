@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"github.com/Rican7/retry"
 	"github.com/Rican7/retry/strategy"
-	"github.com/link33/sidercar/internal/peermgr"
-	"github.com/link33/sidercar/internal/port"
-	"github.com/link33/sidercar/model/pb"
+	"github.com/link33/sidecar/internal/peermgr"
+	"github.com/link33/sidecar/internal/port"
+	"github.com/link33/sidecar/model/pb"
 	"github.com/sirupsen/logrus"
 	"time"
 )
@@ -180,7 +180,7 @@ func (ex *Exchanger) handleSendIBTPReceiptMessage(p port.Port, msg *pb.Message) 
 
 	ex.feedReceipt(receipt)
 
-	ex.logger.Info("Receive ibtp receipt from other sidercar")
+	ex.logger.Info("Receive ibtp receipt from other sidecar")
 }
 
 // 直连
@@ -206,7 +206,7 @@ func (ex *Exchanger) handleGetIBTPMessage(p port.Port, msg *pb.Message) {
 }
 
 // 直连
-func (ex *Exchanger) handleNewConnection(dstSidercarID string) {
+func (ex *Exchanger) handleNewConnection(dstSidecarID string) {
 	appchainMethod := []byte(ex.appchainDID)
 	msg := peermgr.Message(pb.Message_INTERCHAIN_META_GET, true, appchainMethod)
 
@@ -216,7 +216,7 @@ func (ex *Exchanger) handleNewConnection(dstSidercarID string) {
 	}{}
 
 	loop := func() error {
-		interchainMeta, err := ex.peerMgr.Send(dstSidercarID, msg)
+		interchainMeta, err := ex.peerMgr.Send(dstSidecarID, msg)
 		if err != nil {
 			return err
 		}

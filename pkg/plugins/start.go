@@ -7,7 +7,7 @@ import (
 
 	"github.com/hashicorp/go-hclog"
 	"github.com/hashicorp/go-plugin"
-	"github.com/link33/sidercar/internal/repo"
+	"github.com/link33/sidecar/internal/repo"
 )
 
 var logger = hclog.New(&hclog.LoggerOptions{
@@ -16,8 +16,8 @@ var logger = hclog.New(&hclog.LoggerOptions{
 	Level:  hclog.Trace,
 })
 
-func CreateClient(sidercarID string, appchainConfig repo.Appchain, extra []byte) (Client, *plugin.Client, error) {
-	// Sidercar is the host. Start by launching the plugin process.
+func CreateClient(sidecarID string, appchainConfig repo.Appchain, extra []byte) (Client, *plugin.Client, error) {
+	// Sidecar is the host. Start by launching the plugin process.
 	rootPath, err := repo.PathRoot()
 	if err != nil {
 		return nil, nil, err
@@ -55,7 +55,7 @@ func CreateClient(sidercarID string, appchainConfig repo.Appchain, extra []byte)
 	}
 
 	// initialize our client plugin
-	err = appchain.Initialize(pluginConfigPath, sidercarID, extra)
+	err = appchain.Initialize(pluginConfigPath, sidecarID, extra)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -64,7 +64,7 @@ func CreateClient(sidercarID string, appchainConfig repo.Appchain, extra []byte)
 }
 
 func CreateClients(appchainConfigs repo.Appchains, extra []byte) []Client {
-	// Sidercar is the host. Start by launching the plugin process.
+	// Sidecar is the host. Start by launching the plugin process.
 	rootPath, err := repo.PathRoot()
 	if err != nil {
 		panic(err)

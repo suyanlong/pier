@@ -7,9 +7,9 @@ import (
 	"time"
 
 	"github.com/golang/mock/gomock"
-	"github.com/link33/sidercar/internal/repo"
-	"github.com/link33/sidercar/model/pb"
-	"github.com/link33/sidercar/pkg/plugins/mock_client"
+	"github.com/link33/sidecar/internal/repo"
+	"github.com/link33/sidecar/model/pb"
+	"github.com/link33/sidecar/pkg/plugins/mock_client"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
@@ -63,7 +63,7 @@ func TestGRPCServer(t *testing.T) {
 	grpcServer := GRPCServer{cli}
 	initReq := &pb.InitializeRequest{
 		ConfigPath: configPath,
-		SidercarId: from,
+		SidecarId:  from,
 		Extra:      make([]byte, 0),
 	}
 	outReq := &pb.GetOutMessageRequest{
@@ -262,7 +262,7 @@ type mockAppchainPluginClient struct {
 }
 
 func (mc *mockAppchainPluginClient) Initialize(ctx context.Context, in *pb.InitializeRequest, opts ...grpc.CallOption) (*pb.Empty, error) {
-	if in.SidercarId == to {
+	if in.SidecarId == to {
 		return nil, fmt.Errorf("initialize error")
 	}
 	return nil, nil

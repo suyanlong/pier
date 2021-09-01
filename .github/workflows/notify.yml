@@ -16,5 +16,5 @@ jobs:
         uses: lijinke666/ding-talk-pr-notify@main
         with:
           ding_talk_token: ${{ secrets.DING_TALK_ACCESS_TOKEN }}
-          repo_url: https://github.com/link33/sidercar/pull
+          repo_url: https://github.com/link33/sidecar/pull
           at_all: false

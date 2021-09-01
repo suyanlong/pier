@@ -11,8 +11,8 @@ import (
 	"github.com/Rican7/retry"
 	"github.com/Rican7/retry/strategy"
 	"github.com/cbergoon/merkletree"
-	rpcx "github.com/link33/sidercar/hub/client"
-	"github.com/link33/sidercar/model/pb"
+	rpcx "github.com/link33/sidecar/hub/client"
+	"github.com/link33/sidecar/model/pb"
 	"github.com/meshplus/bitxhub-kit/storage"
 	"github.com/meshplus/bitxhub-kit/types"
 	"github.com/sirupsen/logrus"
@@ -36,20 +36,20 @@ type WrapperSyncer struct {
 	mode        string
 	isRecover   bool
 	height      uint64
-	sidercarID  string
+	sidecarID   string
 	appchainDID string
 	ctx         context.Context
 	cancel      context.CancelFunc
 }
 
 type SubscriptionKey struct {
-	SidercarID  string `json:"sidercar_id"`
+	SidecarID   string `json:"sidecar_id"`
 	AppchainDID string `json:"appchain_did"`
 }
 
 // New creates instance of WrapperSyncer given agent interacting with bitxhub,
 // validators addresses of bitxhub and local storage
-func New(sidercarID, appchainDID string, mode string, opts ...Option) (*WrapperSyncer, error) {
+func New(sidecarID, appchainDID string, mode string, opts ...Option) (*WrapperSyncer, error) {
 	cfg, err := GenerateConfig(opts...)
 	if err != nil {
 		return nil, err
@@ -62,7 +62,7 @@ func New(sidercarID, appchainDID string, mode string, opts ...Option) (*WrapperS
 		storage:     cfg.storage,
 		logger:      cfg.logger,
 		mode:        mode,
-		sidercarID:  sidercarID,
+		sidecarID:   sidecarID,
 		appchainDID: appchainDID,
 	}
 
@@ -102,7 +102,7 @@ func (syncer *WrapperSyncer) Start() error {
 	return nil
 }
 
-// recover will recover those missing merkle wrapper when sidercar is down
+// recover will recover those missing merkle wrapper when sidecar is down
 func (syncer *WrapperSyncer) recover(begin, end uint64) {
 	syncer.isRecover = true
 	defer func() {
@@ -200,7 +200,7 @@ func (syncer *WrapperSyncer) getWrappersChannel() chan *pb.InterchainTxWrappers 
 	)
 	subscriptType = pb.SubscriptionRequest_INTERCHAIN_TX_WRAPPER
 	// retry for network reason
-	subKey := &SubscriptionKey{syncer.sidercarID, syncer.appchainDID}
+	subKey := &SubscriptionKey{syncer.sidecarID, syncer.appchainDID}
 	subKeyData, _ := json.Marshal(subKey)
 	if err := retry.Retry(func(attempt uint) error {
 		// 订阅消息

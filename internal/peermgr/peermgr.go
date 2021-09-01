@@ -2,8 +2,8 @@ package peermgr
 
 import (
 	"github.com/libp2p/go-libp2p-core/peer"
-	"github.com/link33/sidercar/internal/port"
-	"github.com/link33/sidercar/model/pb"
+	"github.com/link33/sidecar/internal/port"
+	"github.com/link33/sidecar/model/pb"
 )
 
 type MessageHandler func(port.Port, *pb.Message)

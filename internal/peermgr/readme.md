@@ -18,16 +18,16 @@ router 需要重写了。并且任务比较重要。
 1、port转发消息到router
 2、port接受消息到router
 3、router根据接受消息的路由规则，即src|to地址进行转发、路由。
-如果没有，则转发到上一层的sidercar。其实sidercar也是一个port。
+如果没有，则转发到上一层的sidecar。其实sidecar也是一个port。
 
 ### port 封装 pulgin与peer节点。
-1、针对上层来说都是client。如何封装？主要还是根据链did标识或者sidercar did标识。
-sidercar did标识是否要和自己绑定的链did标识一致、用同一个标识。
+1、针对上层来说都是client。如何封装？主要还是根据链did标识或者sidecar did标识。
+sidecar did标识是否要和自己绑定的链did标识一致、用同一个标识。
 2、传输协议是否可以封装一下。一层一层的封装。
 3、这就要求，不管是rpc、grpc、p2p都在下层。
 4、因此peermgr实在p2p这个模块里面。
-5、apiserver、router这些应该是在sidercar这个模块里面。
-6、其它sidercar节点、pulgin都是client。
+5、apiserver、router这些应该是在sidecar这个模块里面。
+6、其它sidecar节点、pulgin都是client。
 7、bithub连接点、其它链接点的都是plugin。
 8、最终所有的都是port。只是对port进行细分，再细分。
 
@@ -41,12 +41,12 @@ Monitor receives event from blockchain and sends it to network
 
 ## exchanger(舍弃)
 是整个核心上层，是一个整体循环，或者说系统的整个动力系统。
-在sidercar里Router才是整个系统的动力系统。
+在sidecar里Router才是整个系统的动力系统。
 
 ## executor
 ChannelExecutor represents the necessary data for executing interchain txs in appchain。
-sidercar:在直连、联盟模式下是主要是和appchain交互，下沉到client下面，每个插件可以实现它。
-sidercar:在中继模式下，使用创建BxhClient客户端代理。
+sidecar:在直连、联盟模式下是主要是和appchain交互，下沉到client下面，每个插件可以实现它。
+sidecar:在中继模式下，使用创建BxhClient客户端代理。
 
 
 
@@ -58,7 +58,7 @@ sidercar:在中继模式下，使用创建BxhClient客户端代理。
 主要是验证交易里面的存在性签名。
 如果仅仅是转发的话。这个模块可以不用的。
 
-sidercar 作用主要是路由转发，路由可以由用户设定。
+sidecar 作用主要是路由转发，路由可以由用户设定。
 路由规则优先级：
 1、用户交易内部的路由规则最高。
 2、用户在程序设定。
@@ -90,18 +90,18 @@ peer管理服务
 * 链ID 一条链可定是唯一的。
 * 节点ID，每一个节点的ID都是唯一的（p2p ID）。
 * 插件ID，每一个插件ID都是唯一的。插件绑定的链ID，才是主要路由的ID。
-* sidercar ID每一个都是唯一的，可以用是p2p的ID充当。
+* sidecar ID每一个都是唯一的，可以用是p2p的ID充当。
 * 
 
 
-sidercar ID （如果目的地址（to）是自己，那就是转发或者存储。）
+sidecar ID （如果目的地址（to）是自己，那就是转发或者存储。）
 plugin ID
 appchain ID 
 
 如何路由？
 plugin ID就是绑定的链ID（appchain ID）
 
-sidercar ID 也可以作为路由的ID，绑定自身的唯一 peer ID，(用于指定路由)（转发消息）
+sidecar ID 也可以作为路由的ID，绑定自身的唯一 peer ID，(用于指定路由)（转发消息）
 
 other blockchain peer ID 这个就用链ID映射吧（直链）
 
@@ -114,15 +114,15 @@ other blockchain peer ID 这个就用链ID映射吧（直链）
 如果是这样，to、from才是正确的。
 
 
-sidercar:
-* UnionMode：sidercar之间组成联盟。路由与转发。
-* 直链模式：sidercar 节点直链，不经过中继链。
+sidecar:
+* UnionMode：sidecar之间组成联盟。路由与转发。
+* 直链模式：sidecar 节点直链，不经过中继链。
 * RelayMode：中继连架构。
 
-## sidercar设计
+## sidecar设计
 1、跨链协议IBTPX设计：根据IBTP跨链协议增加路由策略：路由模式、路由方法等字段，一是用于验证交易的完整性，二是引入惩罚机制。
-2、跨链网关sidercar架构设计，主要模块有：port模块、route模块、pulgin模块、monitor模块、exchanger模块、govern模块等。sidercar只做消息的转发，以及消息订阅，对消息不做任何的修改，存在作恶行为，任何其它节点都可以相互检举到治理模块，治理模块仲裁表决，裁掉作恶网关。
-3、跨链网关路由接口port设计：抽象所有输入与输出为port接口，包括：blockchain peer、blockchain client、sidercar peer等全部抽象为port。
+2、跨链网关sidecar架构设计，主要模块有：port模块、route模块、pulgin模块、monitor模块、exchanger模块、govern模块等。sidecar只做消息的转发，以及消息订阅，对消息不做任何的修改，存在作恶行为，任何其它节点都可以相互检举到治理模块，治理模块仲裁表决，裁掉作恶网关。
+3、跨链网关路由接口port设计：抽象所有输入与输出为port接口，包括：blockchain peer、blockchain client、sidecar peer等全部抽象为port。
 4、route模块：路由转发模块，根据IBTPX跨链扩展协议，使用路由策略，在port之间转发IBTPX消息。
 5、pulgin模块：与其它区块链做跨链的各种适配插件。
 6、govern模块：惩罚机制引入，主要根据IBTPX协议规定的路由路径，做节点校验，存在作恶行为，上报节点信息，相互监控。
@@ -153,7 +153,7 @@ Syncer：是指中继架构下的hub客户端。
 * 适配
 这些是最基本的功能，后面的功能，可以持续迭代进去。
 
-Monitor、Executor:都是绑定自身的appchain的对象实现的接口，一个sidercar绑定一条链ID，
+Monitor、Executor:都是绑定自身的appchain的对象实现的接口，一个sidecar绑定一条链ID，
 
 如何做到别的网关收到以后，会转发给下一个网关，也就是说，自己这边没有appchainID,交由其它的网关进行处理。
 
@@ -165,7 +165,7 @@ Monitor、Executor:都是绑定自身的appchain的对象实现的接口，一�
 
 ## 输入与输出才有会ID，并且都是唯一。
 * pluginID与绑定的blockchainID相同。
-* sidercarID  各自唯一
+* sidecarID  各自唯一
 * blockchainID 一条链的ID
 * pluginID与blockchainID可能会相同。
 
@@ -174,7 +174,7 @@ Monitor、Executor:都是绑定自身的appchain的对象实现的接口，一�
 * 路由IBTPX数据包
 * 校验
 * 审计、治理
-* sidercarID 做背书、签名、留言。
+* sidecarID 做背书、签名、留言。
 * 节点内可以通信不需要加密，节点间需要。
 * 整个网络只能有一个hub。
 * 
@@ -202,7 +202,7 @@ did:bitxhub:relaychain001:0x12345678。
 ## 
 from、to：代表链ID
 
-而sidercar ID 暂时未用，除非指定
+而sidecar ID 暂时未用，除非指定
 
 只有路由功能、适配、转发。
 重传就不需要了吧。

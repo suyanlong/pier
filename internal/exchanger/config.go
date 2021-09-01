@@ -1,11 +1,11 @@
 package exchanger
 
 import (
-	"github.com/link33/sidercar/api"
-	"github.com/link33/sidercar/internal/checker"
-	"github.com/link33/sidercar/internal/peermgr"
-	"github.com/link33/sidercar/internal/router"
-	"github.com/link33/sidercar/internal/syncer"
+	"github.com/link33/sidecar/api"
+	"github.com/link33/sidecar/internal/checker"
+	"github.com/link33/sidecar/internal/peermgr"
+	"github.com/link33/sidecar/internal/router"
+	"github.com/link33/sidecar/internal/syncer"
 	"github.com/meshplus/bitxhub-kit/storage"
 	"github.com/sirupsen/logrus"
 )

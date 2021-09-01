@@ -8,8 +8,8 @@ import (
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
-	pb "github.com/link33/sidercar/model/pb"
-	plugins "github.com/link33/sidercar/pkg/plugins"
+	pb "github.com/link33/sidecar/model/pb"
+	plugins "github.com/link33/sidecar/pkg/plugins"
 )
 
 // MockKernel is a mock of Kernel interface.

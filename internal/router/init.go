@@ -2,8 +2,8 @@ package router
 
 import (
 	"context"
-	"github.com/link33/sidercar/internal/port"
-	"github.com/link33/sidercar/model/pb"
+	"github.com/link33/sidecar/internal/port"
+	"github.com/link33/sidecar/model/pb"
 	appchainmgr "github.com/meshplus/bitxhub-core/appchain-mgr"
 	"github.com/meshplus/bitxhub-kit/storage"
 	"github.com/sirupsen/logrus"

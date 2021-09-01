@@ -4,13 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"github.com/link33/sidercar/internal"
-	"github.com/link33/sidercar/internal/port"
-	"github.com/link33/sidercar/internal/repo"
-	"github.com/link33/sidercar/internal/router"
-	"github.com/link33/sidercar/model/pb"
+	"github.com/link33/sidecar/internal"
+	"github.com/link33/sidecar/internal/port"
+	"github.com/link33/sidecar/internal/repo"
+	"github.com/link33/sidecar/internal/router"
+	"github.com/link33/sidecar/model/pb"
 
-	"github.com/link33/sidercar/internal/peermgr"
+	"github.com/link33/sidecar/internal/peermgr"
 	appchainmgr "github.com/meshplus/bitxhub-core/appchain-mgr"
 	"github.com/sirupsen/logrus"
 )
@@ -105,7 +105,7 @@ type Manger interface {
 
 type MangerPort struct {
 	// peer manger
-	// sidercar manger
+	// sidecar manger
 	logger  logrus.FieldLogger
 	ctx     context.Context
 	cancel  context.CancelFunc
@@ -185,7 +185,7 @@ func (m *MangerPort) Route(ibtpx *pb.IBTPX) error {
 	_, to := ibtp.From, ibtp.To
 	if pp, is := m.portMap.Port(to); is {
 		switch {
-		case pp.Type() == port.Hub || pp.Type() == port.Sidercar:
+		case pp.Type() == port.Hub || pp.Type() == port.Sidecar:
 			return pp.AsyncSend(ibtpx)
 		case pp.Type() == port.Appchain:
 			switch mode {

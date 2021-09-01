@@ -1,7 +1,7 @@
 package port
 
 import (
-	"github.com/link33/sidercar/model/pb"
+	"github.com/link33/sidecar/model/pb"
 	"math/rand"
 	"sync"
 )
@@ -11,13 +11,13 @@ type Type int
 
 const (
 	Hub      = "hub"      //Hub: 同步数据，同步元数据等。
-	Sidercar = "sidercar" //SiderCar节点
+	Sidecar  = "sidecar"  //SideCar节点
 	Appchain = "appchain" //区块链客户端
 )
 
 // 设计一套port管理机制：包括各种的管理模块。以组合的行驶。
 // 设计一套，管理机制。
-// 与中继交互的是单独完整的机制。并且注册到路由表中。或者更加类型，这样就限制一个sidercar最多只能连接一个hub。避免网络风暴。或者只是一个转发功能。转发到指定节点。
+// 与中继交互的是单独完整的机制。并且注册到路由表中。或者更加类型，这样就限制一个sidecar最多只能连接一个hub。避免网络风暴。或者只是一个转发功能。转发到指定节点。
 // 先是从转发开始完成。
 // 协议实现
 // 路由策略
@@ -89,7 +89,7 @@ func (p *PortMap) add(pt Port) {
 		}
 	case Appchain:
 		p.appchainPort[pt.ID()] = pt
-	case Sidercar:
+	case Sidecar:
 		p.peerPort[pt.ID()] = pt
 	}
 }
@@ -182,7 +182,7 @@ func (p *PortMap) remove(pt Port) {
 		}
 	case Appchain:
 		delete(p.appchainPort, pt.ID())
-	case Sidercar:
+	case Sidecar:
 		delete(p.peerPort, pt.ID())
 	}
 }

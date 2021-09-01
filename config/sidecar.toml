@@ -1,4 +1,4 @@
-title = "Sidercar"
+title = "Sidecar"
 
 [port]
 http = 44544
@@ -7,7 +7,7 @@ pprof = 44555
 [log]
 level = "info"
 dir = "logs"
-filename = "sidercar.log"
+filename = "sidecar.log"
 report_caller = false
 [log.module]
   api_server   = "info"

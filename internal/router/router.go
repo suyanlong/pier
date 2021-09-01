@@ -1,7 +1,7 @@
 package router
 
 import (
-	"github.com/link33/sidercar/model/pb"
+	"github.com/link33/sidecar/model/pb"
 	appchainmgr "github.com/meshplus/bitxhub-core/appchain-mgr"
 )
 

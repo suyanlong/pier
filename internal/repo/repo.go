@@ -21,16 +21,16 @@ import (
 
 const (
 	// DefaultPathName is the default config dir name
-	DefaultPathName = "sidercar"
+	DefaultPathName = "sidecar"
 
 	// DefaultPathRoot is the path to the default config dir location.
 	DefaultPathRoot = "~/" + DefaultPathName
 
 	// EnvDir is the environment variable used to change the path root.
-	EnvDir = "SIDERCAR_PATH"
+	EnvDir = "SIDECAR_PATH"
 
 	// ConfigName is config name
-	ConfigName = "sidercar.toml"
+	ConfigName = "sidecar.toml"
 
 	// config path
 	ConfigPath = "../../config"
@@ -53,7 +53,7 @@ const (
 
 var RootPath string
 
-// Initialize creates sidercar path and necessary configuration,
+// Initialize creates sidecar path and necessary configuration,
 // account file and so on.
 func Initialize(repoRoot string) error {
 	if _, err := os.Stat(repoRoot); os.IsNotExist(err) {
@@ -116,7 +116,7 @@ func InitConfig(path string) error {
 	return nil
 }
 
-// PathRoot returns root path (default sidercar)
+// PathRoot returns root path (default sidecar)
 func PathRoot() (string, error) {
 	if RootPath != "" {
 		return RootPath, nil
