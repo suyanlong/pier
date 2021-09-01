@@ -280,7 +280,7 @@ func (ex *Exchanger) queryIBTP(mode string, id, target string) (*pb.IBTP, bool, 
 
 	// 交易中，如果是用户，根据用户指定，如果没有按默认配置，依次排序。
 	switch mode {
-	case repo.RelayMode: // 中继模式是查询bithub上的ibtp交易根据交易ID。
+	case repo.RelayMode: // 中继模式是查询hub上的ibtp交易根据交易ID。
 		ibtp, isValid, err = ex.syncer.QueryIBTP(id)
 		if err != nil {
 			if errors.Is(err, syncer.ErrIBTPNotFound) {

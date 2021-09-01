@@ -5,7 +5,7 @@
 ### <a name="submit-pr"></a> Submitting a Pull Request (PR)
 Before you submit your Pull Request (PR) consider the following guidelines:
 
-1. Search [GitHub](https://github.com/meshplus/bitxhub/pulls) for an open or closed PR
+1. Search [GitHub]() for an open or closed PR
   that relates to your submission. You don't want to duplicate effort.
 1. Be sure that an issue describes the problem you're fixing, or documents the design for the feature you'd like to add.
   Discussing the design up front helps to ensure that we're ready to accept your work.

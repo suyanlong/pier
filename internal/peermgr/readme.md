@@ -28,7 +28,7 @@ sidecar did标识是否要和自己绑定的链did标识一致、用同一个标
 4、因此peermgr实在p2p这个模块里面。
 5、apiserver、router这些应该是在sidecar这个模块里面。
 6、其它sidecar节点、pulgin都是client。
-7、bithub连接点、其它链接点的都是plugin。
+7、hub连接点、其它链接点的都是plugin。
 8、最终所有的都是port。只是对port进行细分，再细分。
 
 
@@ -51,7 +51,7 @@ sidecar:在中继模式下，使用创建BxhClient客户端代理。
 
 
 ## Checker规则验证
-下沉到client层下面，或者是每一个用户侧，也可以是bithub一侧。
+下沉到client层下面，或者是每一个用户侧，也可以是hub一侧。
 
 
 ## rulemgr 规则验证管理，
@@ -75,14 +75,14 @@ WrapperSyncer represents the necessary data for sync tx wrappers from bitxhub
 或者，是每一个用户插件都应该实现的接口。
 
 ## Lite Client
-轻客户端，主要是同步bithub上的数据。其实可以给每一个client使用。
+轻客户端，主要是同步hub上的数据。其实可以给每一个client使用。
 
 
 
 ## 整理
 
 peer管理服务
-节点同步需要有bithub同步过来。
+节点同步需要有hub同步过来。
 
 提升路由规则到router最上层。
 区分优先级

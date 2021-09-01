@@ -53,7 +53,7 @@ jobs:
       - name: Build and push sidecar image
         uses: elgohr/Publish-Docker-Github-Action@master
         with:
-          name: meshplus/sidecar
+          name: link33/sidecar
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
           registry: hub.docker.com
