@@ -66,6 +66,7 @@ type LogModule struct {
 	Router      string `toml:"router" json:"router"`
 	Swarm       string `toml:"swarm" json:"swarm"`
 	Syncer      string `toml:"syncer" json:"syncer"`
+	Manger      string `toml:"manger" json:"manger"`
 }
 
 // Appchain are configs about appchain

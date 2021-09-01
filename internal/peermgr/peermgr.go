@@ -3,6 +3,7 @@ package peermgr
 import (
 	"github.com/libp2p/go-libp2p-core/peer"
 	"github.com/link33/sidercar/internal/port"
+	"github.com/link33/sidercar/model/pb"
 )
 
 type MessageHandler func(port.Port, *pb.Message)
@@ -18,21 +19,29 @@ type PeerManager interface {
 	// Stop
 	Stop() error
 
-	// AsyncSend sends message to peer with peer info.
-	AsyncSend(string, port.Message) error
-
 	Connect(info *peer.AddrInfo) (string, error)
 
-	// AsyncSendWithStream sends message using existed stream
-	AsyncSendWithPort(port.Port, port.Message) error
-
+	// AsyncSend sends message to peer with peer info.
+	AsyncSend(string, port.Message) error
 	// Send sends message waiting response
 	Send(string, port.Message) (*pb.Message, error)
 
-	// Peers
-	//Peers() map[string]*peer.AddrInfo
+	AsyncSendWithPort(port.Port, port.Message) error
 
-	Ports() []port.Port
+	SendWithPort(s port.Port, msg port.Message) (*pb.Message, error)
+
+	Handler
+}
+
+type Handler interface {
+	// RegisterMsgHandler
+	RegisterMsgHandler(pb.Message_Type, MessageHandler) error
+
+	// RegisterMultiMsgHandler
+	RegisterMultiMsgHandler([]pb.Message_Type, MessageHandler) error
+
+	// RegisterConnectHandler
+	RegisterConnectHandler(ConnectHandler) error
 }
 
 type DHTManager interface {

@@ -16,15 +16,29 @@ import (
 )
 
 type Manager struct {
-	logger logrus.FieldLogger
-	Mgr    appchainmgr.AppchainMgr
+	logger     logrus.FieldLogger
+	Mgr        appchainmgr.AppchainMgr
+	pm         peermgr.Handler
+	mangerPort *MangerPort
 }
 
-func NewManager(addr string, logger logrus.FieldLogger) (*Manager, error) {
-	appchainMgr := appchainmgr.New(&Persister{addr: addr, logger: logger})
+func (mgr *Manager) Start() error {
+	panic("implement me")
+}
+
+func (mgr *Manager) Stop() error {
+	panic("implement me")
+}
+
+func NewManager(addr string, portMap *port.PortMap, pm peermgr.PeerManager, Mgr appchainmgr.AppchainMgr, logger logrus.FieldLogger) (*Manager, error) {
+
+	mangerPort := NewMangerPort(portMap, logger)
+
 	am := &Manager{
-		Mgr:    appchainMgr,
-		logger: logger,
+		Mgr:        Mgr,
+		logger:     logger,
+		mangerPort: mangerPort,
+		pm:         pm,
 	}
 
 	err := pm.RegisterMultiMsgHandler([]pb.Message_Type{
@@ -103,14 +117,14 @@ type MangerPort struct {
 
 type routeMethod func([]string) []port.Port
 
-func NewMangerPort(logger logrus.FieldLogger) *MangerPort {
+func NewMangerPort(portMap *port.PortMap, logger logrus.FieldLogger) *MangerPort {
 	ctx, cancel := context.WithCancel(context.Background())
 	return &MangerPort{
 		logger:  logger,
 		ctx:     ctx,
 		cancel:  cancel,
 		router:  nil,
-		portMap: port.NewPortMap(),
+		portMap: portMap,
 	}
 }
 
@@ -201,7 +215,7 @@ func (m *MangerPort) Route(ibtpx *pb.IBTPX) error {
 			m.firstRoute(ibtpx)
 		}
 		for _, p := range ports {
-			_ := p.AsyncSend(ibtpx)
+			_ = p.AsyncSend(ibtpx)
 		}
 	}
 	m.firstRoute(ibtpx)

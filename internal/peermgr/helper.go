@@ -12,7 +12,7 @@ func Message(typ pb.Message_Type, ok bool, data []byte) *pb.Message {
 	return &pb.Message{
 		Type:    typ,
 		Version: V1,
-		Payload: &pb.Payload{
+		Payload: &pb.Pack{
 			Ok:   ok,
 			Data: data,
 		},

@@ -194,3 +194,11 @@ func (p *PortMap) Removes(ppt []Port) {
 		p.remove(pt)
 	}
 }
+
+func (p *PortMap) Store(id string, port Port) {
+	p.Add(port)
+}
+
+func (p *PortMap) Load(key string) (value Port, ok bool) {
+	return p.Port(key)
+}

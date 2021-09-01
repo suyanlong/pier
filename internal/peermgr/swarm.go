@@ -30,20 +30,22 @@ const (
 var _ PeerManager = (*Swarm)(nil)
 
 type Swarm struct {
-	p2p             network.Network
-	logger          logrus.FieldLogger
-	peers           map[string]*peer.AddrInfo
-	connectedPeers  sync.Map
+	p2p            network.Network
+	logger         logrus.FieldLogger
+	peers          map[string]*peer.AddrInfo
+	connectedPeers *port.PortMap
+
 	providers       uint64
-	connectHandlers []ConnectHandler
 	privKey         crypto.PrivateKey
+	msgHandlers     sync.Map
+	connectHandlers []ConnectHandler
 
 	lock   sync.RWMutex
 	ctx    context.Context
 	cancel context.CancelFunc
 }
 
-func New(config *repo.Config, nodePrivKey crypto.PrivateKey, privKey crypto.PrivateKey, providers uint64, logger logrus.FieldLogger) (*Swarm, error) {
+func New(config *repo.Config, portMap *port.PortMap, nodePrivKey crypto.PrivateKey, privKey crypto.PrivateKey, providers uint64, logger logrus.FieldLogger) (*Swarm, error) {
 	libp2pPrivKey, err := convertToLibp2pPrivKey(nodePrivKey)
 	if err != nil {
 		return nil, fmt.Errorf("convert private key: %w", err)
@@ -124,7 +126,21 @@ func (swarm *Swarm) Start() error {
 					"address:": address,
 				}).Info("Connect successfully")
 
-				swarm.connectedPeers.Store(address, addr)
+				rec := make(chan *pb.IBTPX)
+				p := &sidercar{
+					addr:  addr,
+					swarm: swarm,
+					tag:   "",
+					rev:   rec,
+				}
+				swarm.connectedPeers.Store(id, p)
+				swarm.lock.RLock()
+				defer swarm.lock.RUnlock()
+				for _, handler := range swarm.connectHandlers {
+					go func(connectHandler ConnectHandler, address string) {
+						connectHandler(address)
+					}(handler, address)
+				}
 				wg.Done()
 				return nil
 			},
@@ -140,13 +156,51 @@ func (swarm *Swarm) Start() error {
 	return nil
 }
 
+//注册异步处理数据的方法
+func (swarm *Swarm) handleMessage(s network.Stream, data []byte) {
+	m := &pb.Message{}
+	if err := m.Unmarshal(data); err != nil {
+		swarm.logger.Error(err)
+		return
+	}
+
+	pack := m.Payload.Data
+	t := m.Type
+	switch {
+	case t == pb.Message_IBTP_SEND || t == pb.Message_IBTP_GET || t == pb.Message_IBTP_RECEIPT_SEND:
+		ibtpx := &pb.IBTPX{}
+		if err := m.Unmarshal(pack); err != nil {
+			swarm.logger.Error(err)
+			return
+		}
+		p, is := swarm.connectedPeers.Load(s.RemotePeerID())
+		if is {
+			ps, iss := p.(*sidercar)
+			if iss {
+				ps.rev <- ibtpx
+				return
+			}
+		}
+		addr, _ := peer.AddrInfoFromP2pAddr(s.RemotePeerAddr())
+		rec := make(chan *pb.IBTPX)
+		newPort := &sidercar{
+			addr:  addr,
+			swarm: swarm,
+			tag:   "",
+			rev:   rec,
+		}
+		swarm.connectedPeers.Store(addr.ID.String(), newPort)
+		rec <- ibtpx
+	default:
+
+	}
+}
+
 func (swarm *Swarm) Stop() error {
 	if err := swarm.p2p.Stop(); err != nil {
 		return err
 	}
-
 	swarm.cancel()
-
 	return nil
 }
 
@@ -155,48 +209,50 @@ func (swarm *Swarm) Connect(addrInfo *peer.AddrInfo) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	sidercarId, err := swarm.getRemoteAddress(addrInfo.ID)
+	address, err := swarm.getRemoteAddress(addrInfo.ID)
 	if err != nil {
 		return "", err
 	}
 	swarm.logger.WithFields(logrus.Fields{
-		"sidercarId": sidercarId,
-		"addrInfo":   addrInfo,
+		"address":  address,
+		"addrInfo": addrInfo,
 	}).Info("Connect peer")
-	swarm.connectedPeers.Store(sidercarId, addrInfo)
 
-	return sidercarId, nil
+	rec := make(chan *pb.IBTPX)
+	p := &sidercar{
+		addr:  addrInfo,
+		swarm: swarm,
+		tag:   "",
+		rev:   rec,
+	}
+	swarm.connectedPeers.Add(p)
+	return addrInfo.ID.String(), nil
 }
 
 func (swarm *Swarm) AsyncSendWithPort(s port.Port, msg port.Message) error {
 	return s.AsyncSend(msg)
 }
 
+func (swarm *Swarm) SendWithPort(s port.Port, msg port.Message) (*pb.Message, error) {
+	return s.Send(msg)
+}
+
 func (swarm *Swarm) AsyncSend(id string, msg port.Message) error {
-	addrInfo, err := swarm.getAddrInfo(id)
-	if err != nil {
-		return err
-	}
 	data, err := msg.Marshal()
 	if err != nil {
 		return fmt.Errorf("marshal message: %w", err)
 	}
 
-	return swarm.p2p.AsyncSend(addrInfo.ID.String(), data)
+	return swarm.p2p.AsyncSend(id, data)
 }
 
 func (swarm *Swarm) Send(id string, msg port.Message) (*pb.Message, error) {
-	addrInfo, err := swarm.getAddrInfo(id)
-	if err != nil {
-		return nil, err
-	}
-
 	data, err := msg.Marshal()
 	if err != nil {
 		return nil, err
 	}
 
-	ret, err := swarm.p2p.Send(addrInfo.ID.String(), data)
+	ret, err := swarm.p2p.Send(id, data)
 	if err != nil {
 		return nil, fmt.Errorf("sync send: %w", err)
 	}
@@ -209,45 +265,12 @@ func (swarm *Swarm) Send(id string, msg port.Message) (*pb.Message, error) {
 	return m, nil
 }
 
-// ConnectedPeerIDs gets connected PeerIDs
-func (swarm *Swarm) ConnectedPeerIDs() []string {
-	peerIDs := []string{}
-	swarm.connectedPeers.Range(func(key, value interface{}) bool {
-		peerIDs = append(peerIDs, value.(string))
-		return true
-	})
-	return peerIDs
-}
-
-func (swarm *Swarm) Ports() []port.Port {
-	ports := []port.Port{}
-	swarm.connectedPeers.Range(func(key, value interface{}) bool {
-		p := &sidercar{
-			peerIDs: value.(string),
-			swarm:   swarm,
-		}
-		ports = append(ports, p)
-		return true
-	})
-	return ports
-}
-
 func (swarm *Swarm) Peers() map[string]*peer.AddrInfo {
 	m := make(map[string]*peer.AddrInfo)
 	for id, addr := range swarm.peers {
 		m[id] = addr
 	}
-
 	return m
-}
-
-func (swarm *Swarm) getAddrInfo(id string) (*peer.AddrInfo, error) {
-	addr, ok := swarm.connectedPeers.Load(id)
-	if !ok {
-		return nil, fmt.Errorf("wrong id: %s", id)
-	}
-
-	return addr.(*peer.AddrInfo), nil
 }
 
 func convertToLibp2pPrivKey(privateKey crypto.PrivateKey) (crypto2.PrivKey, error) {
@@ -306,17 +329,6 @@ func AddrToPeerInfo(multiAddr string) (*peer.AddrInfo, error) {
 	}
 
 	return peer.AddrInfoFromP2pAddr(maddr)
-}
-
-//注册异步处理数据的方法
-func (swarm *Swarm) handleMessage(s network.Stream, data []byte) {
-	p := &sidercar{peerIDs: s.RemotePeerID(), swarm: swarm}
-	m := &pb.Message{}
-	if err := m.Unmarshal(data); err != nil {
-		swarm.logger.Error(err)
-		return
-	}
-	p.rev <- m
 }
 
 func (swarm *Swarm) getRemoteAddress(id peer.ID) (string, error) {

@@ -2,7 +2,7 @@ package txcrypto
 
 import (
 	"fmt"
-	"github.com/link33/sidercar/internal/manger"
+	appchainmgr "github.com/meshplus/bitxhub-core/appchain-mgr"
 
 	"github.com/btcsuite/btcd/btcec"
 	"github.com/meshplus/bitxhub-kit/crypto"
@@ -11,18 +11,17 @@ import (
 )
 
 type DirectCryptor struct {
-	appchainMgr *manger.Manager
-	privKey     crypto.PrivateKey
-	keyMap      map[string][]byte
+	mgr     appchainmgr.AppchainMgr
+	privKey crypto.PrivateKey
+	keyMap  map[string][]byte
 }
 
-func NewDirectCryptor(appchainMgr *manger.Manager, privKey crypto.PrivateKey) (Cryptor, error) {
+func NewDirectCryptor(mgr appchainmgr.AppchainMgr, privKey crypto.PrivateKey) (Cryptor, error) {
 	keyMap := make(map[string][]byte)
-
 	return &DirectCryptor{
-		appchainMgr: appchainMgr,
-		privKey:     privKey,
-		keyMap:      keyMap,
+		mgr:     mgr,
+		privKey: privKey,
+		keyMap:  keyMap,
 	}, nil
 }
 
@@ -45,7 +44,7 @@ func (d *DirectCryptor) Decrypt(content []byte, address string) ([]byte, error) 
 func (d *DirectCryptor) getDesKey(address string) (crypto.SymmetricKey, error) {
 	pubKey, ok := d.keyMap[address]
 	if !ok {
-		get, ret := d.appchainMgr.Mgr.GetPubKeyByChainID(address)
+		get, ret := d.mgr.GetPubKeyByChainID(address)
 		if !get {
 			return nil, fmt.Errorf("cannot find the public key")
 		}

@@ -15,6 +15,14 @@ type Persister struct {
 	logger  logrus.FieldLogger
 }
 
+func NewPersister(add string, store storage.Storage, logger logrus.FieldLogger) Persister {
+	return Persister{
+		addr:    add,
+		storage: store,
+		logger:  logger,
+	}
+}
+
 func (m Persister) Caller() string {
 	return m.addr
 }

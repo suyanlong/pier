@@ -59,26 +59,6 @@ func start(ctx *cli.Context) error {
 
 	var sidercar internal.Launcher
 
-	//TODO
-	//switch config.Mode.Type {
-	//case repo.RelayMode:
-	//	fallthrough
-	//case repo.DirectMode:
-	//	if err := checkPlugin(config.Appchain.Plugin); err != nil {
-	//		return fmt.Errorf("check plugin: %w", err)
-	//	}
-	//
-	//	sidercar, err = app.NewSidercar(repoRoot, config)
-	//	if err != nil {
-	//		return err
-	//	}
-	//case repo.UnionMode:
-	//	sidercar, err = app.NewUnionSidercar(repoRoot, config)
-	//	if err != nil {
-	//		return err
-	//	}
-	//}
-
 	sidercar, err = app.NewSidercar(repoRoot, config)
 	if err != nil {
 		return err

@@ -18,27 +18,39 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+var portMap = &port.PortMap{}
+
+func newSidercar(addr *peer2.AddrInfo, pm PeerManager) port.Port {
+	rec := make(chan *pb.IBTPX)
+	return &sidercar{
+		addr:  addr,
+		swarm: pm,
+		tag:   "",
+		rev:   rec,
+	}
+}
+
 func TestNew(t *testing.T) {
 	logger := log.NewWithModule("swarm")
 	// test wrong nodePrivKey
 	nodeKeys, privKeys, config, _ := genKeysAndConfig(t, 2, repo.DirectMode)
 
-	_, err := New(config, nil, privKeys[0], 0, logger)
+	_, err := New(config, portMap, nil, privKeys[0], 0, logger)
 	require.NotNil(t, err)
 
 	// test new swarm in direct mode
 	nodeKeys, privKeys, config, _ = genKeysAndConfig(t, 2, repo.DirectMode)
 
-	_, err = New(config, nodeKeys[0], privKeys[0], 0, logger)
+	_, err = New(config, portMap, nodeKeys[0], privKeys[0], 0, logger)
 	require.Nil(t, err)
 
-	_, err = New(config, nodeKeys[0], privKeys[0], 0, logger)
+	_, err = New(config, portMap, nodeKeys[0], privKeys[0], 0, logger)
 	require.Nil(t, err)
 
 	// test new swarm in unsupport mode
 	nodeKeys, privKeys, config, _ = genKeysAndConfig(t, 2, "")
 
-	_, err = New(config, nodeKeys[0], privKeys[0], 0, logger)
+	_, err = New(config, portMap, nodeKeys[0], privKeys[0], 0, logger)
 	require.NotNil(t, err)
 }
 
@@ -46,12 +58,12 @@ func TestSwarm_Start(t *testing.T) {
 	logger := log.NewWithModule("swarm")
 	nodeKeys, privKeys, config, _ := genKeysAndConfig(t, 2, repo.DirectMode)
 
-	swarm1, err := New(config, nodeKeys[0], privKeys[0], 0, logger)
+	swarm1, err := New(config, portMap, nodeKeys[0], privKeys[0], 0, logger)
 	require.Nil(t, err)
 
 	go swarm1.Start()
 
-	swarm2, err := New(config, nodeKeys[1], privKeys[1], 0, logger)
+	swarm2, err := New(config, portMap, nodeKeys[1], privKeys[1], 0, logger)
 	require.Nil(t, err)
 
 	go swarm2.Start()
@@ -83,7 +95,7 @@ func TestSwarm_AsyncSend(t *testing.T) {
 	addr, err := AddrToPeerInfo(mockMultiAddr)
 	require.Nil(t, err)
 
-	mockSwarm.connectedPeers.Store(mockId, addr)
+	mockSwarm.connectedPeers.Store(mockId, newSidercar(addr, mockSwarm))
 
 	err = mockSwarm.AsyncSend(mockId, mockMsg)
 	require.Nil(t, err)
@@ -100,7 +112,7 @@ func TestSwarm_Send(t *testing.T) {
 	addr, err := AddrToPeerInfo(mockMultiAddr)
 	require.Nil(t, err)
 
-	mockSwarm.connectedPeers.Store(mockId, addr)
+	mockSwarm.connectedPeers.Store(mockId, newSidercar(addr, mockSwarm))
 
 	_, err = mockSwarm.Send(mockId, mockMsg)
 	require.Nil(t, err)
@@ -211,16 +223,10 @@ func TestSwarm_Provider(t *testing.T) {
 	require.Nil(t, err)
 }
 
-func TestSwarm_ConnectedPeerIDs(t *testing.T) {
-	_, _, mockSwarm, _, _, _ := prepare(t)
-	ids := mockSwarm.ConnectedPeerIDs()
-	require.NotNil(t, ids)
-}
-
 func prepare(t *testing.T) (*Swarm, []string, *Swarm, port.Message, string, string) {
 	nodeKeys, privKeys, config, ids := genKeysAndConfig(t, 2, repo.DirectMode)
 
-	swarm, err := New(config, nodeKeys[0], privKeys[0], 0, log.NewWithModule("swarm"))
+	swarm, err := New(config, portMap, nodeKeys[0], privKeys[0], 0, log.NewWithModule("swarm"))
 	require.Nil(t, err)
 
 	mockMsg := &pb.Message{Type: pb.Message_APPCHAIN_REGISTER}
@@ -265,7 +271,6 @@ func genKeysAndConfig(t *testing.T, peerCnt int, mode string) ([]crypto.PrivateK
 	}
 
 	config := &repo.Config{}
-	config.Mode.Type = mode
 	return nodeKeys, privKeys, config, ids
 }
 

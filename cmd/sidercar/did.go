@@ -180,7 +180,7 @@ func initClientWithKeyPath(ctx *cli.Context, chainAdminKeyPath string) (rpcx.Cli
 		return nil, nil, err
 	}
 
-	client, err := loadClient(chainAdminKeyPath, config.Mode.Relay.Addrs, ctx)
+	client, err := loadClient(chainAdminKeyPath, config.Peer.Peers, ctx)
 	if err != nil {
 		return nil, nil, fmt.Errorf("load client: %w", err)
 	}

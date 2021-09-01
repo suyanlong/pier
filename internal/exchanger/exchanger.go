@@ -101,20 +101,20 @@ func (ex *Exchanger) startWithDirectMode() error {
 		return fmt.Errorf("register on connection handler: %w", err)
 	}
 
-	if err := ex.peerMgr.RegisterMsgHandler(peerMsg.Message_INTERCHAIN_META_GET, ex.handleGetInterchainMessage); err != nil {
+	if err := ex.peerMgr.RegisterMsgHandler(pb.Message_INTERCHAIN_META_GET, ex.handleGetInterchainMessage); err != nil {
 		return fmt.Errorf("register query interchain msg handler: %w", err)
 	}
 
 	// API调用
-	if err := ex.peerMgr.RegisterMsgHandler(peerMsg.Message_IBTP_SEND, ex.handleSendIBTPMessage); err != nil {
+	if err := ex.peerMgr.RegisterMsgHandler(pb.Message_IBTP_SEND, ex.handleSendIBTPMessage); err != nil {
 		return fmt.Errorf("register ibtp handler: %w", err)
 	}
 
-	if err := ex.peerMgr.RegisterMsgHandler(peerMsg.Message_IBTP_RECEIPT_SEND, ex.handleSendIBTPReceiptMessage); err != nil {
+	if err := ex.peerMgr.RegisterMsgHandler(pb.Message_IBTP_RECEIPT_SEND, ex.handleSendIBTPReceiptMessage); err != nil {
 		return fmt.Errorf("register ibtp handler: %w", err)
 	}
 
-	if err := ex.peerMgr.RegisterMsgHandler(peerMsg.Message_IBTP_GET, ex.handleGetIBTPMessage); err != nil {
+	if err := ex.peerMgr.RegisterMsgHandler(pb.Message_IBTP_GET, ex.handleGetIBTPMessage); err != nil {
 		return fmt.Errorf("register ibtp receipt handler: %w", err)
 	}
 
@@ -131,12 +131,6 @@ func (ex *Exchanger) startWithRelayMode() error {
 		return fmt.Errorf("register router handler: %w", err)
 	}
 
-	// syncer should be started first in case to recover ibtp from monitor
-	if err := ex.syncer.Start(); err != nil {
-		return fmt.Errorf("syncer start: %w", err)
-	}
-
-	// recover exchanger before relay any interchain msgs
 	return nil
 }
 
@@ -298,7 +292,7 @@ func (ex *Exchanger) queryIBTP(mode string, id, target string) (*pb.IBTP, bool, 
 		}
 	case repo.DirectMode:
 		// query ibtp from another sidercar
-		msg := pb.Message(peerMsg.Message_IBTP_GET, true, []byte(id))
+		msg := pb.Message(pb.Message_IBTP_GET, true, []byte(id))
 		result, err := ex.peerMgr.Send(target, msg)
 		if err != nil {
 			return nil, false, err
