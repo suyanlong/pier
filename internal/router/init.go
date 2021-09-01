@@ -73,7 +73,7 @@ func (r *router) OutPut(ibtp *pb.IBTP) chan *pb.IBTP {
 	panic("implement me")
 }
 
-// 路由method，路由规则集。
+// 路由规则集
 type RouteMethod interface {
 	Single()
 	Multicast()

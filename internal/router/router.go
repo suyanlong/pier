@@ -25,7 +25,6 @@ type Router interface {
 	//AddAppchains adds appchains to route map and broadcast them to union network
 	AddAppchains(appchains []*appchainmgr.Appchain) error
 
-	//异步返回
 	InPut(ibtp *pb.IBTP) chan *pb.IBTP
 	OutPut(ibtp *pb.IBTP) chan *pb.IBTP
 	//代替上面两个方法

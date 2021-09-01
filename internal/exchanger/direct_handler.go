@@ -3,49 +3,14 @@ package exchanger
 import (
 	"encoding/json"
 	"fmt"
-	"sync"
-	"time"
-
 	"github.com/Rican7/retry"
 	"github.com/Rican7/retry/strategy"
 	"github.com/link33/sidercar/internal/peermgr"
 	"github.com/link33/sidercar/internal/port"
 	"github.com/link33/sidercar/model/pb"
 	"github.com/sirupsen/logrus"
+	"time"
 )
-
-type Pool struct {
-	ibtps *sync.Map
-	ch    chan *pb.IBTPX
-}
-
-func NewPool() *Pool {
-	return &Pool{
-		ibtps: &sync.Map{},
-		ch:    make(chan *pb.IBTPX, 40960),
-	}
-}
-
-func (pool *Pool) feed(ibtp *pb.IBTPX) {
-	pool.ch <- ibtp
-}
-
-func (pool *Pool) put(ibtp *pb.IBTPX) {
-	pool.ibtps.Store(ibtp.Ibtp.Index, ibtp)
-}
-
-func (pool *Pool) delete(idx uint64) {
-	pool.ibtps.Delete(idx)
-}
-
-func (pool *Pool) get(index uint64) *pb.IBTPX {
-	ibtp, ok := pool.ibtps.Load(index)
-	if !ok {
-		return nil
-	}
-
-	return ibtp.(*pb.IBTPX)
-}
 
 func (ex *Exchanger) feedIBTP(wIbtp *pb.IBTPX) {
 	var pool *Pool
@@ -155,7 +120,7 @@ func (ex *Exchanger) feedReceipt(receipt *pb.IBTP) {
 
 func (ex *Exchanger) postHandleIBTP(from string, receipt *pb.IBTP) {
 	if receipt == nil {
-		retMsg := pb.Message(peerMsg.Message_IBTP_RECEIPT_SEND, true, nil)
+		retMsg := peermgr.Message(pb.Message_IBTP_RECEIPT_SEND, true, nil)
 		err := ex.peerMgr.AsyncSend(from, retMsg)
 		if err != nil {
 			ex.logger.Errorf("Send back empty ibtp receipt: %s", err.Error())
@@ -164,16 +129,16 @@ func (ex *Exchanger) postHandleIBTP(from string, receipt *pb.IBTP) {
 	}
 
 	data, _ := receipt.Marshal()
-	retMsg := pb.Message(peerMsg.Message_IBTP_RECEIPT_SEND, true, data)
+	retMsg := peermgr.Message(pb.Message_IBTP_RECEIPT_SEND, true, data)
 	if err := ex.peerMgr.AsyncSend(from, retMsg); err != nil {
 		ex.logger.Errorf("Send back ibtp receipt: %s", err.Error())
 	}
 }
 
 //直链模式
-func (ex *Exchanger) handleSendIBTPMessage(p port.Port, msg *peerMsg.Message) {
+func (ex *Exchanger) handleSendIBTPMessage(p port.Port, msg *pb.Message) {
 	ex.ch <- struct{}{}
-	go func(msg *peerMsg.Message) {
+	go func(msg *pb.Message) {
 		wIbtp := &pb.IBTPX{}
 		if err := json.Unmarshal(msg.Payload.Data, wIbtp); err != nil {
 			ex.logger.Errorf("Unmarshal ibtp: %s", err.Error())
@@ -191,7 +156,7 @@ func (ex *Exchanger) handleSendIBTPMessage(p port.Port, msg *peerMsg.Message) {
 }
 
 //直链模式
-func (ex *Exchanger) handleSendIBTPReceiptMessage(p port.Port, msg *peerMsg.Message) {
+func (ex *Exchanger) handleSendIBTPReceiptMessage(p port.Port, msg *pb.Message) {
 	if msg.Payload.Data == nil {
 		return
 	}
@@ -219,7 +184,7 @@ func (ex *Exchanger) handleSendIBTPReceiptMessage(p port.Port, msg *peerMsg.Mess
 }
 
 // 直连
-func (ex *Exchanger) handleGetIBTPMessage(p port.Port, msg *peerMsg.Message) {
+func (ex *Exchanger) handleGetIBTPMessage(p port.Port, msg *pb.Message) {
 	ibtpID := string(msg.Payload.Data)
 	ibtp, err := ex.mnt.QueryIBTP(ibtpID)
 	if err != nil {
@@ -232,7 +197,7 @@ func (ex *Exchanger) handleGetIBTPMessage(p port.Port, msg *peerMsg.Message) {
 		return
 	}
 
-	retMsg := pb.Message(peerMsg.Message_ACK, true, data)
+	retMsg := peermgr.Message(pb.Message_ACK, true, data)
 
 	err = ex.peerMgr.AsyncSendWithPort(p, retMsg)
 	if err != nil {
@@ -243,7 +208,7 @@ func (ex *Exchanger) handleGetIBTPMessage(p port.Port, msg *peerMsg.Message) {
 // 直连
 func (ex *Exchanger) handleNewConnection(dstSidercarID string) {
 	appchainMethod := []byte(ex.appchainDID)
-	msg := pb.Message(peerMsg.Message_INTERCHAIN_META_GET, true, appchainMethod)
+	msg := peermgr.Message(pb.Message_INTERCHAIN_META_GET, true, appchainMethod)
 
 	indices := &struct {
 		InterchainIndex uint64 `json:"interchain_index"`
@@ -275,7 +240,7 @@ func (ex *Exchanger) handleNewConnection(dstSidercarID string) {
 }
 
 //直链模式
-func (ex *Exchanger) handleGetInterchainMessage(p port.Port, msg *peerMsg.Message) {
+func (ex *Exchanger) handleGetInterchainMessage(p port.Port, msg *pb.Message) {
 	mntMeta := ex.mnt.QueryOuterMeta()
 	execMeta := ex.exec.QueryInterchainMeta()
 
@@ -299,7 +264,7 @@ func (ex *Exchanger) handleGetInterchainMessage(p port.Port, msg *peerMsg.Messag
 		panic(err)
 	}
 
-	retMsg := pb.Message(peerMsg.Message_ACK, true, data)
+	retMsg := peermgr.Message(pb.Message_ACK, true, data)
 	if err := ex.peerMgr.AsyncSendWithPort(p, retMsg); err != nil {
 		ex.logger.Error(err)
 		return

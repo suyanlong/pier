@@ -10,13 +10,11 @@ const (
 	ApiServer   = "api_server"
 	App         = "app"
 	AppchainMgr = "appchain_mgr"
-	Lite33      = "lite33"
 	Executor    = "executor"
 	Exchanger   = "exchanger"
 	Monitor     = "monitor"
 	PeerMgr     = "peer_mgr"
 	Router      = "router"
-	RuleMgr     = "rule_mgr"
 	Swarm       = "swarm"
 	Syncer      = "syncer"
 	Manger      = "manger"
@@ -36,8 +34,6 @@ func InitializeLogger(config *repo.Config) {
 	m[App].Logger.SetLevel(log.ParseLevel(config.Log.Level))
 	m[AppchainMgr] = log.NewWithModule(AppchainMgr)
 	m[AppchainMgr].Logger.SetLevel(log.ParseLevel(config.Log.Module.AppchainMgr))
-	m[Lite33] = log.NewWithModule(Lite33)
-	m[Lite33].Logger.SetLevel(log.ParseLevel(config.Log.Module.Lite33))
 	m[Exchanger] = log.NewWithModule(Exchanger)
 	m[Exchanger].Logger.SetLevel(log.ParseLevel(config.Log.Module.Exchanger))
 	m[Executor] = log.NewWithModule(Executor)

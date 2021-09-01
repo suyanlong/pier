@@ -65,10 +65,3 @@ type Client interface { //业务实现委托接口。需要实现的那有些。
 	// ID
 	ID() string
 }
-
-//type ClientX interface {
-//	Client
-//
-//	ID() string
-//	Send(ibtp *pb.IBTP) error
-//}

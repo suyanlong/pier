@@ -1,5 +1,5 @@
 # use : docker build --build-arg PLUGIN_URL=https://github.com/link33/sidercar-client-fabric --build-arg PLUGIN_VERSION=v1.0.0-rc2 -t sidercar:1.0.0 .
-FROM golang:1.14.2 as builder
+FROM golang:1.17 as builder
 
 RUN mkdir -p /go/src/github.com/link33/sidercar
 WORKDIR /go/src/github.com/link33/sidercar

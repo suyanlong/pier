@@ -25,19 +25,12 @@ import (
 // Sidercar represents the necessary data for starting the sidercar app
 type Sidercar struct {
 	privateKey crypto.PrivateKey
-	//plugin     plugins.Client  //Client defines the interface that interacts with appchain 交互接口
-	//grpcPlugin *plugin.Client  //plugin 管理接口。可以定义到plugin里面
-	//monitor    monitor.Monitor //Monitor receives event from blockchain and sends it to network ：AppchainMonitor
-	//Syncer 与 bithub交互的接口机制。
-	//exec executor.Executor //represents the necessary data for executing interchain txs in appchain：与appchain链交互执行的接口
-	storage storage.Storage // 存储
-	//appchain   *appchainmgr.Appchain //appchain管理机制
-	//exchanger internal.Launcher //主动交换，sidercar的核心动力引擎。
-	ctx    context.Context
-	cancel context.CancelFunc
-	config *repo.Config
-	logger logrus.FieldLogger
-	manger internal.Launcher
+	storage    storage.Storage
+	ctx        context.Context
+	cancel     context.CancelFunc
+	config     *repo.Config
+	logger     logrus.FieldLogger
+	manger     internal.Launcher
 }
 
 // NewSidercar instantiates sidercar instance.
@@ -54,10 +47,7 @@ func NewSidercar(repoRoot string, config *repo.Config) (internal.Launcher, error
 	var (
 	//ck          checker.Checker
 	//cryptor     txcrypto.Cryptor
-	//ex internal.Launcher
-	//sync        syncer.Syncer
 	//apiServer   *api.Server
-	//peerManager peermgr.PeerManager
 	)
 	portMap := port.NewPortMap()
 	pm, err := peermgr.New(config, portMap, nodePrivKey, privateKey, 1, loggers.Logger(loggers.PeerMgr))

@@ -49,9 +49,7 @@ func New(typ, appchainDID string, meta *pb.Interchain, opts ...Option) (*Exchang
 	ctx, cancel := context.WithCancel(context.Background())
 	return &Exchanger{
 		checker:     config.checker,
-		exec:        config.exec,
 		apiServer:   config.apiServer,
-		mnt:         config.mnt,
 		peerMgr:     config.peerMgr,
 		syncer:      config.syncer,
 		store:       config.store,
@@ -240,7 +238,7 @@ func (ex *Exchanger) sendIBTP(ibtp *pb.IBTP) error {
 			if err != nil {
 				panic(fmt.Sprintf("marshal ibtp: %s", err.Error()))
 			}
-			msg := pb.Message(peerMsg.Message_IBTP_SEND, true, data)
+			msg := pb.Message(pb.Message_IBTP_SEND, true, data)
 			var dst string
 			if ibtp.Type == pb.IBTP_INTERCHAIN {
 				dst = ibtp.To

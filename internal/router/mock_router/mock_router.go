@@ -77,8 +77,36 @@ func (mr *MockRouterMockRecorder) ExistAppchain(id interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExistAppchain", reflect.TypeOf((*MockRouter)(nil).ExistAppchain), id)
 }
 
+// InPut mocks base method.
+func (m *MockRouter) InPut(ibtp *pb.IBTP) chan *pb.IBTP {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "InPut", ibtp)
+	ret0, _ := ret[0].(chan *pb.IBTP)
+	return ret0
+}
+
+// InPut indicates an expected call of InPut.
+func (mr *MockRouterMockRecorder) InPut(ibtp interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InPut", reflect.TypeOf((*MockRouter)(nil).InPut), ibtp)
+}
+
+// OutPut mocks base method.
+func (m *MockRouter) OutPut(ibtp *pb.IBTP) chan *pb.IBTP {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "OutPut", ibtp)
+	ret0, _ := ret[0].(chan *pb.IBTP)
+	return ret0
+}
+
+// OutPut indicates an expected call of OutPut.
+func (mr *MockRouterMockRecorder) OutPut(ibtp interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "OutPut", reflect.TypeOf((*MockRouter)(nil).OutPut), ibtp)
+}
+
 // Route mocks base method.
-func (m *MockRouter) Route(ibtp *pb.IBTP) error {
+func (m *MockRouter) Route(ibtp *pb.IBTPX) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Route", ibtp)
 	ret0, _ := ret[0].(error)

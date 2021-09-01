@@ -4,7 +4,7 @@ CURRENT_PATH = $(shell pwd)
 APP_NAME = sidercar
 
 # build with verison infos
-VERSION_DIR = github.com/meshplus/${APP_NAME}
+VERSION_DIR = github.com/link33/${APP_NAME}
 BUILD_DATE = $(shell date +%FT%T)
 GIT_COMMIT = $(shell git log --pretty=format:'%h' -n 1)
 GIT_BRANCH = $(shell git rev-parse --abbrev-ref HEAD)
@@ -97,6 +97,7 @@ release-binary:
 ## make linter: Run golanci-lint
 linter:
 	golangci-lint run
+	golangci-lint run -E goimports -E bodyclose --skip-dirs-use-default
 
 fmt:
 	go fmt ./...
@@ -128,10 +129,6 @@ grpc:
 	--swagger_out=logtostderr=true:. \
 	--gogofaster_out=plugins=grpc:. \
 	broker.proto plugin.proto
-
-## make linter: Run golanci-lint
-linter:
-	golangci-lint run -E goimports -E bodyclose --skip-dirs-use-default
 
 
 clean:

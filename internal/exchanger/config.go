@@ -3,8 +3,6 @@ package exchanger
 import (
 	"github.com/link33/sidercar/api"
 	"github.com/link33/sidercar/internal/checker"
-	"github.com/link33/sidercar/internal/executor"
-	"github.com/link33/sidercar/internal/monitor"
 	"github.com/link33/sidercar/internal/peermgr"
 	"github.com/link33/sidercar/internal/router"
 	"github.com/link33/sidercar/internal/syncer"
@@ -17,8 +15,6 @@ type Config struct {
 	store     storage.Storage
 	peerMgr   peermgr.PeerManager
 	router    router.Router
-	mnt       monitor.Monitor
-	exec      executor.Executor
 	syncer    syncer.Syncer
 	apiServer *api.Server
 	logger    logrus.FieldLogger
@@ -29,18 +25,6 @@ type Option func(*Config)
 func WithChecker(checker checker.Checker) Option {
 	return func(config *Config) {
 		config.checker = checker
-	}
-}
-
-func WithExecutor(exec executor.Executor) Option {
-	return func(config *Config) {
-		config.exec = exec
-	}
-}
-
-func WithMonitor(mnt monitor.Monitor) Option {
-	return func(config *Config) {
-		config.mnt = mnt
 	}
 }
 
